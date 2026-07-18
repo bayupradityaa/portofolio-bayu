@@ -18,16 +18,16 @@ export const profile = {
     "Informatics student building AI-driven, backend-solid, front-of-mind web products. I care about how software feels, not just what it does.",
   // Longer bio for the About section (kept to a comfortable reading width).
   bio: [
-    "I am an Informatics student and full stack engineer in the making, most at home where product thinking meets systems work. My days move between training small models, shaping resilient APIs, and pushing pixels until an interface feels inevitable.",
-    "What drives me is craft: the difference between a feature that works and one that feels considered. I build in public, learn in the open, and treat every project as a chance to raise my own bar.",
+    "Saya adalah mahasiswa Teknik Informatika di Universitas Gunadarma yang memiliki ketertarikan pada Full-Stack Development, Machine Learning, dan Graphic Design. Bagi saya, teknologi bukan hanya tentang menulis baris kode, tetapi tentang bagaimana desain, pengalaman pengguna, dan sistem backend dapat bekerja selaras untuk menciptakan produk digital yang bermanfaat. Saya menikmati proses mengubah ide menjadi solusi nyata melalui eksplorasi, eksperimen, dan pengembangan yang berkelanjutan.",
+    "Di luar dunia akademik, sejak tahun 2023 saya membangun dan mengelola CLT.Store, sebuah bisnis digital di bidang top-up dan joki game berbasis Instagram. Pengalaman tersebut membentuk cara saya memandang pengembangan perangkat lunak—tidak hanya dari sisi teknis, tetapi juga dari sudut pandang pengguna, operasional, dan pertumbuhan produk. Saya percaya bahwa software yang baik bukan hanya berjalan dengan benar, tetapi juga mampu memberikan pengalaman yang sederhana, efisien, dan bernilai bagi penggunanya.",
   ],
 };
 
 export const stats: Stat[] = [
-  { label: "Projects shipped", value: 18, suffix: "+" },
-  { label: "Public repositories", value: 42, suffix: "" },
-  { label: "Technologies in rotation", value: 25, suffix: "+" },
-  { label: "Coffee-fueled commits", value: 1400, suffix: "+" },
+  { label: "Business active since", value: 2023, suffix: "" },
+  { label: "Happy Gamers / Orders", value: 5000, suffix: "+" },
+  { label: "Technologies in rotation", value: 10, suffix: "+" },
+  { label: "Design assets crafted", value: 30, suffix: "+" },
 ];
 
 export const socials: SocialLink[] = [
