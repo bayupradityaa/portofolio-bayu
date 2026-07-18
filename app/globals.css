@@ -120,6 +120,16 @@
   will-change: opacity;
 }
 
+@media (min-width: 1024px) {
+  .hero-glow {
+    background: radial-gradient(
+      ellipse 50% 55% at 53% 50%,
+      color-mix(in oklab, var(--accent) 18%, transparent) 0%,
+      transparent 70%
+    );
+  }
+}
+
 /* Faint engineering grid */
 .hero-grid {
   position: absolute;

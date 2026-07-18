@@ -24,13 +24,9 @@ interface UseHeroTimelineProps {
   titleHelloRef: React.RefObject<HTMLSpanElement | null>;
   titleBayuRef: React.RefObject<HTMLSpanElement | null>;
   titlePradityaRef: React.RefObject<HTMLSpanElement | null>;
-  subtitleRef: React.RefObject<HTMLParagraphElement | null>;
+  subtitleRef: React.RefObject<HTMLDivElement | null>;
   descriptionRef: React.RefObject<HTMLParagraphElement | null>;
   button1Ref: React.RefObject<HTMLDivElement | null>;
-  button2Ref: React.RefObject<HTMLDivElement | null>;
-  indicatorRootRef: React.RefObject<HTMLDivElement | null>;
-  indicatorFillRef: React.RefObject<HTMLDivElement | null>;
-  stageNumberRef: React.RefObject<HTMLSpanElement | null>;
   renderFrame: (index: number) => void;
 }
 
@@ -45,10 +41,6 @@ export function useHeroTimeline({
   subtitleRef,
   descriptionRef,
   button1Ref,
-  button2Ref,
-  indicatorRootRef,
-  indicatorFillRef,
-  stageNumberRef,
   renderFrame,
 }: UseHeroTimelineProps) {
   const reduce = useReducedMotion();
@@ -69,10 +61,6 @@ export function useHeroTimeline({
     const subtitle = subtitleRef.current;
     const description = descriptionRef.current;
     const button1 = button1Ref.current;
-    const button2 = button2Ref.current;
-    const indicatorRoot = indicatorRootRef.current;
-    const indicatorFill = indicatorFillRef.current;
-    const stageNumber = stageNumberRef.current;
 
     // Strict guard checking that all DOM references are fully attached
     if (
@@ -85,11 +73,7 @@ export function useHeroTimeline({
       !titlePraditya ||
       !subtitle ||
       !description ||
-      !button1 ||
-      !button2 ||
-      !indicatorRoot ||
-      !indicatorFill ||
-      !stageNumber
+      !button1
     ) {
       return;
     }
@@ -114,10 +98,7 @@ export function useHeroTimeline({
       subtitle,
       descriptionContainer: description,
       descriptionWords,
-      buttonWraps: [button1, button2],
-      scrollIndicator: indicatorRoot,
-      scrollIndicatorFill: indicatorFill,
-      stageNumber,
+      buttonWraps: [button1],
       renderFrame,
     };
 
@@ -147,11 +128,6 @@ export function useHeroTimeline({
         const p = self.progress;
         setProgress(p);
 
-        // Update indicator fill height continuously directly in DOM
-        if (refs.scrollIndicatorFill) {
-          gsap.set(refs.scrollIndicatorFill, { scaleY: p });
-        }
-
         // Determine current stage & update text in DOM
         let currentStage = HeroStage.INTRO;
         let stageText = "01";
@@ -177,11 +153,6 @@ export function useHeroTimeline({
         }
 
         setStage(currentStage);
-
-        // Update stage number text directly in DOM to avoid React re-render lag
-        if (refs.stageNumber && refs.stageNumber.textContent !== stageText) {
-          refs.stageNumber.textContent = stageText;
-        }
 
         // Control idle breathing timeline
         if (currentStage === HeroStage.READY || currentStage === HeroStage.IDLE) {
@@ -225,10 +196,6 @@ export function useHeroTimeline({
     subtitleRef,
     descriptionRef,
     button1Ref,
-    button2Ref,
-    indicatorRootRef,
-    indicatorFillRef,
-    stageNumberRef,
     renderFrame,
   ]);
 

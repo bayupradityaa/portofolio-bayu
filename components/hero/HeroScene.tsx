@@ -2,6 +2,7 @@
 
 import { useRef, useCallback, useEffect } from "react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "motion/react";
 import { HeroProvider } from "./hero-context";
 import { HeroGrid } from "./hero-grid";
@@ -12,8 +13,9 @@ import { HeroTitle } from "./hero-title";
 import { HeroSubtitle } from "./hero-subtitle";
 import { HeroDescription } from "./hero-description";
 import { HeroButtons } from "./hero-buttons";
-import { HeroScrollIndicator } from "./hero-scroll-indicator";
 import { useHeroTimeline } from "./hooks/use-hero-timeline";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export function HeroScene() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -26,13 +28,9 @@ export function HeroScene() {
   const titleHelloRef = useRef<HTMLSpanElement>(null);
   const titleBayuRef = useRef<HTMLSpanElement>(null);
   const titlePradityaRef = useRef<HTMLSpanElement>(null);
-  const subtitleRef = useRef<HTMLParagraphElement>(null);
+  const subtitleRef = useRef<HTMLDivElement>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const button1Ref = useRef<HTMLDivElement>(null);
-  const button2Ref = useRef<HTMLDivElement>(null);
-  const indicatorRootRef = useRef<HTMLDivElement>(null);
-  const indicatorFillRef = useRef<HTMLDivElement>(null);
-  const stageNumberRef = useRef<HTMLSpanElement>(null);
 
   const reduce = useReducedMotion();
 
@@ -70,6 +68,30 @@ export function HeroScene() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [handleMouseMove]);
 
+  // Awwwards-level dynamic curved borders flattening on scroll
+  useEffect(() => {
+    if (reduce) return;
+
+    const content = document.getElementById("content-container");
+    if (!content) return;
+
+    const ctx = gsap.context(() => {
+      gsap.to(content, {
+        borderTopLeftRadius: 0,
+        borderTopRightRadius: 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: content,
+          start: "top bottom", // Starts flattening when top of About section slides up from bottom
+          end: "top top",      // Fully flat (0px radius) when content covers the screen
+          scrub: true,
+        },
+      });
+    });
+
+    return () => ctx.revert();
+  }, [reduce]);
+
   const renderFrame = useCallback((index: number) => {
     if (sequenceRef.current) {
       sequenceRef.current.renderFrame(index);
@@ -88,10 +110,6 @@ export function HeroScene() {
     subtitleRef,
     descriptionRef,
     button1Ref,
-    button2Ref,
-    indicatorRootRef,
-    indicatorFillRef,
-    stageNumberRef,
     renderFrame,
   });
 
@@ -99,7 +117,7 @@ export function HeroScene() {
     <HeroProvider value={{ stage }}>
       <section ref={sectionRef} id="hero" className="relative h-[500vh]">
         <div
-          className="sticky top-0 h-[100dvh] overflow-hidden"
+          className="sticky top-0 h-[100dvh] overflow-hidden z-10"
           style={{ background: "var(--background)" }}
         >
           {/* Faint static grid overlay */}
@@ -126,15 +144,8 @@ export function HeroScene() {
             />
             <HeroSubtitle ref={subtitleRef} />
             <HeroDescription ref={descriptionRef} />
-            <HeroButtons button1Ref={button1Ref} button2Ref={button2Ref} />
+            <HeroButtons button1Ref={button1Ref} />
           </div>
-
-          {/* Progress Scroll Indicator */}
-          <HeroScrollIndicator
-            indicatorRootRef={indicatorRootRef}
-            indicatorFillRef={indicatorFillRef}
-            stageNumberRef={stageNumberRef}
-          />
         </div>
       </section>
     </HeroProvider>

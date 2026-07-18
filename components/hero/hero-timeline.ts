@@ -19,9 +19,6 @@ export interface HeroRefs {
   descriptionContainer: HTMLElement;
   descriptionWords: Element[];
   buttonWraps: Element[];
-  scrollIndicator: HTMLDivElement;
-  scrollIndicatorFill: HTMLDivElement;
-  stageNumber: HTMLElement;
   renderFrame: (index: number) => void;
 }
 
@@ -48,9 +45,6 @@ export function setHeroInitialStates(refs: HeroRefs): void {
   gsap.set(refs.buttonWraps, { opacity: 0, y: 30, scale: 0.95 });
   // Glow — invisible and small
   gsap.set(refs.glow, { opacity: 0, scale: 0.6 });
-  // Scroll indicator — hidden
-  gsap.set(refs.scrollIndicator, { opacity: 0 });
-  gsap.set(refs.scrollIndicatorFill, { scaleY: 0, transformOrigin: "top" });
 }
 
 /**
@@ -89,7 +83,6 @@ export function setHeroFinalStates(refs: HeroRefs): void {
  *   37%–44%   Subtitle blur→clear + y
  *   44%–58%   Description word stagger
  *   58%–68%   Buttons opacity+y+scale
- *   72%–80%   Scroll indicator fade in
  *   92%–100%  Content + canvas fade out
  */
 export function createHeroTimeline(refs: HeroRefs): gsap.core.Timeline {
@@ -118,70 +111,63 @@ export function createHeroTimeline(refs: HeroRefs): gsap.core.Timeline {
     0.1,
   );
 
-  // ── Title word masks: sequential reveal ───────────────────────
+  // ── Title word masks: sequential overlapping reveal ───────────
   tl.to(
     refs.titleHello,
-    { yPercent: 0, duration: 0.05, ease: "power3.out" },
-    0.2,
+    { yPercent: 0, duration: 0.09, ease: "power3.out" },
+    0.18,
   );
   tl.to(
     refs.titleBayu,
-    { yPercent: 0, duration: 0.05, ease: "power3.out" },
-    0.26,
+    { yPercent: 0, duration: 0.09, ease: "power3.out" },
+    0.22,
   );
   tl.to(
     refs.titlePraditya,
-    { yPercent: 0, duration: 0.05, ease: "power3.out" },
-    0.32,
+    { yPercent: 0, duration: 0.09, ease: "power3.out" },
+    0.26,
   );
 
-  // ── Subtitle: blur(20px→0) + y(20→0) at 37%–44% ─────────────
+  // ── Subtitle: blur(20px→0) + y(20→0) at 30%–40% ─────────────
   tl.to(
     refs.subtitle,
     {
       opacity: 1,
       y: 0,
       filter: "blur(0px)",
-      duration: 0.07,
-      ease: "power2.out",
+      duration: 0.10,
+      ease: "power3.out",
     },
-    0.37,
+    0.30,
   );
 
-  // ── Description: word stagger at 44%–58% ──────────────────────
+  // ── Description: word stagger at 36%–48% ──────────────────────
   if (refs.descriptionWords.length > 0) {
     tl.to(
       refs.descriptionWords,
       {
         opacity: 1,
         y: 0,
-        duration: 0.02,
-        stagger: 0.004,
-        ease: "power2.out",
+        duration: 0.05,
+        stagger: 0.006,
+        ease: "power3.out",
       },
-      0.44,
+      0.36,
     );
   }
 
-  // ── Buttons: opacity + y + scale at 58%–68% ──────────────────
+  // ── Buttons: opacity + y + scale at 46%–56% ──────────────────
   tl.to(
     refs.buttonWraps,
     {
       opacity: 1,
       y: 0,
       scale: 1,
-      duration: 0.06,
+      duration: 0.10,
       stagger: 0.025,
-      ease: "power2.out",
+      ease: "power3.out",
     },
-    0.58,
-  );
-
-  // ── Scroll indicator: fade in at 72%–80% ──────────────────────
-  tl.to(
-    refs.scrollIndicator,
-    { opacity: 1, duration: 0.08, ease: "power1.out" },
-    0.72,
+    0.46,
   );
 
   // ── Fade out: 92%–100% ────────────────────────────────────────
@@ -190,15 +176,18 @@ export function createHeroTimeline(refs: HeroRefs): gsap.core.Timeline {
     { opacity: 0, y: -40, duration: 0.06, ease: "power2.in" },
     0.92,
   );
+
+  // ── Perspective Push Back: 90%–100% ──────────────────────────
   tl.to(
     refs.parallaxCanvas,
-    { opacity: 0, duration: 0.08, ease: "power1.in" },
-    0.92,
-  );
-  tl.to(
-    refs.scrollIndicator,
-    { opacity: 0, duration: 0.05, ease: "power1.in" },
-    0.93,
+    {
+      scale: 0.92,
+      opacity: 0.4,
+      filter: "blur(6px)",
+      duration: 0.10,
+      ease: "power2.inOut",
+    },
+    0.90,
   );
 
   return tl;

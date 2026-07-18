@@ -19,7 +19,7 @@ export const HeroSequence = forwardRef<HeroSequenceHandle>(
     useImperativeHandle(ref, () => ({ renderFrame }));
 
     return (
-      <div ref={wrapRef} className="absolute inset-0 overflow-hidden bg-surface">
+      <div ref={wrapRef} className="absolute inset-0 overflow-hidden" style={{ background: "var(--background)" }}>
         <canvas
           ref={canvasRef}
           className="h-full w-full"

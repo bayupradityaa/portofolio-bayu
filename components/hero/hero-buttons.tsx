@@ -7,30 +7,18 @@ import { profile } from "@/lib/data/profile";
 
 interface HeroButtonsProps {
   button1Ref: React.RefObject<HTMLDivElement | null>;
-  button2Ref: React.RefObject<HTMLDivElement | null>;
 }
 
 /**
  * CTA buttons with magnetic hover. Exposes wrapper refs directly as props.
  */
-export function HeroButtons({ button1Ref, button2Ref }: HeroButtonsProps) {
+export function HeroButtons({ button1Ref }: HeroButtonsProps) {
   return (
     <div className="mt-9 flex flex-wrap items-center gap-3">
       <div ref={button1Ref} style={{ opacity: 0 }}>
         <MagneticLink href="#work" className={`${btnBase} ${btnPrimary}`}>
           View Projects
           <ArrowUpRight size={18} strokeWidth={2} />
-        </MagneticLink>
-      </div>
-      <div ref={button2Ref} style={{ opacity: 0 }}>
-        <MagneticLink
-          href={`https://github.com/${profile.githubUser}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`${btnBase} ${btnSecondary}`}
-        >
-          <GithubIcon size={18} />
-          GitHub
         </MagneticLink>
       </div>
     </div>

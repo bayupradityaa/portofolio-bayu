@@ -17,13 +17,18 @@ export default function Home() {
       <Nav />
       <main id="main" className="flex-1">
         <Hero />
-        <About />
-        <TechStack />
-        <Projects />
-        <GitHubActivity />
-        <Journey />
-        <Certificates />
-        <Contact />
+        <div
+          id="content-container"
+          className="relative z-20 bg-background rounded-t-[40px] md:rounded-t-[100px] overflow-hidden shadow-[0_-20px_50px_rgba(0,0,0,0.5)]"
+        >
+          <About />
+          <TechStack />
+          <Projects />
+          <GitHubActivity />
+          <Journey />
+          <Certificates />
+          <Contact />
+        </div>
       </main>
       <Footer />
     </>

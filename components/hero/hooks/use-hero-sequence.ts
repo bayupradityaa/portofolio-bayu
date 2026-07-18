@@ -26,21 +26,68 @@ export function useHeroSequence() {
 
     const cw = canvas.width;
     const ch = canvas.height;
-    // Scale up (1.12x) to provide enough padding for a larger vertical shift without blank gaps
-    const scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight) * 1.12;
-    const dw = img.naturalWidth * scale;
-    const dh = img.naturalHeight * scale;
+    
+    const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
+    
+    let scale: number;
+    let dw: number;
+    let dh: number;
+    let x: number;
+    let y: number;
 
-    const baseOffset = (ch - dh) / 2;
-    const dpr = window.devicePixelRatio || 1;
-    // Shift down by 85px to clear the top navigation pill fully
-    const shiftDown = 85 * dpr;
+    if (isDesktop) {
+      // On desktop: scale based on height to prevent cropping hair & hands vertically.
+      // Scale factor 1.01 ensures the image fully covers the vertical canvas without any gaps at the top/bottom.
+      const scaleFactor = 1.01;
+      scale = (ch / img.naturalHeight) * scaleFactor;
+      dw = img.naturalWidth * scale;
+      dh = img.naturalHeight * scale;
 
-    // Clamp vertical offset between maximum bottom boundary (ch - dh) and top boundary (0)
-    const y = Math.min(0, Math.max(ch - dh, baseOffset + shiftDown));
-    const x = (cw - dw) / 2;
+      // Center vertically on the canvas
+      y = (ch - dh) / 2;
 
+      // Align to the right side of the canvas
+      x = cw - dw;
+    } else {
+      // On mobile: keep standard cover scaling
+      const scaleFactor = 1.12;
+      scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight) * scaleFactor;
+      dw = img.naturalWidth * scale;
+      dh = img.naturalHeight * scale;
+
+      const baseOffset = (ch - dh) / 2;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const shiftDown = 85 * dpr;
+
+      y = Math.min(0, Math.max(ch - dh, baseOffset + shiftDown));
+      x = (cw - dw) / 2;
+    }
+
+    // Force high-quality image smoothing (resets on canvas resize)
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+
+    // 1. If we are on desktop and have a gap on the left (x > 0),
+    // fill the gap with the background color (#09090b) to prevent canvas edge glitches.
+    if (isDesktop && x > 0) {
+      ctx.fillStyle = "#09090b";
+      ctx.fillRect(0, 0, x + 1, ch);
+    }
+
+    // 2. Draw the main image
     ctx.drawImage(img, x, y, dw, dh);
+
+    // 3. Smoothly blend the left edge of the image with the background color
+    // using an overlay linear gradient to match the dark text background.
+    if (isDesktop && x > 0) {
+      const blendWidth = 300; // Width of the smooth transition zone in pixels
+      const grad = ctx.createLinearGradient(x, 0, x + blendWidth, 0);
+      grad.addColorStop(0, "#09090b");
+      grad.addColorStop(1, "rgba(9, 9, 11, 0)");
+
+      ctx.fillStyle = grad;
+      ctx.fillRect(x - 1, 0, blendWidth + 1, ch);
+    }
   }, []);
 
   useEffect(() => {
