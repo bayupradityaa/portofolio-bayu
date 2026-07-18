@@ -1,26 +1,210 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------ */
+/*  Design tokens — dark theme, locked page-wide. Single green accent. */
+/* ------------------------------------------------------------------ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #09090b;
+  --surface: #111113;
+  --card: #18181b;
+  --border: #27272a;
+  --foreground: #fafafa;
+  --secondary: #a1a1aa;
+  --muted: #71717a;
+  --accent: #22c55e;
+  --accent-hover: #4ade80;
+  --accent-contrast: #04120a;
+
+  --radius: 0.75rem;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-border: var(--border);
   --color-foreground: var(--foreground);
+  --color-secondary: var(--secondary);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-contrast: var(--accent-contrast);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 0.25rem);
+  --radius-2xl: calc(var(--radius) + 0.75rem);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: auto; /* Lenis owns smooth scroll */
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "ss01", "cv01";
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--accent) 28%, transparent);
+    color: var(--foreground);
+  }
+
+  /* Visible, on-brand keyboard focus everywhere */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  h1, h2, h3, h4 {
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .text-display {
+    font-size: clamp(2.75rem, 7vw, 6rem);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+  }
+
+  /* Fine top hairline separates sections without heavy borders */
+  .hairline-t {
+    border-top: 1px solid var(--border);
+  }
+
+  /* Subtle background grid, only where it organizes real content */
+  .grid-faint {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--border) 55%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--border) 55%, transparent) 1px, transparent 1px);
+    background-size: 72px 72px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 0%, transparent 78%);
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 0%, transparent 78%);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Hero — cinematic scroll experience                                */
+/* ------------------------------------------------------------------ */
+
+/* Soft radial green glow behind portrait */
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 50% 55% at 50% 45%,
+    color-mix(in oklab, var(--accent) 18%, transparent) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  will-change: opacity;
+}
+
+/* Faint engineering grid */
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--border) 40%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--border) 40%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 0%, transparent 80%);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 0%, transparent 80%);
+}
+
+/* Word mask container for SplitType reveals */
+.word-mask {
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.word-mask .word {
+  display: inline-block;
+  will-change: transform;
+  opacity: 0;
+}
+
+/* Scroll progress indicator */
+.scroll-indicator {
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 10;
+}
+
+.scroll-indicator__track {
+  width: 1px;
+  height: 80px;
+  background: color-mix(in oklab, var(--muted) 30%, transparent);
+  position: relative;
+  overflow: hidden;
+}
+
+.scroll-indicator__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  background: var(--accent);
+  transition: height 0.1s linear;
+  will-change: height;
+}
+
+.scroll-indicator__number {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------------ */
+
+/* Fixed film grain lives on a pointer-events-none overlay only */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
