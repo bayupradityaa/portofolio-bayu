@@ -13,10 +13,11 @@ export type TechItem = {
 export type TechGroup = {
   id: string;
   title: string;
-  blurb: string;
+  description: string;
   items: TechItem[];
+  capability: string;
   /** Grid span hint for the bento layout. */
-  span: "sm" | "md" | "lg";
+  span: "sm" | "lg";
   accent?: boolean;
 };
 

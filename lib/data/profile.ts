@@ -32,7 +32,7 @@ export const stats: Stat[] = [
 
 export const socials: SocialLink[] = [
   { label: "GitHub", href: "https://github.com/bayupradityaa", handle: "@bayupradityaa" },
-  { label: "LinkedIn", href: "https://linkedin.com", handle: "LinkedIn" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/bayupradityaa/", handle: "bayupradityaa" },
   { label: "Instagram", href: "https://www.instagram.com/bayuupradityaa", handle: "@bayuupradityaa" },
   { label: "Email", href: "mailto:bayuupraditya@gmail.com", handle: "bayuupraditya@gmail.com" },
 ];

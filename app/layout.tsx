@@ -4,6 +4,8 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { siteConfig } from "@/lib/data/site";
+import { TabTitleAnimator } from "@/components/shell/tab-title-animator";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -63,6 +65,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">
+        <TabTitleAnimator />
         <a
           href="#work"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[110] focus:rounded-md focus:bg-card focus:px-4 focus:py-2 focus:text-sm focus:outline-2 focus:outline-accent"
