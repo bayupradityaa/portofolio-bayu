@@ -3,7 +3,6 @@
 import { useCallback, useRef } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { GithubIcon } from "@/components/ui/brand-icons";
-import { profile } from "@/lib/data/profile";
 
 interface HeroButtonsProps {
   button1Ref: React.RefObject<HTMLDivElement | null>;

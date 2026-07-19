@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea, Label, FieldError } from "@/components/ui/field";
-import { contactSchema, type ContactInput } from "@/lib/contact-schema";
+import { contactSchema, type ContactFormValues } from "@/lib/schemas/contact";
 
 export function ContactForm() {
   const {
@@ -14,12 +14,12 @@ export function ContactForm() {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<ContactInput>({
+  } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
     mode: "onBlur",
   });
 
-  async function onSubmit(values: ContactInput) {
+  async function onSubmit(values: ContactFormValues) {
     try {
       const res = await fetch("/api/contact", {
         method: "POST",

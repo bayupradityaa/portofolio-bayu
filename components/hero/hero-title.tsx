@@ -4,13 +4,18 @@ interface HeroTitleProps {
   helloRef: React.RefObject<HTMLSpanElement | null>;
   bayuRef: React.RefObject<HTMLSpanElement | null>;
   pradityaRef: React.RefObject<HTMLSpanElement | null>;
+  name?: string;
 }
 
 /**
  * Hero title with word-mask structure for editorial reveal.
  * Direct props ref passing avoids any useImperativeHandle race conditions.
  */
-export function HeroTitle({ helloRef, bayuRef, pradityaRef }: HeroTitleProps) {
+export function HeroTitle({ helloRef, bayuRef, pradityaRef, name = "Bayu Praditya" }: HeroTitleProps) {
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0] || "";
+  const last = parts.slice(1).join(" ") || "";
+
   return (
     <div>
       <p
@@ -29,15 +34,19 @@ export function HeroTitle({ helloRef, bayuRef, pradityaRef }: HeroTitleProps) {
       >
         <span className="word-mask">
           <span ref={bayuRef} className="word">
-            Bayu
+            {first}
           </span>
         </span>
-        <br />
-        <span className="word-mask">
-          <span ref={pradityaRef} className="word">
-            Praditya
-          </span>
-        </span>
+        {last && (
+          <>
+            <br />
+            <span className="word-mask">
+              <span ref={pradityaRef} className="word">
+                {last}
+              </span>
+            </span>
+          </>
+        )}
       </h1>
     </div>
   );

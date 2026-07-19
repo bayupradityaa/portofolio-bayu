@@ -2,12 +2,14 @@ import { ArrowUpRight, GitBranch, Star } from "lucide-react";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { Reveal } from "@/components/motion/reveal";
 import { getGitHubActivity } from "@/lib/github";
-import { profile } from "@/lib/data/profile";
+import { getProfileSettings } from "@/lib/actions/settings";
 import { GithubCalendar } from "./github-calendar";
 
 /** Server Component: fetches (and caches) public GitHub data at build/revalidate. */
 export async function GitHubActivity() {
-  const activity = await getGitHubActivity();
+  const settings = await getProfileSettings();
+  const githubUser = settings?.github ? settings.github.trim().split("/").pop() || "bayupradityaa" : "bayupradityaa";
+  const activity = await getGitHubActivity(githubUser);
 
   return (
     <Section id="github">
@@ -25,12 +27,12 @@ export async function GitHubActivity() {
                 {activity.totalContributions.toLocaleString("en-US")}
               </h3>
               <a
-                href={`https://github.com/${profile.githubUser}`}
+                href={`https://github.com/${githubUser}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-sm text-secondary transition-colors hover:text-foreground"
               >
-                @{profile.githubUser}
+                @{githubUser}
                 <ArrowUpRight size={14} strokeWidth={1.5} />
               </a>
             </div>
@@ -40,7 +42,7 @@ export async function GitHubActivity() {
 
             <div className="mt-6 flex-1">
               <GithubCalendar
-                username={profile.githubUser}
+                username={githubUser}
                 weeksProp={activity.weeks}
                 showStats={false}
                 className="border-none p-0 bg-transparent"
@@ -112,7 +114,7 @@ export async function GitHubActivity() {
 
       {activity.isPlaceholder && (
         <p className="mt-6 text-xs text-muted">
-          Showing sample data. Set a real GitHub username in lib/data/profile.ts
+          Showing sample data. Set a real GitHub URL in the Admin Settings Panel
           to pull live activity.
         </p>
       )}

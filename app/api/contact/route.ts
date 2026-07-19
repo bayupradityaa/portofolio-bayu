@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { contactSchema } from "@/lib/contact-schema";
+import { contactSchema } from "@/lib/schemas/contact";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
 export const runtime = "nodejs";

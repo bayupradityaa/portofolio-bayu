@@ -9,8 +9,12 @@ import { GitHubActivity } from "@/components/sections/github/github-activity";
 import { Journey } from "@/components/sections/journey";
 import { Certificates } from "@/components/sections/certificates";
 import { Contact } from "@/components/sections/contact";
+import { getPublishedTechnologies } from "@/lib/actions/technologies";
 
-export default function Home() {
+export default async function Home() {
+  const technologies = await getPublishedTechnologies();
+  const techNames = technologies.map((t) => t.name);
+
   return (
     <>
       <LoadingScreen />
@@ -22,9 +26,9 @@ export default function Home() {
           className="relative z-20 bg-background rounded-t-[40px] md:rounded-t-[100px] overflow-hidden shadow-[0_-20px_50px_rgba(0,0,0,0.5)]"
         >
           <About />
-          <TechStack />
-          <Projects />
+          <TechStack technologies={techNames} />
           <GitHubActivity />
+          <Projects />
           <Journey />
           <Certificates />
           <Contact />

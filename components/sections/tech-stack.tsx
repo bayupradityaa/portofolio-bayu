@@ -149,18 +149,21 @@ const logoTooltips: Record<string, string> = {
   Figma: "Vector design & prototyping",
 };
 
-export function TechStack() {
+export function TechStack({ technologies = [] }: { technologies?: string[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Balanced 2-Row Layout Configuration (Static and highly optimized)
-  const row1 = [
+  const defaultRow1 = [
     "React", "Next.js", "TypeScript", "Tailwind CSS", "GSAP", "Framer Motion", "Lenis",
     "Go", "Fiber", "Node.js", "Express", "REST API", "Python", "Flask"
   ];
-  const row2 = [
+  const defaultRow2 = [
     "PostgreSQL", "MySQL", "Firebase", "Supabase", "Cloudflare", "Docker",
     "Git", "GitHub", "GitHub Actions", "Postman", "VS Code", "Figma"
   ];
+
+  const row1 = technologies.length > 0 ? technologies.slice(0, Math.ceil(technologies.length / 2)) : defaultRow1;
+  const row2 = technologies.length > 0 ? technologies.slice(Math.ceil(technologies.length / 2)) : defaultRow2;
 
   // Custom mousemove handler to update a single CSS custom variable on the parent container
   const handleMouseMove = (e: React.MouseEvent) => {

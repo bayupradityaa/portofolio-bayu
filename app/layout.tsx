@@ -3,9 +3,8 @@ import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
-import { siteConfig } from "@/lib/data/site";
+import { getProfileSettings } from "@/lib/actions/settings";
 import { TabTitleAnimator } from "@/components/shell/tab-title-animator";
-
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,36 +21,44 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
-  title: {
-    default: siteConfig.title,
-    template: "%s — Bayu Praditya",
-  },
-  description: siteConfig.description,
-  keywords: [
-    "Bayu Praditya",
-    "software engineer",
-    "full stack developer",
-    "AI engineer",
-    "portfolio",
-  ],
-  authors: [{ name: "Bayu Praditya" }],
-  openGraph: {
-    type: "website",
-    url: siteConfig.url,
-    title: siteConfig.title,
-    description: siteConfig.description,
-    images: [{ url: siteConfig.ogImage, width: 1200, height: 630 }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: siteConfig.title,
-    description: siteConfig.description,
-    images: [siteConfig.ogImage],
-  },
-  robots: { index: true, follow: true },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getProfileSettings();
+  const title = settings?.seo_title || "Bayu Praditya — Full Stack Software Engineer";
+  const description = settings?.seo_description || "Portfolio of Bayu Praditya, a full stack software engineer working across AI, backend engineering, and modern frontend.";
+  const url = settings?.site_url || "https://bayupraditya.dev";
+  const ogImage = settings?.og_image || "/og-image.jpg";
+  const keywords = settings?.seo_keywords && settings.seo_keywords.length > 0 ? settings.seo_keywords : ["Bayu Praditya", "software engineer", "full stack developer", "AI engineer", "portfolio"];
+
+  return {
+    metadataBase: new URL(url),
+    title: {
+      default: title,
+      template: `%s — ${settings?.name || "Bayu Praditya"}`,
+    },
+    description,
+    keywords,
+    icons: {
+      icon: [{ url: "/fotobulat.webp", type: "image/webp" }],
+      shortcut: [{ url: "/fotobulat.webp", type: "image/webp" }],
+      apple: [{ url: "/fotobulat.webp", type: "image/webp" }],
+    },
+    authors: [{ name: settings?.name || "Bayu Praditya" }],
+    openGraph: {
+      type: "website",
+      url,
+      title,
+      description,
+      images: [{ url: ogImage, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
+    robots: { index: true, follow: true },
+  };
+}
 
 export default function RootLayout({
   children,

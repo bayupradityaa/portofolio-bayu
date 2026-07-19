@@ -1,9 +1,13 @@
 import { ArrowUpRight, BadgeCheck } from "lucide-react";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { Reveal } from "@/components/motion/reveal";
-import { certificates } from "@/lib/data/journey";
+import { getPublishedCertificates } from "@/lib/actions/certificates";
 
-export function Certificates() {
+export async function Certificates() {
+  const certificates = await getPublishedCertificates();
+
+  if (certificates.length === 0) return null;
+
   return (
     <Section id="certificates">
       <SectionHeading
@@ -13,13 +17,13 @@ export function Certificates() {
 
       <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {certificates.map((cert, i) => {
-          const Wrapper = cert.credentialUrl ? "a" : "div";
+          const Wrapper = cert.credential_url ? "a" : "div";
           return (
-            <Reveal key={cert.title} delay={(i % 3) * 0.06} as="div">
+            <Reveal key={cert.id} delay={(i % 3) * 0.06} as="div">
               <Wrapper
-                {...(cert.credentialUrl
+                {...(cert.credential_url
                   ? {
-                      href: cert.credentialUrl,
+                      href: cert.credential_url,
                       target: "_blank",
                       rel: "noopener noreferrer",
                     }
@@ -28,7 +32,7 @@ export function Certificates() {
               >
                 <div className="flex items-start justify-between">
                   <BadgeCheck size={22} strokeWidth={1.5} className="text-accent" />
-                  {cert.credentialUrl && (
+                  {cert.credential_url && (
                     <ArrowUpRight
                       size={16}
                       strokeWidth={1.5}
@@ -41,7 +45,11 @@ export function Certificates() {
                 </h3>
                 <div className="mt-auto flex items-baseline justify-between gap-3 pt-5 text-sm">
                   <span className="text-secondary">{cert.issuer}</span>
-                  <span className="font-mono text-xs text-muted">{cert.year}</span>
+                  <span className="font-mono text-xs text-muted">
+                    {cert.issue_date
+                      ? new Date(cert.issue_date).getFullYear().toString()
+                      : ""}
+                  </span>
                 </div>
               </Wrapper>
             </Reveal>

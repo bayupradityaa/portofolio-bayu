@@ -1,10 +1,19 @@
 import { Mail } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
-import { profile, socials } from "@/lib/data/profile";
+import { getProfileSettings } from "@/lib/actions/settings";
 import { GithubIcon, LinkedinIcon, InstagramIcon } from "@/components/ui/brand-icons";
 
-export function Footer() {
+export async function Footer() {
+  const settings = await getProfileSettings();
   const year = new Date().getFullYear();
+
+  const socials = [
+    settings?.github ? { label: "GitHub", href: settings.github } : null,
+    settings?.linkedin ? { label: "LinkedIn", href: settings.linkedin } : null,
+    settings?.instagram ? { label: "Instagram", href: settings.instagram } : null,
+    settings?.email ? { label: "Email", href: `mailto:${settings.email}` } : null,
+  ].filter(Boolean) as { label: string; href: string }[];
+
   return (
     <footer className="hairline-t">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-14 md:flex-row md:items-center md:justify-between">
@@ -13,7 +22,7 @@ export function Footer() {
             <Logo />
           </a>
           <p className="text-sm text-muted">
-            {`Designed and built by ${profile.name}. ${year}.`}
+            {`Designed and built by ${settings?.name || "Bayu Praditya"}. ${year}.`}
           </p>
         </div>
 

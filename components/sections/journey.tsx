@@ -1,9 +1,13 @@
 import { Section, SectionHeading } from "@/components/ui/section";
 import { Reveal } from "@/components/motion/reveal";
 import { Badge } from "@/components/ui/badge";
-import { timeline } from "@/lib/data/journey";
+import { getPublishedExperience } from "@/lib/actions/experience";
 
-export function Journey() {
+export async function Journey() {
+  const timeline = await getPublishedExperience();
+
+  if (timeline.length === 0) return null;
+
   return (
     <Section id="journey">
       <SectionHeading
@@ -13,7 +17,7 @@ export function Journey() {
 
       <ol className="mt-14 border-l border-border">
         {timeline.map((entry, i) => (
-          <Reveal key={entry.title} delay={i * 0.06} as="li">
+          <Reveal key={entry.id} delay={i * 0.06} as="li">
             <div className="relative pb-12 pl-8 last:pb-0">
               {/* node */}
               <span className="absolute -left-[6.5px] top-1.5 h-3 w-3 rounded-full border-2 border-background bg-accent" />

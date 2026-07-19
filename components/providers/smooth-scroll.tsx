@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -15,9 +16,10 @@ gsap.registerPlugin(ScrollTrigger);
  */
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const reduce = useReducedMotion();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (reduce) {
+    if (reduce || pathname?.startsWith("/dev")) {
       ScrollTrigger.refresh();
       return;
     }

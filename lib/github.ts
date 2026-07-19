@@ -1,4 +1,3 @@
-import { profile } from "./data/profile";
 
 export type Repo = {
   name: string;
@@ -190,8 +189,7 @@ const placeholderRepos: Repo[] = [
   },
 ];
 
-export async function getGitHubActivity(): Promise<GitHubActivity> {
-  const user = profile.githubUser;
+export async function getGitHubActivity(user: string): Promise<GitHubActivity> {
   try {
     const [repos, contributions] = await Promise.all([
       fetchRepos(user),

@@ -6,8 +6,16 @@ import { User, Cpu, Briefcase, Compass, Mail, Menu, X } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { LinkButton } from "@/components/ui/button";
 import { GithubIcon } from "@/components/ui/brand-icons";
-import { navItems } from "@/lib/data/site";
 import { cn } from "@/lib/utils";
+
+const navItems = [
+  { id: "about", label: "About" },
+  { id: "stack", label: "Stack" },
+  { id: "github", label: "GitHub" },
+  { id: "work", label: "Work" },
+  { id: "journey", label: "Journey" },
+  { id: "contact", label: "Contact" },
+] as const;
 
 const navItemConfig: Record<
   string,

@@ -399,3 +399,131 @@ export function ExpressIcon({ size = 20, className }: IconProps) {
     </svg>
   );
 }
+
+export function TechIcon({ name, className, size = 14 }: { name: string; className?: string; size?: number }) {
+  const normalized = name.toLowerCase().trim().replace(/[\.\s-]/g, "");
+
+  switch (normalized) {
+    case "nextjs":
+      return <NextdotjsIcon size={size} className={className} />;
+    case "react":
+    case "reactdom":
+      return <ReactIcon size={size} className={className} />;
+    case "typescript":
+      return <TypescriptIcon size={size} className={className} />;
+    case "tailwind":
+    case "tailwindcss":
+      return <TailwindcssIcon size={size} className={className} />;
+    case "fastapi":
+      return (
+        <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} className={className} aria-hidden="true">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+        </svg>
+      );
+    case "python":
+      return <PythonIcon size={size} className={className} />;
+    case "supabase":
+      return <SupabaseIcon size={size} className={className} />;
+    case "postgresql":
+    case "postgres":
+      return <PostgresqlIcon size={size} className={className} />;
+    case "framermotion":
+      return <FramermotionIcon size={size} className={className} />;
+    case "gsap":
+      return <GsapIcon size={size} className={className} />;
+    case "figma":
+      return <FigmaIcon size={size} className={className} />;
+    case "vite":
+      return (
+        <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} className={className} aria-hidden="true">
+          <path d="M18.8 2.4l-7.2 13.8h4.8L12 22.8l9.6-13.8h-6l3.2-6.6z" />
+        </svg>
+      );
+    case "vercel":
+      return (
+        <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} className={className} aria-hidden="true">
+          <path d="M24 22.525H0L12 1.475l12 21.05z" />
+        </svg>
+      );
+    case "recharts":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size} className={className} aria-hidden="true">
+          <path d="M3 3v18h18" />
+          <path d="M18 17V9" />
+          <path d="M13 17V5" />
+          <path d="M8 17v-4" />
+        </svg>
+      );
+    case "instagram":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size} className={className} aria-hidden="true">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+        </svg>
+      );
+    case "canva":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">CV</text>
+        </svg>
+      );
+    case "photoshop":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">PS</text>
+        </svg>
+      );
+    case "metabusinesssuite":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">MB</text>
+        </svg>
+      );
+    case "pytorch":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">PT</text>
+        </svg>
+      );
+    case "transformers":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">HF</text>
+        </svg>
+      );
+    case "zod":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">ZD</text>
+        </svg>
+      );
+    case "reacthookform":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">HF</text>
+        </svg>
+      );
+    case "lenis":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">LN</text>
+        </svg>
+      );
+    default:
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size} className={className} aria-hidden="true">
+          <polyline points="16 18 22 12 16 6" />
+          <polyline points="8 6 2 12 8 18" />
+        </svg>
+      );
+  }
+}

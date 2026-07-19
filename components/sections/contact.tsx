@@ -2,10 +2,20 @@ import { Mail } from "lucide-react";
 import { Section } from "@/components/ui/section";
 import { Reveal } from "@/components/motion/reveal";
 import { ContactForm } from "./contact-form";
-import { socials } from "@/lib/data/profile";
 import { GithubIcon, LinkedinIcon, InstagramIcon } from "@/components/ui/brand-icons";
+import { getProfileSettings } from "@/lib/actions/settings";
 
-export function Contact() {
+export async function Contact() {
+  const settings = await getProfileSettings();
+
+  // Build socials array from settings
+  const socials = [
+    settings?.github ? { label: "GitHub", href: settings.github } : null,
+    settings?.linkedin ? { label: "LinkedIn", href: settings.linkedin } : null,
+    settings?.instagram ? { label: "Instagram", href: settings.instagram } : null,
+    settings?.email ? { label: "Email", href: `mailto:${settings.email}` } : null,
+  ].filter(Boolean) as { label: string; href: string }[];
+
   return (
     <Section id="contact">
       <div className="grid grid-cols-1 gap-14 md:grid-cols-2 md:gap-20">
@@ -21,7 +31,7 @@ export function Contact() {
             and I will reply within a day or two.
           </p>
 
-          {/* Social Icons row (No Text handles) */}
+          {/* Social Icons row */}
           <div className="mt-8 flex flex-wrap gap-3.5">
             {socials.map((s) => {
               let icon = null;

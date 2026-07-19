@@ -14,4 +14,4 @@ export const contactSchema = z.object({
     .max(2000, "Keep it under 2000 characters"),
 });
 
-export type ContactInput = z.infer<typeof contactSchema>;
+export type ContactFormValues = z.infer<typeof contactSchema>;
