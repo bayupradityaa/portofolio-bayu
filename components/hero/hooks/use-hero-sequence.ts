@@ -5,8 +5,8 @@ type Status = "loading" | "ready" | "unavailable";
 
 /**
  * Canvas image-sequence engine optimized for 90+ Google Lighthouse performance scores.
- * Uses progressive non-blocking frame loading (Frame 1 instant LCP paint + idle batch preloading)
- * to eliminate Total Blocking Time (TBT) and accelerate Largest Contentful Paint (LCP).
+ * Uses progressive keyframe preloading and nearest-frame fallback so the background
+ * NEVER resets back to frame 0 when scrolling or holding scroll.
  */
 export function useHeroSequence() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -30,8 +30,27 @@ export function useHeroSequence() {
     const canvas = canvasRef.current;
     if (!ctx || !canvas) return;
 
-    // Fall back to frame 0 if target frame is still downloading asynchronously
-    const img = images[index] || images[0];
+    // Find requested target frame, or nearest available loaded frame (never snap back to 0)
+    let img = images[index];
+    if (!img || !img.complete || img.naturalWidth === 0) {
+      // Look backwards for nearest loaded frame
+      for (let i = index - 1; i >= 0; i--) {
+        if (images[i] && images[i].complete && images[i].naturalWidth > 0) {
+          img = images[i];
+          break;
+        }
+      }
+      // Look forwards if backwards has none
+      if (!img || !img.complete || img.naturalWidth === 0) {
+        for (let i = index + 1; i < images.length; i++) {
+          if (images[i] && images[i].complete && images[i].naturalWidth > 0) {
+            img = images[i];
+            break;
+          }
+        }
+      }
+    }
+
     if (!img || !img.complete || img.naturalWidth === 0) return;
 
     lastIndexRef.current = index;
@@ -127,7 +146,7 @@ export function useHeroSequence() {
       lastIndexRef.current = -1;
     };
 
-    // Phase 1: Load Frame 1 FIRST for instant LCP paint (< 0.8s)
+    // Phase 1: Load Frame 1 FIRST for instant sub-second LCP paint
     const frame1 = new Image();
     frame1.onload = () => {
       if (isCancelled) return;
@@ -137,37 +156,55 @@ export function useHeroSequence() {
       renderFrame(0);
       setStatus("ready");
 
-      // Phase 2: Non-blocking background idle batch preloader for remaining frames (0ms TBT spike)
+      // Phase 2: Fast-track Keyframes (every 10th frame) for instant scroll coverage
+      const keyframeIndices: number[] = [];
+      for (let k = 10; k < frameCount; k += 10) {
+        keyframeIndices.push(k);
+      }
+      keyframeIndices.push(frameCount);
+
+      keyframeIndices.forEach((fNum) => {
+        const kImg = new Image();
+        kImg.src = path(fNum);
+        const idx = fNum - 1;
+        kImg.onload = () => {
+          if (!isCancelled) images[idx] = kImg;
+        };
+      });
+
+      // Phase 3: Fill remaining in-between frames in non-blocking background idle batches (0ms TBT spike)
       let currentFrameIndex = 2;
 
       const loadBatch = () => {
         if (isCancelled || currentFrameIndex > frameCount) return;
-        const batchSize = 6;
+        const batchSize = 8;
         const end = Math.min(frameCount, currentFrameIndex + batchSize);
 
         for (let i = currentFrameIndex; i <= end; i++) {
-          const img = new Image();
-          img.src = path(i);
           const index = i - 1;
-          img.onload = () => {
-            if (!isCancelled) images[index] = img;
-          };
+          if (!images[index]) {
+            const img = new Image();
+            img.src = path(i);
+            img.onload = () => {
+              if (!isCancelled) images[index] = img;
+            };
+          }
         }
 
         currentFrameIndex = end + 1;
         if (currentFrameIndex <= frameCount && !isCancelled) {
           if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-            window.requestIdleCallback(loadBatch, { timeout: 800 });
+            window.requestIdleCallback(loadBatch, { timeout: 600 });
           } else {
-            setTimeout(loadBatch, 25);
+            setTimeout(loadBatch, 20);
           }
         }
       };
 
       if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-        window.requestIdleCallback(loadBatch, { timeout: 400 });
+        window.requestIdleCallback(loadBatch, { timeout: 300 });
       } else {
-        setTimeout(loadBatch, 40);
+        setTimeout(loadBatch, 30);
       }
     };
 
