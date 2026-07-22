@@ -79,6 +79,7 @@ export default function RootLayout({
           href="/sequence-mobile/ezgif-frame-001.webp"
           as="image"
           type="image/webp"
+          fetchPriority="high"
           media="(max-width: 1023px)"
         />
         <link
@@ -86,6 +87,7 @@ export default function RootLayout({
           href="/sequence-desktop/ezgif-frame-001.webp"
           as="image"
           type="image/webp"
+          fetchPriority="high"
           media="(min-width: 1024px)"
         />
       </head>
