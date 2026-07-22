@@ -4,9 +4,8 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 /**
- * First-paint logo reveal. Reason for motion: it covers font/asset settle and
- * hands off to the page once ready. Kept short; skipped entirely if the visitor
- * has already seen it this session or prefers reduced motion.
+ * First-paint logo reveal screen. Displays 'BayuPraditya.' on load.
+ * 'Bayu' in white (text-foreground), 'Praditya' in theme green (text-accent), '.' in white.
  */
 export function LoadingScreen() {
   const reduce = useReducedMotion();
@@ -15,8 +14,7 @@ export function LoadingScreen() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const seen = sessionStorage.getItem("intro-seen");
-    // Skip the intro entirely if already seen or reduced-motion. Dismiss on the
-    // next frame (not synchronously) to avoid a cascading render in the effect.
+    // Skip the intro entirely if already seen or reduced-motion.
     const skip = Boolean(seen) || reduce;
     if (skip) {
       const raf = requestAnimationFrame(() => setVisible(false));
@@ -45,14 +43,15 @@ export function LoadingScreen() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
           <motion.div
-            className="flex items-baseline text-4xl font-semibold tracking-tight md:text-5xl"
+            className="flex items-baseline text-4xl font-bold tracking-tight md:text-5xl"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
-            <span>bayu</span>
+            <span className="text-foreground">Bayu</span>
+            <span className="text-accent">Praditya</span>
             <motion.span
-              className="text-accent"
+              className="text-foreground"
               initial={{ opacity: 0 }}
               animate={{ opacity: [0, 1, 1, 0.2, 1] }}
               transition={{ duration: 1.2, times: [0, 0.2, 0.6, 0.8, 1] }}

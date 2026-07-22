@@ -73,6 +73,22 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${plusJakartaSans.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        <link
+          rel="preload"
+          href="/sequence-mobile/ezgif-frame-001.webp"
+          as="image"
+          type="image/webp"
+          media="(max-width: 1023px)"
+        />
+        <link
+          rel="preload"
+          href="/sequence-desktop/ezgif-frame-001.webp"
+          as="image"
+          type="image/webp"
+          media="(min-width: 1024px)"
+        />
+      </head>
       <body className="flex min-h-full flex-col bg-background text-foreground transition-colors duration-300">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <TabTitleAnimator />

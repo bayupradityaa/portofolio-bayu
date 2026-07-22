@@ -5,7 +5,9 @@ type Status = "loading" | "ready" | "unavailable";
 
 /**
  * Canvas image-sequence engine optimized for 60fps across desktop & mobile.
- * Uses DPR capping on mobile, frame index memoization, and lightweight smoothing.
+ * Loads dedicated sequence sets: /sequence-desktop/ (113 frames) for Desktop
+ * and /sequence-mobile/ (124 frames) for Mobile.
+ * Dynamically detects active theme (Dark vs Light) for seamless background & gradient blending.
  */
 export function useHeroSequence() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -15,13 +17,18 @@ export function useHeroSequence() {
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const lastIndexRef = useRef<number>(-1);
 
-  const renderFrame = useCallback((index: number) => {
+  const renderFrame = useCallback((rawIndex: number) => {
+    const images = imagesRef.current;
+    if (images.length === 0) return;
+
+    // Safely clamp frame index to current active sequence length
+    const index = Math.min(Math.max(0, rawIndex), images.length - 1);
+
     // Avoid re-rendering the exact same frame index
     if (lastIndexRef.current === index) return;
 
     const ctx = ctxRef.current;
     const canvas = canvasRef.current;
-    const images = imagesRef.current;
     if (!ctx || !canvas) return;
 
     const img = images[index];
@@ -32,56 +39,67 @@ export function useHeroSequence() {
     const cw = canvas.width;
     const ch = canvas.height;
     const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
+
+    // Detect theme dynamically (Dark mode vs Light mode)
+    const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+    const bgColor = isDark ? "#09090b" : "#ffffff";
+    const shadowRgb = isDark ? "9, 9, 11" : "255, 255, 255";
     
-    let scale: number;
-    let dw: number;
-    let dh: number;
-    let x: number;
-    let y: number;
-
     if (isDesktop) {
-      // Desktop: Scale to cover vertical height cleanly
+      // Desktop: Dynamic theme adaptive rendering
       const scaleFactor = 1.01;
-      scale = (ch / img.naturalHeight) * scaleFactor;
-      dw = img.naturalWidth * scale;
-      dh = img.naturalHeight * scale;
+      const scale = (ch / img.naturalHeight) * scaleFactor;
+      const dw = img.naturalWidth * scale;
+      const dh = img.naturalHeight * scale;
+      const y = (ch - dh) / 2;
+      const x = cw - dw;
 
-      y = (ch - dh) / 2;
-      x = cw - dw;
-    } else {
-      // Mobile: Lightweight cover scaling with fixed DPR to prevent GPU bottleneck
-      const scaleFactor = 1.12;
-      scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight) * scaleFactor;
-      dw = img.naturalWidth * scale;
-      dh = img.naturalHeight * scale;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
 
-      const baseOffset = (ch - dh) / 2;
-      const shiftDown = 85;
+      if (x > 0) {
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, x + 1, ch);
+      }
 
-      y = Math.min(0, Math.max(ch - dh, baseOffset + shiftDown));
-      x = (cw - dw) / 2;
+      ctx.drawImage(img, x, y, dw, dh);
+
+      if (x > 0) {
+        const blendWidth = 300;
+        const grad = ctx.createLinearGradient(x, 0, x + blendWidth, 0);
+        grad.addColorStop(0, bgColor);
+        grad.addColorStop(1, `rgba(${shadowRgb}, 0)`);
+
+        ctx.fillStyle = grad;
+        ctx.fillRect(x - 1, 0, blendWidth + 1, ch);
+      }
+      return;
     }
 
-    // High quality smoothing on desktop, lightweight rendering on mobile for maximum FPS
+    // Mobile: Render dedicated mobile portrait sequence (/sequence-mobile/)
+    const scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
+    const dw = img.naturalWidth * scale;
+    const dh = img.naturalHeight * scale;
+    const y = (ch - dh) / 2;
+    const x = (cw - dw) / 2;
+
     ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = isDesktop ? "high" : "medium";
+    ctx.imageSmoothingQuality = "medium";
 
-    if (isDesktop && x > 0) {
-      ctx.fillStyle = "#09090b";
-      ctx.fillRect(0, 0, x + 1, ch);
-    }
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, cw, ch);
 
     ctx.drawImage(img, x, y, dw, dh);
 
-    if (isDesktop && x > 0) {
-      const blendWidth = 300;
-      const grad = ctx.createLinearGradient(x, 0, x + blendWidth, 0);
-      grad.addColorStop(0, "#09090b");
-      grad.addColorStop(1, "rgba(9, 9, 11, 0)");
+    // Left gradient blend automatically adapting to Light vs Dark theme
+    const blendWidth = Math.min(120, cw * 0.10);
+    const leftGrad = ctx.createLinearGradient(0, 0, blendWidth, 0);
+    leftGrad.addColorStop(0, `rgba(${shadowRgb}, 0.70)`);
+    leftGrad.addColorStop(0.5, `rgba(${shadowRgb}, 0.30)`);
+    leftGrad.addColorStop(1, `rgba(${shadowRgb}, 0)`);
 
-      ctx.fillStyle = grad;
-      ctx.fillRect(x - 1, 0, blendWidth + 1, ch);
-    }
+    ctx.fillStyle = leftGrad;
+    ctx.fillRect(0, 0, blendWidth, ch);
   }, []);
 
   useEffect(() => {
@@ -93,19 +111,21 @@ export function useHeroSequence() {
     if (!ctx) return;
     ctxRef.current = ctx;
 
-    const { frameCount, path } = sequenceConfig;
+    const isDesktop = window.innerWidth >= 1024;
+    const activeConfig = isDesktop ? sequenceConfig.desktop : sequenceConfig.mobile;
+    const { frameCount, path } = activeConfig;
+
     const images: HTMLImageElement[] = [];
     let loaded = 0;
     let failed = false;
 
     const sizeCanvas = () => {
       const rect = wrap.getBoundingClientRect();
-      const isDesktop = window.innerWidth >= 1024;
+      const desktopCheck = window.innerWidth >= 1024;
       // Cap DPR to 1 on mobile screens to reduce pixel count by 4x-9x for buttery smooth 60fps
-      const dpr = isDesktop ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+      const dpr = desktopCheck ? Math.min(window.devicePixelRatio || 1, 2) : 1;
       canvas.width = Math.round(rect.width * dpr);
       canvas.height = Math.round(rect.height * dpr);
-      // Reset frame index on resize so it re-draws cleanly
       lastIndexRef.current = -1;
     };
 
@@ -133,6 +153,7 @@ export function useHeroSequence() {
     };
     probe.onerror = () => setStatus("unavailable");
     probe.src = path(1);
+
     imagesRef.current = images;
 
     const onResize = () => {
@@ -140,7 +161,18 @@ export function useHeroSequence() {
     };
     window.addEventListener("resize", onResize);
 
+    // Listen for theme mutations on documentElement class to re-render frame dynamically
+    const observer = new MutationObserver(() => {
+      lastIndexRef.current = -1;
+      renderFrame(0);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
     return () => {
+      observer.disconnect();
       window.removeEventListener("resize", onResize);
       images.forEach((img) => {
         img.onload = null;
