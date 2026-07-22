@@ -1018,6 +1018,10 @@ export const GithubCalendar = memo(function GithubCalendar({
               <div className="flex items-center gap-2 border-l border-border/80 pl-4">
                 <span className="text-[11px] text-muted select-none">Game Mode</span>
                 <button
+                  type="button"
+                  aria-label="Toggle Github contribution game mode"
+                  role="switch"
+                  aria-checked={gameActive}
                   onClick={() => setGameActive(!gameActive)}
                   className={cn(
                     "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",

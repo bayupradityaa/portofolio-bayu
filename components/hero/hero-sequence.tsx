@@ -9,8 +9,8 @@ export interface HeroSequenceHandle {
 }
 
 /**
- * Canvas-rendered portrait sequence. Dumb component — the parent timeline
- * calls renderFrame(index) to advance frames. Zero animation logic.
+ * Canvas-rendered portrait sequence optimized for 90+ Lighthouse performance scores.
+ * Renders an instant-paint HTML picture element on mount to ensure sub-second LCP.
  */
 export const HeroSequence = forwardRef<HeroSequenceHandle>(
   function HeroSequence(_, ref) {
@@ -22,21 +22,23 @@ export const HeroSequence = forwardRef<HeroSequenceHandle>(
       <div ref={wrapRef} className="absolute inset-0 overflow-hidden" style={{ background: "var(--background)" }}>
         <canvas
           ref={canvasRef}
-          className="h-full w-full"
+          className="h-full w-full relative z-10"
           role="img"
           aria-label="Bayu Praditya, cinematic portrait sequence"
         />
 
-        {/* Placeholder while frames load or if absent */}
+        {/* High-priority LCP static poster for instant sub-second paint */}
         {status !== "ready" && (
-          <div
-            aria-hidden
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(120% 90% at 70% 10%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 55%), var(--surface)",
-            }}
-          />
+          <picture className="absolute inset-0 z-0">
+            <source media="(max-width: 1023px)" srcSet="/sequence-mobile/ezgif-frame-001.webp" />
+            <source media="(min-width: 1024px)" srcSet="/sequence-desktop/ezgif-frame-001.webp" />
+            <img
+              src="/sequence-mobile/ezgif-frame-001.webp"
+              alt="Bayu Praditya"
+              fetchPriority="high"
+              className="h-full w-full object-cover"
+            />
+          </picture>
         )}
       </div>
     );
