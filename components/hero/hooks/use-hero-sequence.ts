@@ -5,8 +5,8 @@ type Status = "loading" | "ready" | "unavailable";
 
 /**
  * Canvas image-sequence engine optimized for 90+ Google Lighthouse performance scores.
- * Uses progressive keyframe preloading and nearest-frame fallback so the background
- * NEVER resets back to frame 0 when scrolling or holding scroll.
+ * Uses progressive keyframe preloading, current-frame tracking, and theme-filtered DOM observers
+ * to ensure the background NEVER resets back to frame 0 during scroll or scroll-pause.
  */
 export function useHeroSequence() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -15,6 +15,7 @@ export function useHeroSequence() {
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const lastIndexRef = useRef<number>(-1);
+  const currentFrameIndexRef = useRef<number>(0);
 
   const renderFrame = useCallback((rawIndex: number) => {
     const images = imagesRef.current;
@@ -22,6 +23,7 @@ export function useHeroSequence() {
 
     // Safely clamp frame index to current active sequence length
     const index = Math.min(Math.max(0, rawIndex), images.length - 1);
+    currentFrameIndexRef.current = index;
 
     // Avoid re-rendering the exact same frame index
     if (lastIndexRef.current === index) return;
@@ -221,11 +223,19 @@ export function useHeroSequence() {
     };
     window.addEventListener("resize", onResize);
 
-    // Listen for theme mutations on documentElement class to re-render frame dynamically
+    // Listen for theme mutations ONLY (ignore scroll class mutations to prevent unwanted frame resets)
+    let lastThemeIsDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+
     const observer = new MutationObserver(() => {
-      lastIndexRef.current = -1;
-      renderFrame(0);
+      const currentThemeIsDark = document.documentElement.classList.contains("dark");
+      if (currentThemeIsDark !== lastThemeIsDark) {
+        lastThemeIsDark = currentThemeIsDark;
+        const activeFrameIndex = currentFrameIndexRef.current;
+        lastIndexRef.current = -1;
+        renderFrame(activeFrameIndex);
+      }
     });
+
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["class"],
