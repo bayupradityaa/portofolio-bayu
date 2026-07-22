@@ -49,6 +49,7 @@ export function useHeroTimeline({
 
   const masterTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const breathingTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const currentStageRef = useRef<HeroStage>(reduce ? HeroStage.IDLE : HeroStage.INTRO);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -118,41 +119,39 @@ export function useHeroTimeline({
     const masterTl = createHeroTimeline(refs);
     masterTimelineRef.current = masterTl;
 
-    // Connect to ScrollTrigger
+    const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
+
+    // Connect to ScrollTrigger with optimized scrub for mobile
     const st = ScrollTrigger.create({
       trigger: section,
       start: "top top",
       end: "bottom bottom",
-      scrub: 0.5,
+      scrub: isDesktop ? 0.5 : 0.2, // Smoother & faster scrub response on mobile
       onUpdate: (self) => {
         const p = self.progress;
-        setProgress(p);
 
-        // Determine current stage & update text in DOM
+        // Determine current stage
         let currentStage = HeroStage.INTRO;
-        let stageText = "01";
-
         if (p < 0.1) {
           currentStage = HeroStage.INTRO;
-          stageText = "01";
         } else if (p < 0.2) {
           currentStage = HeroStage.REVEAL;
-          stageText = "02";
         } else if (p < 0.35) {
           currentStage = HeroStage.TITLE;
-          stageText = "03";
         } else if (p < 0.6) {
           currentStage = HeroStage.CONTENT;
-          stageText = "04";
         } else if (p < 0.8) {
           currentStage = HeroStage.READY;
-          stageText = "05";
         } else {
           currentStage = HeroStage.IDLE;
-          stageText = "06";
         }
 
-        setStage(currentStage);
+        // Only trigger React state updates when the stage ACTUALLY changes
+        if (currentStage !== currentStageRef.current) {
+          currentStageRef.current = currentStage;
+          setStage(currentStage);
+          setProgress(p);
+        }
 
         // Control idle breathing timeline without spawning redundant scroll tweens
         if (currentStage === HeroStage.READY || currentStage === HeroStage.IDLE) {
@@ -173,7 +172,7 @@ export function useHeroTimeline({
           })
         );
 
-        // Drive the timeline progress
+        // Drive the timeline progress directly in GSAP without re-rendering React
         masterTl.progress(p);
       },
     });

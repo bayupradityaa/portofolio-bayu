@@ -37,10 +37,10 @@ export function HeroScene({ settings }: { settings: ProfileSettings | null }) {
 
   const reduce = useReducedMotion();
 
-  // Parallax input handler
+  // Parallax input handler (desktop only)
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      if (reduce) return;
+      if (reduce || window.innerWidth < 1024) return;
       const cx = window.innerWidth / 2;
       const cy = window.innerHeight / 2;
       const dx = ((e.clientX - cx) / cx) * 5; // Max ±5px
@@ -121,7 +121,7 @@ export function HeroScene({ settings }: { settings: ProfileSettings | null }) {
 
   return (
     <HeroProvider value={{ stage }}>
-      <section ref={sectionRef} id="hero" className="relative h-[200vh]">
+      <section ref={sectionRef} id="hero" className="relative h-[160vh] md:h-[200vh]">
         <div
           ref={stickyRef}
           className="sticky top-0 h-[100dvh] overflow-hidden z-10 will-change-transform"
