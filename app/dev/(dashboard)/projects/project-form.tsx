@@ -225,7 +225,7 @@ export function ProjectForm({ project, technologies }: ProjectFormProps) {
                     id="pf-role"
                     {...register("role")}
                     className="w-full rounded-lg border border-[#27272a] bg-[#0a0a0c] px-3 py-2.5 text-sm text-[#fafafa] placeholder:text-[#71717a] focus:border-[#22c55e] focus:outline-none"
-                    placeholder="Full Stack Engineer"
+                    placeholder="Web Developer"
                   />
                 </div>
               </div>

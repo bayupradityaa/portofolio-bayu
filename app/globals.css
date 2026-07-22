@@ -18,6 +18,21 @@
   --radius: 0.75rem;
 }
 
+.light,
+html.light,
+[data-theme="light"] {
+  --background: #f8fafc;
+  --surface: #f1f5f9;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --foreground: #0f172a;
+  --secondary: #475569;
+  --muted: #64748b;
+  --accent: #16a34a;
+  --accent-hover: #15803d;
+  --accent-contrast: #ffffff;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
@@ -46,7 +61,8 @@
   html {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    scroll-behavior: auto; /* Lenis owns smooth scroll */
+    scroll-behavior: auto;
+    /* Lenis owns smooth scroll */
   }
 
   body {
@@ -69,7 +85,10 @@
     border-radius: 2px;
   }
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     letter-spacing: -0.02em;
     text-wrap: balance;
   }
@@ -111,22 +130,18 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(
-    ellipse 50% 55% at 50% 45%,
-    color-mix(in oklab, var(--accent) 18%, transparent) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(ellipse 50% 55% at 50% 45%,
+      color-mix(in oklab, var(--accent) 18%, transparent) 0%,
+      transparent 70%);
   opacity: 0;
   will-change: opacity;
 }
 
 @media (min-width: 1024px) {
   .hero-glow {
-    background: radial-gradient(
-      ellipse 50% 55% at 53% 50%,
-      color-mix(in oklab, var(--accent) 18%, transparent) 0%,
-      transparent 70%
-    );
+    background: radial-gradient(ellipse 50% 55% at 53% 50%,
+        color-mix(in oklab, var(--accent) 18%, transparent) 0%,
+        transparent 70%);
   }
 }
 
@@ -208,7 +223,46 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* ------------------------------------------------------------------ */
+/*  Hardware-Accelerated Infinite Marquee                              */
+/* ------------------------------------------------------------------ */
+@keyframes marquee-left {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes marquee-right {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-marquee-left {
+  animation: marquee-left var(--marquee-duration, 35s) linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-right {
+  animation: marquee-right var(--marquee-duration, 35s) linear infinite;
+  will-change: transform;
+}
+
+.marquee-container:hover .animate-marquee-left,
+.marquee-container:hover .animate-marquee-right {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {

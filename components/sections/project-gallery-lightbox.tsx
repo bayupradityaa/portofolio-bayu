@@ -88,7 +88,7 @@ export function ProjectGalleryLightbox({
           </span>
         )}
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover/image:opacity-100 backdrop-blur-[2px]">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-[#09090b]/90 px-3.5 py-1.5 font-mono text-xs font-semibold text-emerald-400 shadow-[0_0_12px_rgba(34,197,94,0.15)]">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-background/90 px-3.5 py-1.5 font-mono text-xs font-semibold text-emerald-400 shadow-[0_0_12px_rgba(34,197,94,0.15)]">
             <Images size={14} strokeWidth={2} aria-hidden="true" />
             View gallery ({slides.length})
           </span>

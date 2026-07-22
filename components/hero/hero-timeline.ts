@@ -170,24 +170,17 @@ export function createHeroTimeline(refs: HeroRefs): gsap.core.Timeline {
     0.46,
   );
 
-  // ── Fade out: 92%–100% ────────────────────────────────────────
+  // ── Hero Fade Out: 88%–100% ──────────────────────────────────
   tl.to(
     refs.parallaxText,
-    { opacity: 0, y: -40, duration: 0.06, ease: "power2.in" },
-    0.92,
+    { opacity: 0, y: -30, duration: 0.08, ease: "power2.in" },
+    0.88,
   );
 
-  // ── Perspective Push Back: 90%–100% ──────────────────────────
   tl.to(
     refs.parallaxCanvas,
-    {
-      scale: 0.92,
-      opacity: 0.4,
-      filter: "blur(6px)",
-      duration: 0.10,
-      ease: "power2.inOut",
-    },
-    0.90,
+    { opacity: 0, duration: 0.10, ease: "power2.inOut" },
+    0.88,
   );
 
   return tl;

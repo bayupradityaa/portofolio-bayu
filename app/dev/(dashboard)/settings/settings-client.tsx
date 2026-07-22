@@ -111,7 +111,7 @@ export function SettingsClient({ settings }: { settings: ProfileSettings | null 
           <div className="space-y-4 max-w-xl">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-[#fafafa]">Headline</label>
-              <input value={headline} onChange={(e) => setHeadline(e.target.value)} className={inputClass} placeholder="Full Stack Software Engineer" />
+              <input value={headline} onChange={(e) => setHeadline(e.target.value)} className={inputClass} placeholder="Web Developer" />
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium text-[#fafafa]">Subtitle</label>

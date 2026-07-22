@@ -7,13 +7,14 @@ import { Logo } from "@/components/ui/logo";
 import { LinkButton } from "@/components/ui/button";
 import { GithubIcon } from "@/components/ui/brand-icons";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/shell/theme-toggle";
 
 const navItems = [
   { id: "about", label: "About" },
   { id: "stack", label: "Stack" },
-  { id: "github", label: "GitHub" },
   { id: "work", label: "Work" },
   { id: "journey", label: "Journey" },
+  { id: "github", label: "GitHub" },
   { id: "contact", label: "Contact" },
 ] as const;
 
@@ -77,12 +78,17 @@ const sharedTransition = {
   duration: 0.4,
 };
 
+import { usePathname } from "next/navigation";
+
 export function Nav() {
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
   const [active, setActive] = useState<string>("");
   const [open, setOpen] = useState(false);
   const [heroProgress, setHeroProgress] = useState(0);
 
   useEffect(() => {
+    if (!isHomePage) return;
     const onHeroScroll = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       if (detail && typeof detail.progress === "number") {
@@ -91,9 +97,16 @@ export function Nav() {
     };
     window.addEventListener("hero-scroll", onHeroScroll);
     return () => window.removeEventListener("hero-scroll", onHeroScroll);
-  }, []);
+  }, [isHomePage]);
 
   useEffect(() => {
+    if (!isHomePage) {
+      if (pathname?.startsWith("/projects")) {
+        setActive("work");
+      }
+      return;
+    }
+
     const ids = navItems.map((n) => n.id);
     const sections = ids
       .map((id) => document.getElementById(id))
@@ -113,7 +126,7 @@ export function Nav() {
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [isHomePage, pathname]);
 
   // Close the mobile sheet on Escape.
   useEffect(() => {
@@ -123,8 +136,8 @@ export function Nav() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const scrolled = heroProgress > 0.6;
-  const logoOpacity = Math.min(1, Math.max(0.3, (heroProgress - 0.5) / 0.2));
+  const scrolled = !isHomePage || heroProgress > 0.6;
+  const logoOpacity = !isHomePage ? 1 : Math.min(1, Math.max(0.3, (heroProgress - 0.5) / 0.2));
 
   return (
     <header
@@ -143,7 +156,7 @@ export function Nav() {
       >
         {/* Logo */}
         <a
-          href="#hero"
+          href={isHomePage ? "#hero" : "/"}
           className="rounded-sm text-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
           style={{
             opacity: logoOpacity,
@@ -165,11 +178,12 @@ export function Nav() {
           {navItems.map((item) => {
             const config = navItemConfig[item.id];
             const isActive = active === item.id;
+            const targetHref = isHomePage ? `#${item.id}` : `/#${item.id}`;
 
             return (
               <motion.a
                 key={item.id}
-                href={`#${item.id}`}
+                href={targetHref}
                 className={cn(
                   "relative block px-3 py-1.5 text-xs md:text-sm font-medium rounded-xl group select-none cursor-pointer overflow-visible",
                 )}
@@ -253,33 +267,37 @@ export function Nav() {
           })}
         </nav>
 
-        {/* Right Action CTA Button (Shown on Desktop) */}
+        {/* Right Action CTA Button & Theme Toggle (Shown on Desktop) */}
         <div
-          className="hidden md:block"
+          className="hidden md:flex items-center gap-2.5"
           style={{
             opacity: logoOpacity,
             transition: "opacity 0.4s ease",
           }}
         >
-          <LinkButton href="#contact" size="sm">
+          <ThemeToggle />
+          <LinkButton href={isHomePage ? "#contact" : "/#contact"} size="sm">
             Get in touch
           </LinkButton>
         </div>
 
         {/* Mobile Hamburger menu */}
-        <button
-          type="button"
-          className="rounded-md p-2 text-foreground md:hidden cursor-pointer"
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? (
-            <X size={22} strokeWidth={1.5} />
-          ) : (
-            <Menu size={22} strokeWidth={1.5} />
-          )}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
+          <button
+            type="button"
+            className="rounded-md p-2 text-foreground cursor-pointer"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? (
+              <X size={22} strokeWidth={1.5} />
+            ) : (
+              <Menu size={22} strokeWidth={1.5} />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Drawer menu */}
@@ -289,11 +307,12 @@ export function Nav() {
             {navItems.map((item) => {
               const config = navItemConfig[item.id];
               const isActive = active === item.id;
+              const targetHref = isHomePage ? `#${item.id}` : `/#${item.id}`;
 
               return (
                 <a
                   key={item.id}
-                  href={`#${item.id}`}
+                  href={targetHref}
                   onClick={() => setOpen(false)}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
@@ -309,10 +328,13 @@ export function Nav() {
                 </a>
               );
             })}
+            <div className="mt-2 border-t border-border pt-3">
+              <ThemeToggle showLabel className="w-full justify-center py-2.5" />
+            </div>
             <LinkButton
-              href="#contact"
+              href={isHomePage ? "#contact" : "/#contact"}
               size="md"
-              className="mt-3 w-full"
+              className="mt-2 w-full"
               onClick={() => setOpen(false)}
             >
               Get in touch

@@ -23,11 +23,11 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getProfileSettings();
-  const title = settings?.seo_title || "Bayu Praditya — Full Stack Software Engineer";
-  const description = settings?.seo_description || "Portfolio of Bayu Praditya, a full stack software engineer working across AI, backend engineering, and modern frontend.";
+  const title = settings?.seo_title || "Bayu Praditya — Web Developer";
+  const description = settings?.seo_description || "Portfolio of Bayu Praditya, a web developer working across modern frontend, backend engineering, and digital products.";
   const url = settings?.site_url || "https://bayupraditya.dev";
   const ogImage = settings?.og_image || "/og-image.jpg";
-  const keywords = settings?.seo_keywords && settings.seo_keywords.length > 0 ? settings.seo_keywords : ["Bayu Praditya", "software engineer", "full stack developer", "AI engineer", "portfolio"];
+  const keywords = settings?.seo_keywords && settings.seo_keywords.length > 0 ? settings.seo_keywords : ["Bayu Praditya", "software engineer", "web developer", "AI engineer", "portfolio"];
 
   return {
     metadataBase: new URL(url),
@@ -60,6 +60,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+import { ThemeProvider } from "@/components/providers/theme-provider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -71,27 +73,29 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${plusJakartaSans.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col">
-        <TabTitleAnimator />
-        <a
-          href="#work"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[110] focus:rounded-md focus:bg-card focus:px-4 focus:py-2 focus:text-sm focus:outline-2 focus:outline-accent"
-        >
-          Skip to content
-        </a>
-        <SmoothScroll>{children}</SmoothScroll>
-        <div className="grain" aria-hidden />
-        <Toaster
-          theme="dark"
-          position="bottom-right"
-          toastOptions={{
-            style: {
-              background: "var(--card)",
-              border: "1px solid var(--border)",
-              color: "var(--foreground)",
-            },
-          }}
-        />
+      <body className="flex min-h-full flex-col bg-background text-foreground transition-colors duration-300">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <TabTitleAnimator />
+          <a
+            href="#work"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[110] focus:rounded-md focus:bg-card focus:px-4 focus:py-2 focus:text-sm focus:outline-2 focus:outline-accent"
+          >
+            Skip to content
+          </a>
+          <SmoothScroll>{children}</SmoothScroll>
+          <div className="grain" aria-hidden />
+          <Toaster
+            theme="dark"
+            position="bottom-right"
+            toastOptions={{
+              style: {
+                background: "var(--card)",
+                border: "1px solid var(--border)",
+                color: "var(--foreground)",
+              },
+            }}
+          />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
+import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, ImageOff } from "lucide-react";
+import { ArrowUpRight, ImageOff, ArrowRight, Sparkles } from "lucide-react";
 import { GithubIcon } from "@/components/ui/brand-icons";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { Reveal } from "@/components/motion/reveal";
@@ -16,11 +17,26 @@ export async function Projects() {
 
   return (
     <Section id="work">
-      <SectionHeading
-        title="My Projects"
-        lead="A collection of real-world projects spanning full-stack development, artificial intelligence, and digital business—each built with a focus on performance, scalability, and meaningful user experiences."
-      />
+      {/* Header with View All Projects CTA */}
+      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+        <SectionHeading
+          title="My Projects"
+          lead="A collection of real-world projects spanning web development, artificial intelligence, and digital business—each built with a focus on performance, scalability, and meaningful user experiences."
+        />
 
+        <Link
+          href="/projects"
+          className="group inline-flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-5 py-3 font-sans text-xs font-semibold text-accent transition-all duration-300 hover:border-accent hover:bg-accent hover:text-accent-contrast hover:shadow-[0_0_20px_rgba(34,197,94,0.25)] shrink-0 self-start md:self-auto"
+        >
+          <span>View All Projects</span>
+          <ArrowRight
+            size={14}
+            className="transition-transform duration-300 group-hover:translate-x-1"
+          />
+        </Link>
+      </div>
+
+      {/* Featured Projects List */}
       <div className="mt-16 flex flex-col gap-20 md:gap-28">
         {projects.map((project, i) => (
           <ProjectCase key={project.slug} project={project} flip={i % 2 === 1} />
@@ -86,7 +102,7 @@ function ProjectCase({ project, flip }: { project: ProjectWithRelations; flip: b
             >
               {coverImage}
               <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover/image:opacity-100 backdrop-blur-[2px]">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-[#09090b]/90 px-3.5 py-1.5 font-mono text-xs font-semibold text-emerald-400 shadow-[0_0_12px_rgba(34,197,94,0.15)]">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-background/90 px-3.5 py-1.5 font-mono text-xs font-semibold text-emerald-400 shadow-[0_0_12px_rgba(34,197,94,0.15)]">
                   {project.live_url_label || "Visit Website"}
                   <ArrowUpRight size={14} strokeWidth={2} aria-hidden="true" />
                 </span>

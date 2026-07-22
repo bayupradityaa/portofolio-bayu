@@ -11,6 +11,8 @@ import { Certificates } from "@/components/sections/certificates";
 import { Contact } from "@/components/sections/contact";
 import { getPublishedTechnologies } from "@/lib/actions/technologies";
 
+import { SectionOverlap } from "@/components/ui/section-overlap";
+
 export default async function Home() {
   const technologies = await getPublishedTechnologies();
   const techNames = technologies.map((t) => t.name);
@@ -23,14 +25,14 @@ export default async function Home() {
         <Hero />
         <div
           id="content-container"
-          className="relative z-20 bg-background rounded-t-[40px] md:rounded-t-[100px] overflow-hidden shadow-[0_-20px_50px_rgba(0,0,0,0.5)]"
+          className="relative z-20 w-full bg-background"
         >
           <About />
           <TechStack technologies={techNames} />
-          <GitHubActivity />
           <Projects />
           <Journey />
           <Certificates />
+          <GitHubActivity />
           <Contact />
         </div>
       </main>

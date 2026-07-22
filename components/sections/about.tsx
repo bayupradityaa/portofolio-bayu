@@ -20,7 +20,7 @@ export async function About() {
     : ["No bio configured yet."];
 
   return (
-    <Section id="about">
+    <Section id="about" hairline={false}>
       <div className="flex flex-col items-center text-center">
         <h2 className="text-3xl font-semibold tracking-tight md:text-5xl text-accent">
           About

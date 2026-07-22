@@ -154,15 +154,15 @@ export function useHeroTimeline({
 
         setStage(currentStage);
 
-        // Control idle breathing timeline
+        // Control idle breathing timeline without spawning redundant scroll tweens
         if (currentStage === HeroStage.READY || currentStage === HeroStage.IDLE) {
           if (!breatheTl.isActive()) {
             breatheTl.play();
           }
         } else {
-          if (breatheTl.isActive() || breatheTl.progress() > 0) {
+          if (breatheTl.isActive()) {
             breatheTl.pause();
-            gsap.to(canvasLayer, { scale: 1, duration: 0.5 });
+            gsap.set(canvasLayer, { scale: 1 });
           }
         }
 

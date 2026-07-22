@@ -15,7 +15,7 @@ interface MorphItem {
 
 const morphItems: MorphItem[] = [
   { icon: Code2, text: "Software Engineer" },
-  { icon: Boxes, text: "Full Stack Developer" },
+  { icon: Boxes, text: "Web Developer" },
   { icon: Palette, text: "Graphic Designer" },
   { icon: BrainCircuit, text: "AI Enthusiast" },
   { icon: Store, text: "Founder @CLT.STORE" },
