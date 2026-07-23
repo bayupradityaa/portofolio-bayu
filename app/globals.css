@@ -47,6 +47,7 @@ html.light,
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-jakarta: var(--font-plus-jakarta);
 
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 0.25rem);
@@ -221,6 +222,103 @@ html.light,
   pointer-events: none;
   opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ------------------------------------------------------------------ */
+/*  Featured Projects — cinematic showcase depth                       */
+/* ------------------------------------------------------------------ */
+
+.featured-shell {
+  /* Slightly deeper than page background so the section reads as a "stage". */
+  background: color-mix(in oklab, var(--background) 92%, #000 8%);
+}
+
+/* Layered depth: two soft accent glows + a faint vertical wash. No flat fill. */
+.featured-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 40% 50% at 18% 30%,
+      color-mix(in oklab, var(--accent) 10%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 55% at 85% 75%,
+      color-mix(in oklab, var(--accent) 7%, transparent) 0%, transparent 62%),
+    linear-gradient(to bottom,
+      transparent 0%,
+      color-mix(in oklab, var(--surface) 40%, transparent) 100%);
+}
+
+/* Fine noise overlay scoped to the section, softer than the global grain. */
+.featured-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='fn'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23fn)'/%3E%3C/svg%3E");
+}
+
+/* ------------------------------------------------------------------ */
+/*  Journey timeline — self-drawing rail + active nodes                 */
+/* ------------------------------------------------------------------ */
+/* Accent progress rail sits over the faint static rail; scaleY scrubbed. */
+.journey-progress {
+  transform: scaleY(0);
+}
+
+/* Timeline node: a ring that fills + glows while its entry owns the view. */
+.journey-node {
+  height: 0.875rem;
+  width: 0.875rem;
+  border-radius: 9999px;
+  background: var(--background);
+  border: 2px solid color-mix(in oklab, var(--border) 100%, transparent);
+  transition:
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.5s ease,
+    box-shadow 0.5s ease,
+    background-color 0.5s ease;
+}
+
+.journey-node.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.35);
+  box-shadow:
+    0 0 0 4px color-mix(in oklab, var(--accent) 18%, transparent),
+    0 0 18px color-mix(in oklab, var(--accent) 55%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-node {
+    transition: none;
+  }
+}
+
+/* Featured sidebar meta: crossfade the title/category as it swaps per project.
+   Remounted via React `key`, so a fresh entry animation fires each change. */
+.fp-meta {
+  animation: fp-meta-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fp-meta-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fp-meta {
+    animation: none;
+  }
 }
 
 /* ------------------------------------------------------------------ */

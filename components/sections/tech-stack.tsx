@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { Section } from "@/components/ui/section";
 import { cn } from "@/lib/utils";
 import { ScrollFloat } from "@/components/motion/scroll-float";
@@ -148,6 +150,12 @@ const logoTooltips: Record<string, string> = {
 };
 
 export function TechStack({ technologies = [] }: { technologies?: string[] }) {
+  const [activeTech, setActiveTech] = useState<string | null>(null);
+
+  const handleTechClick = (name: string) => {
+    setActiveTech((prev) => (prev === name ? null : name));
+  };
+
   // Balanced 2-Row Layout Configuration
   const defaultRow1 = [
     "React", "Next.js", "TypeScript", "Tailwind CSS", "GSAP", "Framer Motion", "Lenis",
@@ -193,10 +201,22 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
 
         <div className="flex flex-col gap-6">
           {/* Row 1: moves left */}
-          <MarqueeRow items={row1} direction="left" duration={38} />
+          <MarqueeRow
+            items={row1}
+            direction="left"
+            duration={38}
+            activeTech={activeTech}
+            onTechClick={handleTechClick}
+          />
 
           {/* Row 2: moves right */}
-          <MarqueeRow items={row2} direction="right" duration={32} />
+          <MarqueeRow
+            items={row2}
+            direction="right"
+            duration={32}
+            activeTech={activeTech}
+            onTechClick={handleTechClick}
+          />
         </div>
       </div>
     </Section>
@@ -208,11 +228,15 @@ function MarqueeRow({
   direction,
   duration = 35,
   className,
+  activeTech,
+  onTechClick,
 }: {
   items: string[];
   direction: "left" | "right";
   duration?: number;
   className?: string;
+  activeTech: string | null;
+  onTechClick: (name: string) => void;
 }) {
   const animClass = direction === "left" ? "animate-marquee-left" : "animate-marquee-right";
 
@@ -231,14 +255,27 @@ function MarqueeRow({
       >
         {/* Quadruple items to ensure 100% seamless infinite looping across all screen sizes */}
         {[...items, ...items, ...items, ...items].map((logo, idx) => (
-          <LogoPill key={`${logo}-${idx}`} name={logo} />
+          <LogoPill
+            key={`${logo}-${idx}`}
+            name={logo}
+            isActive={activeTech === logo}
+            onClick={() => onTechClick(logo)}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function LogoPill({ name }: { name: string }) {
+function LogoPill({
+  name,
+  isActive,
+  onClick,
+}: {
+  name: string;
+  isActive?: boolean;
+  onClick?: () => void;
+}) {
   const Icon = logoIcons[name];
   const tooltipText = logoTooltips[name];
 
@@ -247,19 +284,50 @@ function LogoPill({ name }: { name: string }) {
   return (
     <div
       tabIndex={0}
+      role="button"
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
       className={cn(
-        "group relative flex h-[52px] items-center gap-3 rounded-full border border-border bg-card/90 px-6 py-3 outline-none text-secondary shadow-sm transition-all duration-[300ms] ease-out transform-gpu will-change-transform",
-        "hover:-translate-y-1 hover:scale-[1.04] hover:border-accent/40 hover:text-accent hover:shadow-[0_0_20px_rgba(34,197,94,0.15)] focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:-translate-y-1 focus-visible:scale-[1.04] focus-visible:border-accent/40",
-        "cursor-pointer"
+        "group relative flex h-[52px] items-center gap-3 rounded-full border bg-card/90 px-6 py-3 outline-none shadow-sm transition-all duration-[300ms] ease-out transform-gpu will-change-transform cursor-pointer select-none",
+        isActive
+          ? "border-accent/60 bg-accent/10 text-accent shadow-[0_0_22px_rgba(34,197,94,0.25)] scale-[1.04] -translate-y-1"
+          : "border-border text-secondary hover:-translate-y-1 hover:scale-[1.04] hover:border-accent/40 hover:text-accent hover:shadow-[0_0_20px_rgba(34,197,94,0.15)] active:border-accent/40 active:text-accent active:bg-accent/10 focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:-translate-y-1 focus-visible:scale-[1.04] focus-visible:border-accent/40"
       )}
     >
-      <Icon size={18} className="text-secondary/70 group-hover:text-accent transition-colors duration-[300ms] ease-out" />
-      <span className="font-mono text-[11px] font-medium text-secondary group-hover:text-accent transition-colors duration-[300ms] ease-out">
+      <Icon
+        size={18}
+        className={cn(
+          "transition-colors duration-[300ms] ease-out",
+          isActive
+            ? "text-accent"
+            : "text-secondary/70 group-hover:text-accent group-active:text-accent group-focus:text-accent"
+        )}
+      />
+      <span
+        className={cn(
+          "font-mono text-[11px] font-medium transition-colors duration-[300ms] ease-out",
+          isActive
+            ? "text-accent"
+            : "text-secondary group-hover:text-accent group-active:text-accent group-focus:text-accent"
+        )}
+      >
         {name}
       </span>
 
-      {/* Understated Floating Tooltip */}
-      <div className="pointer-events-none absolute bottom-full left-1/2 mb-3 w-48 -translate-x-1/2 rounded-xl border border-border bg-card p-3 text-center opacity-0 shadow-[0_10px_30px_rgba(0,0,0,0.15)] transition-all duration-300 group-hover:opacity-100 group-focus-within:opacity-100 z-50 transform translate-y-1 group-hover:-translate-y-0">
+      {/* Floating Tooltip */}
+      <div
+        className={cn(
+          "pointer-events-none absolute bottom-full left-1/2 mb-3 w-48 -translate-x-1/2 rounded-xl border border-border bg-card p-3 text-center shadow-[0_10px_30px_rgba(0,0,0,0.15)] transition-all duration-300 z-50 transform",
+          isActive
+            ? "opacity-100 translate-y-0 border-accent/40"
+            : "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0"
+        )}
+      >
         <div className="font-mono text-xs font-semibold text-foreground">{name}</div>
         <div className="mt-1 font-mono text-[10px] leading-relaxed text-muted">{tooltipText}</div>
         {/* Subtle arrow pointer */}

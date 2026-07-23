@@ -4,7 +4,7 @@ import { Footer } from "@/components/shell/footer";
 import { Hero } from "@/components/hero/hero";
 import { About } from "@/components/sections/about";
 import { TechStack } from "@/components/sections/tech-stack";
-import { Projects } from "@/components/sections/projects";
+import { FeaturedProjects } from "@/components/projects/featured/FeaturedProjects";
 import { GitHubActivity } from "@/components/sections/github/github-activity";
 import { Journey } from "@/components/sections/journey";
 import { Certificates } from "@/components/sections/certificates";
@@ -29,7 +29,7 @@ export default async function Home() {
         >
           <About />
           <TechStack technologies={techNames} />
-          <Projects />
+          <FeaturedProjects />
           <Journey />
           <Certificates />
           <GitHubActivity />
