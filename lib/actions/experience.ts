@@ -7,10 +7,12 @@ import type { Experience } from "@/lib/types/database";
 import { unstable_cache } from "next/cache";
 import { CACHE_TAGS } from "@/lib/cache";
 
+import { INITIAL_EXPERIENCE_DATA } from "@/lib/data/experience";
+
 export const getPublishedExperience = unstable_cache(
   async (): Promise<Experience[]> => {
     const supabase = getSupabaseAdmin();
-    if (!supabase) return [];
+    if (!supabase) return INITIAL_EXPERIENCE_DATA;
 
     const { data, error } = await supabase
       .from("experience")
@@ -18,12 +20,12 @@ export const getPublishedExperience = unstable_cache(
       .eq("published", true)
       .order("sort_order", { ascending: true });
 
-    if (error) {
-      console.error("[experience] fetch error:", error.message);
-      return [];
+    if (error || !data || data.length === 0) {
+      if (error) console.error("[experience] fetch error:", error.message);
+      return INITIAL_EXPERIENCE_DATA;
     }
 
-    return (data ?? []) as Experience[];
+    return data as Experience[];
   },
   ["published-experience"],
   { tags: [CACHE_TAGS.EXPERIENCE], revalidate: 3600 },
@@ -31,15 +33,15 @@ export const getPublishedExperience = unstable_cache(
 
 export async function getAllExperience(): Promise<Experience[]> {
   const supabase = getSupabaseAdmin();
-  if (!supabase) return [];
+  if (!supabase) return INITIAL_EXPERIENCE_DATA;
 
   const { data, error } = await supabase
     .from("experience")
     .select("*")
     .order("sort_order", { ascending: true });
 
-  if (error) return [];
-  return (data ?? []) as Experience[];
+  if (error || !data || data.length === 0) return INITIAL_EXPERIENCE_DATA;
+  return data as Experience[];
 }
 
 export async function createExperience(values: unknown) {
