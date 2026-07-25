@@ -1,7 +1,14 @@
+import dynamic from "next/dynamic";
 import { getPublishedProjects } from "@/lib/actions/projects";
 import type { ProjectWithRelations } from "@/lib/types/database";
-import { FeaturedProjectsClient } from "./FeaturedProjectsClient";
 import type { FeaturedProject } from "./types";
+
+// Split into its own chunk so the GSAP pin/scrub wiring hydrates after the
+// initial paint (lower mobile TBT). ssr:true keeps the server HTML identical —
+// desktop output is byte-for-byte unchanged; only the JS chunk is deferred.
+const FeaturedProjectsClient = dynamic(
+  () => import("./FeaturedProjectsClient").then((m) => ({ default: m.FeaturedProjectsClient })),
+);
 
 /** Max panels the pinned experience stays comfortable with. */
 const MAX_FEATURED = 5;

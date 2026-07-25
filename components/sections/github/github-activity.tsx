@@ -3,7 +3,14 @@ import { Section, SectionHeading } from "@/components/ui/section";
 import { Reveal } from "@/components/motion/reveal";
 import { getGitHubActivity } from "@/lib/github";
 import { getProfileSettings } from "@/lib/actions/settings";
-import { GithubCalendar } from "./github-calendar";
+import dynamic from "next/dynamic";
+
+// Split the calendar (SVG builder + theme observers, and the on-demand game
+// loader) into its own chunk so it hydrates after the initial paint. ssr:true
+// keeps the server HTML identical — desktop output is byte-for-byte unchanged.
+const GithubCalendar = dynamic(
+  () => import("./github-calendar").then((m) => ({ default: m.GithubCalendar })),
+);
 
 /** Server Component: fetches (and caches) public GitHub data at build/revalidate. */
 export async function GitHubActivity() {

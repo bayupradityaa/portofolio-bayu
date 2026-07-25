@@ -16,8 +16,12 @@ export function useHeroSequence() {
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const lastIndexRef = useRef<number>(-1);
   const currentFrameIndexRef = useRef<number>(0);
+  // Mobile-only rAF coalescing: many scrub ticks per frame collapse into a
+  // single paint. Desktop paints synchronously (unchanged) for exact fidelity.
+  const rafRef = useRef<number | null>(null);
+  const pendingIndexRef = useRef<number | null>(null);
 
-  const renderFrame = useCallback((rawIndex: number) => {
+  const drawFrame = useCallback((rawIndex: number) => {
     const images = imagesRef.current;
     if (images.length === 0) return;
 
@@ -123,6 +127,29 @@ export function useHeroSequence() {
     ctx.fillRect(0, 0, blendWidth, ch);
   }, []);
 
+  /**
+   * Public entry called by the timeline on every scrub tick.
+   * Desktop: paint immediately (byte-identical to prior behavior).
+   * Mobile (<1024px): coalesce rapid ticks into one rAF-scheduled paint so we
+   * never draw more than once per animation frame — cuts long tasks on scroll.
+   */
+  const renderFrame = useCallback(
+    (rawIndex: number) => {
+      const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
+      if (isDesktop) {
+        drawFrame(rawIndex);
+        return;
+      }
+      pendingIndexRef.current = rawIndex;
+      if (rafRef.current !== null) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        if (pendingIndexRef.current !== null) drawFrame(pendingIndexRef.current);
+      });
+    },
+    [drawFrame],
+  );
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const wrap = wrapRef.current;
@@ -135,6 +162,7 @@ export function useHeroSequence() {
     const isDesktop = window.innerWidth >= 1024;
     const activeConfig = isDesktop ? sequenceConfig.desktop : sequenceConfig.mobile;
     const { frameCount, path } = activeConfig;
+    const step = "step" in activeConfig ? activeConfig.step : 1;
 
     const images: HTMLImageElement[] = new Array(frameCount);
     let isCancelled = false;
@@ -158,43 +186,55 @@ export function useHeroSequence() {
       renderFrame(0);
       setStatus("ready");
 
-      // Phase 2: Fast-track Keyframes (every 10th frame) for instant scroll coverage
-      const keyframeIndices: number[] = [];
-      for (let k = 10; k < frameCount; k += 10) {
-        keyframeIndices.push(k);
+      // Build the list of 1-based frame numbers this device actually decodes.
+      // Desktop (step 1) → every frame (unchanged). Mobile (step 3) → every 3rd
+      // frame; the drawFrame nearest-loaded-frame fallback paints the gaps, so
+      // the scrub stays continuous while decode work drops ~65%.
+      const framesToLoad: number[] = [];
+      for (let f = 1 + step; f <= frameCount; f += step) {
+        framesToLoad.push(f);
       }
-      keyframeIndices.push(frameCount);
+      // Always include the true last frame so the end-of-scroll pose is exact.
+      if (framesToLoad[framesToLoad.length - 1] !== frameCount) {
+        framesToLoad.push(frameCount);
+      }
 
-      keyframeIndices.forEach((fNum) => {
-        const kImg = new Image();
-        kImg.src = path(fNum);
-        const idx = fNum - 1;
-        kImg.onload = () => {
-          if (!isCancelled) images[idx] = kImg;
-        };
-      });
+      // Phase 2: Fast-track keyframes across the range for instant scroll coverage.
+      const strideEvery = Math.max(1, Math.round(framesToLoad.length / 12));
+      framesToLoad
+        .filter((_, i) => i % strideEvery === 0)
+        .forEach((fNum) => {
+          const idx = fNum - 1;
+          if (images[idx]) return;
+          const kImg = new Image();
+          kImg.src = path(fNum);
+          kImg.onload = () => {
+            if (!isCancelled) images[idx] = kImg;
+          };
+        });
 
-      // Phase 3: Fill remaining in-between frames in non-blocking background idle batches (0ms TBT spike)
-      let currentFrameIndex = 2;
+      // Phase 3: Fill the rest in non-blocking idle batches (no TBT spike).
+      let cursor = 0;
 
       const loadBatch = () => {
-        if (isCancelled || currentFrameIndex > frameCount) return;
+        if (isCancelled || cursor >= framesToLoad.length) return;
         const batchSize = 8;
-        const end = Math.min(frameCount, currentFrameIndex + batchSize);
+        const end = Math.min(framesToLoad.length, cursor + batchSize);
 
-        for (let i = currentFrameIndex; i <= end; i++) {
-          const index = i - 1;
+        for (let i = cursor; i < end; i++) {
+          const fNum = framesToLoad[i];
+          const index = fNum - 1;
           if (!images[index]) {
             const img = new Image();
-            img.src = path(i);
+            img.src = path(fNum);
             img.onload = () => {
               if (!isCancelled) images[index] = img;
             };
           }
         }
 
-        currentFrameIndex = end + 1;
-        if (currentFrameIndex <= frameCount && !isCancelled) {
+        cursor = end;
+        if (cursor < framesToLoad.length && !isCancelled) {
           if (typeof window !== "undefined" && "requestIdleCallback" in window) {
             window.requestIdleCallback(loadBatch, { timeout: 600 });
           } else {
@@ -245,6 +285,11 @@ export function useHeroSequence() {
       isCancelled = true;
       observer.disconnect();
       window.removeEventListener("resize", onResize);
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      pendingIndexRef.current = null;
       images.forEach((img) => {
         if (img) {
           img.onload = null;

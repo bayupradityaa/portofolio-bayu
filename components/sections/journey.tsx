@@ -1,5 +1,12 @@
+import dynamic from "next/dynamic";
 import { getPublishedExperience } from "@/lib/actions/experience";
-import { JourneyClient } from "./journey-client";
+
+// Split into its own chunk so the GSAP timeline wiring hydrates after the
+// initial paint (lower mobile TBT). ssr:true keeps the server HTML identical —
+// desktop output is byte-for-byte unchanged; only the JS chunk is deferred.
+const JourneyClient = dynamic(
+  () => import("./journey-client").then((m) => ({ default: m.JourneyClient })),
+);
 
 /**
  * Server entry for "The path so far". Fetches published experience and hands
