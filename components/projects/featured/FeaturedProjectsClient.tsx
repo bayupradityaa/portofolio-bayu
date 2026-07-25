@@ -59,10 +59,7 @@ export function FeaturedProjectsClient({ projects }: { projects: FeaturedProject
 
       {/* Two-column stage */}
       <div className="relative z-10 mx-auto mt-16 grid w-full max-w-7xl grid-cols-1 px-6 md:mt-24 lg:grid-cols-[34%_1fr] lg:gap-10">
-        {/* Left — sticky sidebar (desktop). `sticky top-0` keeps the number +
-            title truly fixed to the viewport while the track scrolls under it;
-            `self-start` stops the grid from stretching the cell so sticky can
-            travel the full column. On mobile it collapses out of flow. */}
+        {/* Left — sticky sidebar (desktop) */}
         <div
           ref={sidebarRef}
           className="hidden self-start lg:sticky lg:top-0 lg:block lg:h-screen"

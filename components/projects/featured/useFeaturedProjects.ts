@@ -71,115 +71,64 @@ export function useFeaturedProjects({ count }: UseFeaturedProjectsArgs): UseFeat
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
 
-      // ── Reduced motion: paint final states, no scrub, fully readable ──────
-      mm.add(REDUCED_QUERY, () => {
-        gsap.set(slideRefs.current, SLIDE_MOTION.visible);
-        gsap.set(imageRefs.current, { y: 0, scale: 1 });
-        gsap.set(numberRefs.current, COUNTER_MOTION.visible);
-        // Only the first number should remain visible; stack the rest hidden.
-        numberRefs.current.forEach((el, i) => {
-          if (el) gsap.set(el, i === 0 ? COUNTER_MOTION.visible : { opacity: 0 });
-        });
-      });
-
-      // ── Desktop: pinned, scrub-driven cinematic sequence ──────────────────
-      mm.add(DESKTOP_QUERY, () => {
+      // ── Smooth scroll reveal — slides reveal on scroll enter and STAY visible ──────
+      mm.add(`(not ${REDUCED_QUERY})`, () => {
         const slides = slideRefs.current.filter(Boolean) as HTMLDivElement[];
-        const images = imageRefs.current.filter(Boolean) as HTMLDivElement[];
         const numbers = numberRefs.current.filter(Boolean) as HTMLSpanElement[];
 
-        // Initial states — first slide/number visible, the rest hidden below.
-        slides.forEach((el, i) => gsap.set(el, i === 0 ? SLIDE_MOTION.visible : SLIDE_MOTION.hidden));
-        numbers.forEach((el, i) =>
-          gsap.set(el, i === 0 ? COUNTER_MOTION.visible : COUNTER_MOTION.hidden),
-        );
-        gsap.set(images, { y: -IMAGE_PARALLAX / 2 });
-
-        // One master timeline, progress mapped 1:1 to scroll via scrub.
-        const tl = gsap.timeline({
-          defaults: { ease: EASE },
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            // One extra viewport of scroll per transition after the first slide.
-            end: () => `+=${window.innerHeight * count}`,
-            // No GSAP pin: the sidebar is held by CSS `position: sticky`, which
-            // is bulletproof against the grid-cell stretch that made the number
-            // drift. This trigger now only scrubs the crossfade timeline.
-            scrub: SCRUB,
-            invalidateOnRefresh: true,
-            onUpdate: (self) => {
-              // Map overall progress → nearest slide index for the React swap.
-              const idx = Math.min(count - 1, Math.round(self.progress * (count - 1)));
-              if (idx !== activeIndexRef.current) {
-                activeIndexRef.current = idx;
-                setActiveIndex(idx);
-              }
-            },
-          },
+        // Initial state for sidebar counter digits
+        numbers.forEach((el, i) => {
+          if (el) gsap.set(el, i === 0 ? COUNTER_MOTION.visible : COUNTER_MOTION.hidden);
         });
 
-        // Each transition occupies one equal segment of the timeline.
-        for (let i = 1; i < count; i++) {
-          const segment = i; // label position, 1 unit per transition
-          // Outgoing slide: settle back, scale down, blur.
-          tl.to(slides[i - 1], { ...SLIDE_MOTION.past, duration: 1 }, segment);
-          // Incoming slide: rise, sharpen, scale to 1.
-          tl.fromTo(
-            slides[i],
-            SLIDE_MOTION.hidden,
-            { ...SLIDE_MOTION.visible, duration: 1 },
-            segment,
-          );
-          // Counter crossfade — no hard switch.
-          tl.to(numbers[i - 1], { ...COUNTER_MOTION.hidden, duration: 1 }, segment);
-          tl.fromTo(
-            numbers[i],
-            COUNTER_MOTION.hidden,
-            { ...COUNTER_MOTION.visible, duration: 1 },
-            segment,
-          );
-        }
-
-        // Continuous, gentle image parallax across the whole scroll.
-        images.forEach((img) => {
-          gsap.to(img, {
-            y: IMAGE_PARALLAX / 2,
-            ease: "none",
-            scrollTrigger: {
-              trigger: section,
-              start: "top top",
-              end: () => `+=${window.innerHeight * count}`,
-              scrub: true,
-              invalidateOnRefresh: true,
-            },
-          });
-        });
-      });
-
-      // ── Mobile / tablet: no pin, per-slide reveal on enter ────────────────
-      mm.add(`(max-width: 1023px) and (not ${REDUCED_QUERY})`, () => {
-        const slides = slideRefs.current.filter(Boolean) as HTMLDivElement[];
-        slides.forEach((el) => {
+        slides.forEach((el, idx) => {
+          // 1. Reveal slide smoothly on scroll enter — STAYS fully visible
           gsap.fromTo(
             el,
-            { opacity: 0, y: 48, filter: "blur(8px)" },
+            { opacity: 0, y: 36, filter: "blur(6px)" },
             {
               opacity: 1,
               y: 0,
               filter: "blur(0px)",
-              duration: 0.8,
+              duration: 0.7,
               ease: EASE,
-              scrollTrigger: { trigger: el, start: "top 80%", once: true },
+              scrollTrigger: {
+                trigger: el,
+                start: "top 85%",
+                once: true, // Only animates once, never fades out on scroll
+              },
             },
           );
+
+          // 2. Update pinned sidebar counter digit as each project enters viewport
+          ScrollTrigger.create({
+            trigger: el,
+            start: "top 50%",
+            end: "bottom 50%",
+            onToggle: (self) => {
+              if (self.isActive && activeIndexRef.current !== idx) {
+                activeIndexRef.current = idx;
+                setActiveIndex(idx);
+
+                numbers.forEach((num, nIdx) => {
+                  if (num) {
+                    gsap.to(num, {
+                      opacity: nIdx === idx ? 1 : 0,
+                      scale: nIdx === idx ? 1 : 0.9,
+                      filter: nIdx === idx ? "blur(0px)" : "blur(6px)",
+                      duration: 0.4,
+                      ease: EASE,
+                    });
+                  }
+                });
+              }
+            },
+          });
         });
-        // Counter digits are shown inline per-slide on mobile; keep sidebar stack hidden.
-        gsap.set(numberRefs.current, { opacity: 0 });
       });
     }, section);
 
-    return () => ctx.revert(); // kills every trigger + tween created above
+    return () => ctx.revert();
   }, [count]);
 
   return {

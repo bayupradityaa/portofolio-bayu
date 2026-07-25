@@ -3,7 +3,16 @@ import { Section, SectionHeading } from "@/components/ui/section";
 import { Reveal } from "@/components/motion/reveal";
 import { getPublishedCertificates } from "@/lib/actions/certificates";
 
+/**
+ * Feature flag for Certificates section.
+ * Set to `false` to hide the section completely while certificates are being collected.
+ * Set to `true` when ready to show published certificates on the portfolio.
+ */
+const ENABLE_CERTIFICATES_SECTION = false;
+
 export async function Certificates() {
+  if (!ENABLE_CERTIFICATES_SECTION) return null;
+
   const certificates = await getPublishedCertificates();
 
   if (certificates.length === 0) return null;
