@@ -9,8 +9,8 @@
   --card: #18181b;
   --border: #27272a;
   --foreground: #fafafa;
-  --secondary: #a1a1aa;
-  --muted: #71717a;
+  --secondary: #b0b0b8;
+  --muted: #94949e;
   --accent: #22c55e;
   --accent-hover: #4ade80;
   --accent-contrast: #04120a;
@@ -24,12 +24,12 @@ html.light,
   --background: #f8fafc;
   --surface: #f1f5f9;
   --card: #ffffff;
-  --border: #e2e8f0;
+  --border: #cbd5e1;
   --foreground: #0f172a;
-  --secondary: #475569;
-  --muted: #64748b;
-  --accent: #16a34a;
-  --accent-hover: #15803d;
+  --secondary: #334155;
+  --muted: #475569;
+  --accent: #15803d;
+  --accent-hover: #166534;
   --accent-contrast: #ffffff;
 }
 
