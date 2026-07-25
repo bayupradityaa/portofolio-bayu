@@ -37,21 +37,26 @@ export function ProjectSlide({
   const primaryLabel = project.liveUrlLabel || "Visit Website";
 
   return (
-    <div className="flex min-h-screen w-full items-center py-16 lg:py-0">
+    <div className="flex w-full py-12 md:py-20 border-b border-border/40 last:border-b-0">
       <div
         ref={slideRef}
-        className="flex w-full flex-col gap-7"
-        style={{ willChange: "transform, opacity, filter" }}
+        className="flex w-full flex-col gap-6"
       >
-        {/* On mobile the counter is inline since the sidebar isn't pinned. */}
-        <div className="flex items-baseline gap-4 lg:hidden">
-          <span className="font-sans text-5xl font-thin leading-none tracking-tighter text-secondary/50">
+        {/* Header — Counter + Category (Mobile only; desktop shows them in the pinned sidebar) */}
+        <div className="flex items-baseline gap-3 lg:hidden">
+          <span className="font-sans text-4xl font-thin leading-none tracking-tighter text-secondary/40">
             {project.index}
           </span>
-          <span className="font-mono text-[0.6875rem] font-medium uppercase tracking-wider text-accent">
+          <span className="font-mono text-xs font-semibold uppercase tracking-wider text-accent">
             {project.category}
           </span>
         </div>
+
+        {/* Title — Mobile only (desktop shows title in pinned sidebar) */}
+        <h3 className="text-2xl font-semibold tracking-tight lg:hidden">{project.name}</h3>
+
+        {/* Tagline */}
+        <p className="text-base text-accent md:text-lg">{project.tagline}</p>
 
         {/* Image */}
         <ProjectImage
@@ -61,21 +66,14 @@ export function ProjectSlide({
           priority={priority}
         />
 
-        {/* Title — mobile only (desktop shows it in the pinned sidebar) */}
-        <div className="lg:hidden">
-          <h3 className="text-2xl font-semibold tracking-tight">{project.name}</h3>
-          <p className="mt-1 text-lg text-accent">{project.tagline}</p>
-        </div>
-
-        {/* Tagline on desktop sits above the description */}
-        <p className="hidden text-lg text-accent lg:block">{project.tagline}</p>
-
-        {/* Description — comfortable reading width */}
-        <p className="max-w-[56ch] leading-relaxed text-secondary">{project.summary}</p>
+        {/* Description — comfortable reading width, always readable */}
+        <p className="max-w-[65ch] text-base leading-relaxed text-secondary md:text-lg">
+          {project.summary}
+        </p>
 
         {/* Optional statistics */}
         {project.stats.length > 0 && (
-          <div className="flex flex-wrap gap-x-10 gap-y-4">
+          <div className="flex flex-wrap gap-x-10 gap-y-4 pt-2">
             {project.stats.map((stat) => (
               <div key={stat.label} className="flex flex-col gap-0.5">
                 <span className="text-xl font-semibold tracking-tight text-foreground">
@@ -91,11 +89,11 @@ export function ProjectSlide({
 
         {/* Tech badges — small rounded pills, fade upward */}
         <motion.div
-          className="flex flex-wrap gap-2"
+          className="flex flex-wrap gap-2 pt-2"
           variants={badgeStagger}
           initial="rest"
           whileInView="show"
-          viewport={{ once: true, amount: 0.5 }}
+          viewport={{ once: true, amount: 0.3 }}
         >
           {project.technologies.map((tech) => (
             <motion.span
@@ -113,7 +111,7 @@ export function ProjectSlide({
         </motion.div>
 
         {/* CTAs */}
-        <div className="mt-1 flex flex-wrap items-center gap-6">
+        <div className="mt-2 flex flex-wrap items-center gap-6">
           {project.status === "Live" && primaryHref ? (
             <motion.a
               href={primaryHref}
