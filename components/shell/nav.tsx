@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence, type Variants } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion, type Variants } from "motion/react";
 import { User, Cpu, Briefcase, Compass, Mail } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { LinkButton } from "@/components/ui/button";
@@ -80,13 +80,48 @@ const sharedTransition = {
   duration: 0.4,
 };
 
-const MENU_SLIDE_ANIMATION = {
-  initial: { x: "calc(100% + 100px)" },
-  enter: { x: "0", transition: { duration: 0.7, ease: [0.76, 0, 0.24, 1] as const } },
-  exit: {
-    x: "calc(100% + 100px)",
-    transition: { duration: 0.7, ease: [0.76, 0, 0.24, 1] as const },
+// ── Concept A: Radial clip-path expand ──────────────────────────────────────
+// The overlay is revealed by a circle that grows from the hamburger button's
+// screen position (passed in as CSS vars) until it covers the viewport. Only
+// clip-path + opacity animate — both GPU-composited, zero layout/reflow, so the
+// reveal stays cheap on mobile main-thread (protects the TBT work).
+const EASE_EXPO = [0.76, 0, 0.24, 1] as const;
+
+const OVERLAY_REVEAL: Variants = {
+  initial: { clipPath: "circle(0% at var(--menu-x) var(--menu-y))", opacity: 1 },
+  enter: {
+    clipPath: "circle(150% at var(--menu-x) var(--menu-y))",
+    opacity: 1,
+    transition: { duration: 0.7, ease: EASE_EXPO },
   },
+  exit: {
+    clipPath: "circle(0% at var(--menu-x) var(--menu-y))",
+    opacity: 1,
+    transition: { duration: 0.55, ease: EASE_EXPO },
+  },
+};
+
+// Stagger container for the nav list — children ride in once the circle opens.
+const MENU_LIST: Variants = {
+  initial: {},
+  enter: {
+    transition: { delayChildren: 0.28, staggerChildren: 0.06 },
+  },
+  exit: {
+    transition: { staggerChildren: 0.03, staggerDirection: -1 },
+  },
+};
+
+// Each item: rises from below + fades in. Wrapper only — the letter-stagger
+// hover on CurvedNavLink stays independent (it uses its own variant names).
+const MENU_ITEM: Variants = {
+  initial: { y: 32, opacity: 0 },
+  enter: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.5, ease: EASE_EXPO },
+  },
+  exit: { y: 20, opacity: 0, transition: { duration: 0.3, ease: EASE_EXPO } },
 };
 
 /** Animated SVG Menu Toggle Button */
@@ -133,41 +168,6 @@ function MenuToggleIcon({
         d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"
       />
       <path d="M7 16 27 16" />
-    </svg>
-  );
-}
-
-/** SVG Curve side edge for smooth drawer slide */
-function Curve() {
-  const [height, setHeight] = useState(0);
-
-  useEffect(() => {
-    setHeight(window.innerHeight);
-    const onResize = () => setHeight(window.innerHeight);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-
-  if (!height) return null;
-
-  const initialPath = `M100 0 L200 0 L200 ${height} L100 ${height} Q-100 ${height / 2} 100 0`;
-  const targetPath = `M100 0 L200 0 L200 ${height} L100 ${height} Q100 ${height / 2} 100 0`;
-
-  const curve = {
-    initial: { d: initialPath },
-    enter: {
-      d: targetPath,
-      transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] as const },
-    },
-    exit: {
-      d: initialPath,
-      transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] as const },
-    },
-  };
-
-  return (
-    <svg className="absolute top-0 -left-[99px] h-full w-[100px] stroke-none fill-background border-none pointer-events-none">
-      <motion.path variants={curve} initial="initial" animate="enter" exit="exit" />
     </svg>
   );
 }
@@ -254,6 +254,10 @@ export function Nav() {
   const [active, setActive] = useState<string>("");
   const [open, setOpen] = useState(false);
   const [heroProgress, setHeroProgress] = useState(0);
+  // Screen origin of the hamburger button — the radial reveal grows from here.
+  const [origin, setOrigin] = useState({ x: "100%", y: "0px" });
+  const menuBtnRef = useRef<HTMLButtonElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (!isHomePage) return;
@@ -303,6 +307,30 @@ export function Nav() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
+
+  // Lock body scroll while the full-screen overlay is open (mobile only).
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
+  // Toggle the menu, seeding the radial-reveal origin from the button's center.
+  const toggleMenu = () => {
+    if (!open) {
+      const rect = menuBtnRef.current?.getBoundingClientRect();
+      if (rect) {
+        setOrigin({
+          x: `${Math.round(rect.left + rect.width / 2)}px`,
+          y: `${Math.round(rect.top + rect.height / 2)}px`,
+        });
+      }
+    }
+    setOpen((v) => !v);
+  };
 
   const scrolled = !isHomePage || heroProgress > 0.6;
   const logoOpacity = !isHomePage ? 1 : Math.min(1, Math.max(0.3, (heroProgress - 0.5) / 0.2));
@@ -449,79 +477,105 @@ export function Nav() {
         <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
           <button
+            ref={menuBtnRef}
             type="button"
-            className="rounded-lg p-2 text-foreground cursor-pointer hover:bg-surface transition-colors"
+            className="relative z-[70] rounded-lg p-2 text-foreground cursor-pointer hover:bg-surface transition-colors"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
-            onClick={() => setOpen((v) => !v)}
+            onClick={toggleMenu}
           >
             <MenuToggleIcon open={open} className="h-6 w-6 text-foreground" />
           </button>
         </div>
       </div>
 
-      {/* Curved Mobile Drawer Menu with AnimatePresence */}
+      {/* Radial-reveal mobile menu (Concept A) */}
       <AnimatePresence mode="wait">
         {open && (
-          <>
-            {/* Dark Backdrop Overlay — tap anywhere outside to close */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"
-              onClick={() => setOpen(false)}
+          // Full-screen radial-reveal overlay (Concept A) — grows from the
+          // hamburger button. Full-viewport + opaque, so it doubles as its own
+          // backdrop; no separate dim layer needed.
+          <motion.div
+            variants={prefersReducedMotion ? undefined : OVERLAY_REVEAL}
+            initial={prefersReducedMotion ? { opacity: 0 } : "initial"}
+            animate={prefersReducedMotion ? { opacity: 1 } : "enter"}
+            exit={prefersReducedMotion ? { opacity: 0 } : "exit"}
+            transition={prefersReducedMotion ? { duration: 0.2 } : undefined}
+            style={
+              {
+                "--menu-x": origin.x,
+                "--menu-y": origin.y,
+              } as React.CSSProperties
+            }
+            className="fixed inset-0 z-[60] h-[100dvh] w-full bg-background md:hidden"
+          >
+            {/* faint accent glow anchored to the reveal origin — pure decoration */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 opacity-70"
+              style={{
+                background:
+                  "radial-gradient(circle at var(--menu-x) var(--menu-y), rgba(34,197,94,0.10) 0%, rgba(34,197,94,0) 45%)",
+              }}
             />
+            <div className="relative flex h-full flex-col justify-between px-6 pt-5 pb-8">
+              <div className="flex flex-col gap-3">
+                {/* Top Bar — NAVIGATION Label & Explicit Close Button */}
+                <motion.div
+                  initial={prefersReducedMotion ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: prefersReducedMotion ? 0 : 0.3 }}
+                  className="flex items-center justify-between border-b border-border/40 pb-3"
+                >
+                  <span className="font-mono text-xs uppercase tracking-widest text-muted">
+                    Navigation
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent transition-colors hover:border-accent hover:bg-accent hover:text-accent-contrast cursor-pointer"
+                    aria-label="Close menu"
+                  >
+                    <span>Close</span>
+                    <MenuToggleIcon open={true} className="h-4 w-4" />
+                  </button>
+                </motion.div>
 
-            {/* Curved Mobile Drawer Panel */}
-            <motion.div
-              variants={MENU_SLIDE_ANIMATION}
-              initial="initial"
-              animate="enter"
-              exit="exit"
-              className="fixed right-0 top-0 z-50 h-[100dvh] w-full max-w-xs sm:max-w-sm border-l border-border bg-background shadow-2xl md:hidden"
-            >
-              <div className="flex h-full flex-col justify-between px-6 pt-5 pb-8">
-                <div className="flex flex-col gap-3">
-                  {/* Drawer Top Bar — NAVIGATION Label & Explicit Close Button */}
-                  <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                    <span className="font-mono text-xs uppercase tracking-widest text-muted">
-                      Navigation
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setOpen(false)}
-                      className="flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent transition-colors hover:border-accent hover:bg-accent hover:text-accent-contrast cursor-pointer"
-                      aria-label="Close menu"
-                    >
-                      <span>Close</span>
-                      <MenuToggleIcon open={true} className="h-4 w-4" />
-                    </button>
-                  </div>
+                <motion.nav
+                  variants={MENU_LIST}
+                  initial={prefersReducedMotion ? false : "initial"}
+                  animate="enter"
+                  exit="exit"
+                  className="mt-1 flex flex-col gap-0.5"
+                  aria-label="Mobile"
+                >
+                  {navItems.map((item, index) => {
+                    const isActive = active === item.id;
+                    const targetHref = isHomePage ? `#${item.id}` : `/#${item.id}`;
 
-                  <nav className="mt-1 flex flex-col gap-0.5" aria-label="Mobile">
-                    {navItems.map((item, index) => {
-                      const isActive = active === item.id;
-                      const targetHref = isHomePage ? `#${item.id}` : `/#${item.id}`;
-
-                      return (
+                    return (
+                      <motion.div key={item.id} variants={MENU_ITEM}>
                         <CurvedNavLink
-                          key={item.id}
                           item={item}
                           index={index + 1}
                           isActive={isActive}
                           onClick={() => setOpen(false)}
                           targetHref={targetHref}
                         />
-                      );
-                    })}
-                  </nav>
-                </div>
+                      </motion.div>
+                    );
+                  })}
+                </motion.nav>
+              </div>
 
-                {/* Mobile Drawer Footer with Social Icons & CTA */}
-                <div className="flex flex-col gap-5 border-t border-border/40 pt-5">
-                  <div className="flex items-center justify-around text-muted">
+              {/* Footer with Social Icons & CTA */}
+              <motion.div
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: prefersReducedMotion ? 0 : 0.55, duration: 0.4, ease: EASE_EXPO }}
+                className="flex flex-col gap-5 border-t border-border/40 pt-5"
+              >
+                <div className="flex items-center justify-around text-muted">
                     <a
                       href="https://github.com/bayupradityaa"
                       target="_blank"
@@ -558,21 +612,17 @@ export function Nav() {
                     </a>
                   </div>
 
-                  <LinkButton
-                    href={isHomePage ? "#contact" : "/#contact"}
-                    size="md"
-                    className="w-full justify-center"
-                    onClick={() => setOpen(false)}
-                  >
-                    Get in touch
-                  </LinkButton>
-                </div>
-              </div>
-
-              {/* Curved SVG Side Edge */}
-              <Curve />
-            </motion.div>
-          </>
+                <LinkButton
+                  href={isHomePage ? "#contact" : "/#contact"}
+                  size="md"
+                  className="w-full justify-center"
+                  onClick={() => setOpen(false)}
+                >
+                  Get in touch
+                </LinkButton>
+              </motion.div>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </header>
