@@ -69,7 +69,7 @@ export function useHeroSequence() {
     const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
     const bgColor = isDark ? "#09090b" : "#ffffff";
     const shadowRgb = isDark ? "9, 9, 11" : "255, 255, 255";
-    
+
     if (isDesktop) {
       // Desktop: Dynamic theme adaptive rendering
       const scaleFactor = 1.01;
@@ -263,7 +263,6 @@ export function useHeroSequence() {
     };
     window.addEventListener("resize", onResize);
 
-    // Listen for theme mutations ONLY (ignore scroll class mutations to prevent unwanted frame resets)
     let lastThemeIsDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
 
     const observer = new MutationObserver(() => {

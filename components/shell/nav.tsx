@@ -509,18 +509,18 @@ export function Nav() {
             }
             className="fixed inset-0 z-[60] h-[100dvh] w-full bg-background md:hidden"
           >
-            {/* faint accent glow anchored to the reveal origin — pure decoration */}
+            {/* faint glow anchored to the reveal origin — pure decoration */}
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 opacity-70"
               style={{
                 background:
-                  "radial-gradient(circle at var(--menu-x) var(--menu-y), rgba(34,197,94,0.10) 0%, rgba(34,197,94,0) 45%)",
+                  "radial-gradient(circle at var(--menu-x) var(--menu-y), rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 45%)",
               }}
             />
             <div className="relative flex h-full flex-col justify-between px-6 pt-5 pb-8">
               <div className="flex flex-col gap-3">
-                {/* Top Bar — NAVIGATION Label & Explicit Close Button */}
+                {/* Top Bar — NAVIGATION Label & Close Button */}
                 <motion.div
                   initial={prefersReducedMotion ? false : { opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -533,11 +533,10 @@ export function Nav() {
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent transition-colors hover:border-accent hover:bg-accent hover:text-accent-contrast cursor-pointer"
+                    className="p-1.5 text-foreground hover:opacity-80 transition-opacity cursor-pointer"
                     aria-label="Close menu"
                   >
-                    <span>Close</span>
-                    <MenuToggleIcon open={true} className="h-4 w-4" />
+                    <MenuToggleIcon open={true} className="h-5 w-5 text-foreground" />
                   </button>
                 </motion.div>
 
