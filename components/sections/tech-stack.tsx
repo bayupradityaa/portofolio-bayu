@@ -30,6 +30,9 @@ import {
   FigmaIcon,
   GitIcon,
   ExpressIcon,
+  GoogleappsscriptIcon,
+  GooglesheetsIcon,
+  GooglecloudIcon,
 } from "@/components/ui/tech-icons";
 
 // Custom local SVG icons for Lenis, Fiber, and REST API to maintain monochrome consistent style
@@ -105,10 +108,16 @@ const logoIcons: Record<string, React.ComponentType<{ className?: string; size?:
   "REST API": RestApiIcon,
   Python: PythonIcon,
   Flask: FlaskIcon,
+  "Apps Script": GoogleappsscriptIcon,
+  "Google Apps Script": GoogleappsscriptIcon,
+  Spreadsheet: GooglesheetsIcon,
+  "Google Sheets": GooglesheetsIcon,
   PostgreSQL: PostgresqlIcon,
   MySQL: MysqlIcon,
   Firebase: FirebaseIcon,
   Supabase: SupabaseIcon,
+  "Google Cloud": GooglecloudIcon,
+  GCP: GooglecloudIcon,
   Cloudflare: CloudflareIcon,
   Docker: DockerIcon,
   Git: GitIcon,
@@ -135,10 +144,16 @@ const logoTooltips: Record<string, string> = {
   "REST API": "API architectural standards",
   Python: "Machine learning & scripting",
   Flask: "Micro web framework for Python",
+  "Apps Script": "Workflow & Google Workspace automation",
+  "Google Apps Script": "Workflow & Google Workspace automation",
+  Spreadsheet: "Data management & structured reporting",
+  "Google Sheets": "Data management & structured reporting",
   PostgreSQL: "Advanced SQL database",
   MySQL: "Relational SQL storage",
-  Firebase: "Realtime backend platform",
+  Firebase: "Realtime backend & cloud platform",
   Supabase: "Open-source Firebase alternative",
+  "Google Cloud": "Cloud infrastructure & enterprise services",
+  GCP: "Cloud infrastructure & enterprise services",
   Cloudflare: "Global Edge Network",
   Docker: "Containerized deployment",
   Git: "Distributed version control",
@@ -159,10 +174,10 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
   // Balanced 2-Row Layout Configuration
   const defaultRow1 = [
     "React", "Next.js", "TypeScript", "Tailwind CSS", "GSAP", "Framer Motion", "Lenis",
-    "Go", "Fiber", "Node.js", "Express", "REST API", "Python", "Flask"
+    "Go", "Fiber", "Node.js", "Express", "REST API", "Python", "Flask", "Apps Script"
   ];
   const defaultRow2 = [
-    "PostgreSQL", "MySQL", "Firebase", "Supabase", "Cloudflare", "Docker",
+    "Spreadsheet", "Firebase", "Google Cloud", "PostgreSQL", "MySQL", "Supabase", "Cloudflare", "Docker",
     "Git", "GitHub", "GitHub Actions", "Postman", "VS Code", "Figma"
   ];
 

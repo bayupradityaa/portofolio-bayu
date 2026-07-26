@@ -400,6 +400,57 @@ export function ExpressIcon({ size = 20, className }: IconProps) {
   );
 }
 
+export function GoogleappsscriptIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg
+      role="img"
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M12.87 1.51L3.06 11.32a1.5 1.5 0 0 0 0 2.12l7.5 7.5a1.5 1.5 0 0 0 2.12 0l9.81-9.81A1.5 1.5 0 0 0 23 10.07V3.01a1.5 1.5 0 0 0-1.5-1.5h-8.63zm.63 2.99h7v7l-7-7zM7.5 13.5l4-4 3 3-4 4-3-3z"/>
+    </svg>
+  );
+}
+
+export function GooglesheetsIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg
+      role="img"
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M19.385 24H4.615A2.618 2.618 0 0 1 2 21.385V2.615A2.618 2.618 0 0 1 4.615 0h10.154L22 7.231v14.154A2.618 2.618 0 0 1 19.385 24zM14.154 2.154V7.385h5.231zM6.308 11.077v8.308h11.384v-8.308zm1.846 1.846h2.462v1.538H8.154zm4.308 0h3.384v1.538h-3.384zm-4.308 3.077h2.462v1.538H8.154zm4.308 0h3.384v1.538h-3.384z" />
+    </svg>
+  );
+}
+
+export function GooglecloudIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg
+      role="img"
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/>
+    </svg>
+  );
+}
+
 export function TechIcon({ name, className, size = 14 }: { name: string; className?: string; size?: number }) {
   const normalized = name.toLowerCase().trim().replace(/[\.\s-]/g, "");
 
@@ -422,6 +473,23 @@ export function TechIcon({ name, className, size = 14 }: { name: string; classNa
       );
     case "python":
       return <PythonIcon size={size} className={className} />;
+    case "firebase":
+      return <FirebaseIcon size={size} className={className} />;
+    case "appscript":
+    case "appsscript":
+    case "googleappsscript":
+    case "googleappscript":
+      return <GoogleappsscriptIcon size={size} className={className} />;
+    case "spreadsheet":
+    case "spreadsheets":
+    case "googlesheets":
+    case "googlesheet":
+    case "excel":
+      return <GooglesheetsIcon size={size} className={className} />;
+    case "googlecloud":
+    case "googlecloudplatform":
+    case "gcp":
+      return <GooglecloudIcon size={size} className={className} />;
     case "supabase":
       return <SupabaseIcon size={size} className={className} />;
     case "postgresql":
