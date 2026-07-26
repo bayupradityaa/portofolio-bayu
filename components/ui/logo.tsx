@@ -9,7 +9,7 @@ export function Logo({ className }: { className?: string }) {
       )}
       aria-label="Bayu Praditya"
     >
-      <span>Uyab</span>
+      <span>Bayu</span>
       <span className="text-accent">.</span>
       <span className="sr-only">Praditya</span>
     </span>
