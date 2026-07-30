@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { ImageOff } from "lucide-react";
 import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
+import { ProjectPreviewPlaceholder } from "@/components/ui/project-preview-placeholder";
 
 /**
  * Project cover with a GSAP-driven parallax layer (the outer ref) and a
@@ -47,9 +48,7 @@ export const ProjectImage = forwardRef<
             className="object-cover"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-secondary">
-            <ImageOff size={28} strokeWidth={1.5} aria-hidden="true" />
-          </div>
+          <ProjectPreviewPlaceholder title={alt} />
         )}
       </div>
 

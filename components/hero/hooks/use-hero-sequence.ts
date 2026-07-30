@@ -111,20 +111,7 @@ export function useHeroSequence() {
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "medium";
 
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, cw, ch);
-
     ctx.drawImage(img, x, y, dw, dh);
-
-    // Left gradient blend automatically adapting to Light vs Dark theme
-    const blendWidth = Math.min(120, cw * 0.10);
-    const leftGrad = ctx.createLinearGradient(0, 0, blendWidth, 0);
-    leftGrad.addColorStop(0, `rgba(${shadowRgb}, 0.70)`);
-    leftGrad.addColorStop(0.5, `rgba(${shadowRgb}, 0.30)`);
-    leftGrad.addColorStop(1, `rgba(${shadowRgb}, 0)`);
-
-    ctx.fillStyle = leftGrad;
-    ctx.fillRect(0, 0, blendWidth, ch);
   }, []);
 
   /**
@@ -176,12 +163,28 @@ export function useHeroSequence() {
       lastIndexRef.current = -1;
     };
 
+    const loadAndDecodeFrame = (fNum: number, index: number) => {
+      if (images[index]) return;
+      const img = new Image();
+      img.src = path(fNum);
+      img.onload = () => {
+        if (isCancelled) return;
+        images[index] = img;
+        if ("decode" in img) {
+          img.decode().catch(() => {});
+        }
+      };
+    };
+
     // Phase 1: Load Frame 1 FIRST for instant sub-second LCP paint
     const frame1 = new Image();
     frame1.onload = () => {
       if (isCancelled) return;
       images[0] = frame1;
       imagesRef.current = images;
+      if ("decode" in frame1) {
+        frame1.decode().catch(() => {});
+      }
       sizeCanvas();
       renderFrame(0);
       setStatus("ready");
@@ -204,13 +207,7 @@ export function useHeroSequence() {
       framesToLoad
         .filter((_, i) => i % strideEvery === 0)
         .forEach((fNum) => {
-          const idx = fNum - 1;
-          if (images[idx]) return;
-          const kImg = new Image();
-          kImg.src = path(fNum);
-          kImg.onload = () => {
-            if (!isCancelled) images[idx] = kImg;
-          };
+          loadAndDecodeFrame(fNum, fNum - 1);
         });
 
       // Phase 3: Fill the rest in non-blocking idle batches (no TBT spike).
@@ -223,14 +220,7 @@ export function useHeroSequence() {
 
         for (let i = cursor; i < end; i++) {
           const fNum = framesToLoad[i];
-          const index = fNum - 1;
-          if (!images[index]) {
-            const img = new Image();
-            img.src = path(fNum);
-            img.onload = () => {
-              if (!isCancelled) images[index] = img;
-            };
-          }
+          loadAndDecodeFrame(fNum, fNum - 1);
         }
 
         cursor = end;

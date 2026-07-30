@@ -71,7 +71,7 @@ export function TechnologySelect({ technologies, selectedIds, onChange }: Techno
       </button>
 
       {open && (
-        <div className="mt-2 max-h-64 overflow-y-auto rounded-xl border border-[#27272a] bg-[#111113] shadow-xl">
+        <div className="mt-2 max-h-80 overflow-y-auto rounded-xl border border-[#27272a] bg-[#111113] shadow-xl">
           {/* Search */}
           <div className="sticky top-0 flex items-center gap-2 border-b border-[#27272a] bg-[#111113] px-3 py-2">
             <Search size={14} className="text-[#71717a]" />

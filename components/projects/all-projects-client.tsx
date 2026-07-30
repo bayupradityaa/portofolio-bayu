@@ -15,6 +15,7 @@ import { GithubIcon } from "@/components/ui/brand-icons";
 import { TechIcon } from "@/components/ui/tech-icons";
 import { Reveal } from "@/components/motion/reveal";
 import { ProjectDetailModal } from "@/components/projects/project-detail-modal";
+import { ProjectPreviewPlaceholder } from "@/components/ui/project-preview-placeholder";
 import type { ProjectWithRelations } from "@/lib/types/database";
 
 interface AllProjectsClientProps {
@@ -115,9 +116,7 @@ function ProjectCard({
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-surface text-secondary">
-              <ImageOff size={28} strokeWidth={1.5} aria-hidden="true" />
-            </div>
+            <ProjectPreviewPlaceholder title={project.name} category={project.category} status={project.status} />
           )}
 
           {/* Hover Overlay with "View Detail Project" Button */}

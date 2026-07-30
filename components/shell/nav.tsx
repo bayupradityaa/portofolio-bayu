@@ -124,51 +124,35 @@ const MENU_ITEM: Variants = {
   exit: { y: 20, opacity: 0, transition: { duration: 0.3, ease: EASE_EXPO } },
 };
 
-/** Animated SVG Menu Toggle Button */
+/** Animated Menu Toggle Icon (Hamburger to X) */
 function MenuToggleIcon({
   open,
   className,
-  fill = "none",
-  stroke = "currentColor",
-  strokeWidth = 2.5,
-  strokeLinecap = "round",
-  strokeLinejoin = "round",
-  duration = 500,
-  ...props
 }: {
   open: boolean;
   className?: string;
-  fill?: string;
-  stroke?: string;
-  strokeWidth?: number;
-  strokeLinecap?: "round" | "butt" | "square";
-  strokeLinejoin?: "round" | "miter" | "bevel";
-  duration?: number;
 }) {
   return (
-    <svg
-      strokeWidth={strokeWidth}
-      fill={fill}
-      stroke={stroke}
-      viewBox="0 0 32 32"
-      strokeLinecap={strokeLinecap}
-      strokeLinejoin={strokeLinejoin}
-      className={cn("transition-transform ease-in-out", open && "-rotate-45", className)}
-      style={{ transitionDuration: `${duration}ms` }}
-      {...props}
-    >
-      <path
-        className={cn(
-          "transition-all ease-in-out",
-          open
-            ? "[stroke-dasharray:20_300] [stroke-dashoffset:-32.42px]"
-            : "[stroke-dasharray:12_63]",
-        )}
-        style={{ transitionDuration: `${duration}ms` }}
-        d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"
+    <div className={cn("relative flex h-6 w-6 items-center justify-center overflow-hidden", className)}>
+      <motion.span
+        initial={false}
+        animate={open ? { rotate: 45, y: 0 } : { rotate: 0, y: -5 }}
+        transition={{ type: "spring", stiffness: 300, damping: 22 }}
+        className="absolute h-[2px] w-5 rounded-full bg-current transform-gpu"
       />
-      <path d="M7 16 27 16" />
-    </svg>
+      <motion.span
+        initial={false}
+        animate={open ? { opacity: 0, x: -8 } : { opacity: 1, x: 0 }}
+        transition={{ duration: 0.15 }}
+        className="absolute h-[2px] w-5 rounded-full bg-current transform-gpu"
+      />
+      <motion.span
+        initial={false}
+        animate={open ? { rotate: -45, y: 0 } : { rotate: 0, y: 5 }}
+        transition={{ type: "spring", stiffness: 300, damping: 22 }}
+        className="absolute h-[2px] w-5 rounded-full bg-current transform-gpu"
+      />
+    </div>
   );
 }
 
@@ -261,14 +245,23 @@ export function Nav() {
 
   useEffect(() => {
     if (!isHomePage) return;
+    let rafId: number | null = null;
     const onHeroScroll = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       if (detail && typeof detail.progress === "number") {
-        setHeroProgress(detail.progress);
+        const val = detail.progress;
+        if (rafId !== null) return;
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          setHeroProgress((prev) => (Math.abs(prev - val) >= 0.01 ? val : prev));
+        });
       }
     };
     window.addEventListener("hero-scroll", onHeroScroll);
-    return () => window.removeEventListener("hero-scroll", onHeroScroll);
+    return () => {
+      window.removeEventListener("hero-scroll", onHeroScroll);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, [isHomePage]);
 
   useEffect(() => {

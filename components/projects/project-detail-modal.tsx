@@ -16,6 +16,7 @@ import {
 import { GithubIcon } from "@/components/ui/brand-icons";
 import { TechIcon } from "@/components/ui/tech-icons";
 import { useLenis } from "@/components/providers/smooth-scroll";
+import { ProjectPreviewPlaceholder } from "@/components/ui/project-preview-placeholder";
 import type { ProjectWithRelations } from "@/lib/types/database";
 import { cn } from "@/lib/utils";
 
@@ -137,9 +138,7 @@ export function ProjectDetailModal({
                 priority
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-muted">
-                <ImageOff size={36} strokeWidth={1.5} />
-              </div>
+              <ProjectPreviewPlaceholder title={project.name} category={project.category} status={project.status} />
             )}
 
             {/* Gallery Navigation Arrows */}

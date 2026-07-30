@@ -121,7 +121,7 @@ export function HeroScene({ settings }: { settings: ProfileSettings | null }) {
 
   return (
     <HeroProvider value={{ stage }}>
-      <section ref={sectionRef} id="hero" className="relative h-[160vh] md:h-[200vh]">
+      <section ref={sectionRef} id="hero" className="relative h-[220vh] md:h-[200vh]">
         <div
           ref={stickyRef}
           className="sticky top-0 h-[100dvh] overflow-hidden z-10 will-change-transform"
