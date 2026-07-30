@@ -33,6 +33,7 @@ import {
   GoogleappsscriptIcon,
   GooglesheetsIcon,
   GooglecloudIcon,
+  TechIcon,
 } from "@/components/ui/tech-icons";
 
 // Custom local SVG icons for Lenis, Fiber, and REST API to maintain monochrome consistent style
@@ -181,8 +182,14 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
     "Git", "GitHub", "GitHub Actions", "Postman", "VS Code", "Figma"
   ];
 
-  const row1 = technologies.length > 0 ? technologies.slice(0, Math.ceil(technologies.length / 2)) : defaultRow1;
-  const row2 = technologies.length > 0 ? technologies.slice(Math.ceil(technologies.length / 2)) : defaultRow2;
+  // Deduplicate and split technology list
+  const uniqueTechs = Array.from(
+    new Set(technologies.length > 0 ? technologies : [...defaultRow1, ...defaultRow2]),
+  );
+  const midPoint = Math.ceil(uniqueTechs.length / 2);
+
+  const row1 = uniqueTechs.slice(0, midPoint);
+  const row2 = uniqueTechs.slice(midPoint);
 
   return (
     <Section id="stack" className="bg-background text-foreground pb-32 md:pb-44 lg:pb-56 overflow-hidden">
@@ -219,7 +226,7 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
           <MarqueeRow
             items={row1}
             direction="left"
-            duration={38}
+            duration={60}
             activeTech={activeTech}
             onTechClick={handleTechClick}
           />
@@ -228,7 +235,7 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
           <MarqueeRow
             items={row2}
             direction="right"
-            duration={32}
+            duration={50}
             activeTech={activeTech}
             onTechClick={handleTechClick}
           />
@@ -241,7 +248,7 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
 function MarqueeRow({
   items,
   direction,
-  duration = 35,
+  duration = 140,
   className,
   activeTech,
   onTechClick,
@@ -268,8 +275,8 @@ function MarqueeRow({
           } as React.CSSProperties
         }
       >
-        {/* Quadruple items to ensure 100% seamless infinite looping across all screen sizes */}
-        {[...items, ...items, ...items, ...items].map((logo, idx) => (
+        {/* Double items for 100% seamless infinite looping with smooth motion */}
+        {[...items, ...items].map((logo, idx) => (
           <LogoPill
             key={`${logo}-${idx}`}
             name={logo}
@@ -291,10 +298,7 @@ function LogoPill({
   isActive?: boolean;
   onClick?: () => void;
 }) {
-  const Icon = logoIcons[name];
-  const tooltipText = logoTooltips[name];
-
-  if (!Icon) return null;
+  const tooltipText = logoTooltips[name] || `${name} Technology`;
 
   return (
     <div
@@ -308,27 +312,28 @@ function LogoPill({
         }
       }}
       className={cn(
-        "group relative flex h-[52px] items-center gap-3 rounded-full border bg-card/90 px-6 py-3 outline-none shadow-sm transition-all duration-[300ms] ease-out transform-gpu will-change-transform cursor-pointer select-none",
+        "group relative flex h-[52px] items-center gap-3 rounded-full border px-6 py-3 outline-none shadow-sm transition-all duration-300 ease-out transform-gpu will-change-transform cursor-pointer select-none",
         isActive
-          ? "border-accent/60 bg-accent/10 text-accent shadow-[0_0_22px_rgba(34,197,94,0.25)] scale-[1.04] -translate-y-1"
-          : "border-border text-secondary hover:-translate-y-1 hover:scale-[1.04] hover:border-accent/40 hover:text-accent hover:shadow-[0_0_20px_rgba(34,197,94,0.15)] active:border-accent/40 active:text-accent active:bg-accent/10 focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:-translate-y-1 focus-visible:scale-[1.04] focus-visible:border-accent/40"
+          ? "border-accent bg-accent text-accent-contrast shadow-[0_0_28px_rgba(34,197,94,0.45)] scale-[1.05] -translate-y-1 font-semibold"
+          : "border-border/80 bg-card/90 text-secondary hover:-translate-y-1 hover:scale-[1.05] hover:border-accent hover:bg-accent hover:text-accent-contrast hover:shadow-[0_0_25px_rgba(34,197,94,0.4)] active:border-accent active:bg-accent active:text-accent-contrast focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:-translate-y-1 focus-visible:scale-[1.05]"
       )}
     >
-      <Icon
+      <TechIcon
+        name={name}
         size={18}
         className={cn(
-          "transition-colors duration-[300ms] ease-out",
+          "transition-colors duration-300 ease-out",
           isActive
-            ? "text-accent"
-            : "text-secondary/70 group-hover:text-accent group-active:text-accent group-focus:text-accent"
+            ? "text-accent-contrast"
+            : "text-secondary/70 group-hover:text-accent-contrast group-active:text-accent-contrast group-focus:text-accent-contrast"
         )}
       />
       <span
         className={cn(
-          "font-mono text-[11px] font-medium transition-colors duration-[300ms] ease-out",
+          "font-mono text-[11px] font-medium transition-colors duration-300 ease-out",
           isActive
-            ? "text-accent"
-            : "text-secondary group-hover:text-accent group-active:text-accent group-focus:text-accent"
+            ? "text-accent-contrast font-semibold"
+            : "text-secondary group-hover:text-accent-contrast group-hover:font-semibold group-active:text-accent-contrast group-focus:text-accent-contrast"
         )}
       >
         {name}

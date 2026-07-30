@@ -24,25 +24,52 @@ const morphItems: MorphItem[] = [
 export const MorphingText: React.FC<{ className?: string }> = ({ className }) => {
   const [index, setIndex] = useState(0);
   const [isMorphing, setIsMorphing] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
   const morphRef = useRef(0);
-  // Start with cooldownTime so the first item stays visible on mount
   const cooldownRef = useRef(cooldownTime);
-  const timeRef = useRef(new Date());
+  const timeRef = useRef(0);
 
   const text1Ref = useRef<HTMLDivElement>(null);
   const text2Ref = useRef<HTMLDivElement>(null);
 
-  const setStyles = useCallback((fraction: number) => {
+  // Detect mobile viewport on mount & resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const setStyles = useCallback((fraction: number, mobile: boolean) => {
     const current1 = text1Ref.current;
     const current2 = text2Ref.current;
     if (!current1 || !current2) return;
 
-    current2.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;
-    current2.style.opacity = `${Math.pow(fraction, 0.4)}`;
+    if (mobile) {
+      // Mobile: Hardware-accelerated sine ease transition (0 SVG filter, 0 blur, locked 60fps)
+      const easeFraction = 0.5 - Math.cos(fraction * Math.PI) / 2;
+      current2.style.filter = "none";
+      current2.style.opacity = `${easeFraction}`;
+      current2.style.transform = `translate3d(0, ${(1 - easeFraction) * 8}px, 0)`;
 
-    const invertedFraction = 1 - fraction;
-    current1.style.filter = `blur(${Math.min(8 / invertedFraction - 8, 100)}px)`;
-    current1.style.opacity = `${Math.pow(invertedFraction, 0.4)}`;
+      const inverted = 1 - easeFraction;
+      current1.style.filter = "none";
+      current1.style.opacity = `${inverted}`;
+      current1.style.transform = `translate3d(0, ${easeFraction * -8}px, 0)`;
+    } else {
+      // Desktop: Original SVG threshold metaball & blur morph
+      current1.style.transform = "none";
+      current2.style.transform = "none";
+      current2.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;
+      current2.style.opacity = `${Math.pow(fraction, 0.4)}`;
+
+      const invertedFraction = 1 - fraction;
+      current1.style.filter = `blur(${Math.min(8 / invertedFraction - 8, 100)}px)`;
+      current1.style.opacity = `${Math.pow(invertedFraction, 0.4)}`;
+    }
   }, []);
 
   const doCooldown = useCallback(() => {
@@ -52,15 +79,16 @@ export const MorphingText: React.FC<{ className?: string }> = ({ className }) =>
     if (current1 && current2) {
       current2.style.filter = "none";
       current2.style.opacity = "0";
+      current2.style.transform = "translate3d(0, 8px, 0)";
+
       current1.style.filter = "none";
       current1.style.opacity = "1";
+      current1.style.transform = "translate3d(0, 0px, 0)";
     }
-    // Disable SVG threshold filter during cooldown to allow clean browser subpixel anti-aliasing
     setIsMorphing((prev) => (prev ? false : prev));
   }, []);
 
   const doMorph = useCallback(() => {
-    // Enable SVG threshold filter during morph transition to create fluid metaballs liquid effect
     setIsMorphing((prev) => (!prev ? true : prev));
     morphRef.current -= cooldownRef.current;
     cooldownRef.current = 0;
@@ -72,22 +100,22 @@ export const MorphingText: React.FC<{ className?: string }> = ({ className }) =>
       fraction = 1;
     }
 
-    setStyles(fraction);
+    setStyles(fraction, isMobile);
 
     if (fraction === 1) {
       setIndex((prev) => prev + 1);
     }
-  }, [setStyles]);
+  }, [setStyles, isMobile]);
 
   useEffect(() => {
     let animationFrameId: number;
+    timeRef.current = performance.now();
 
-    const animate = () => {
+    const animate = (now: number) => {
       animationFrameId = requestAnimationFrame(animate);
 
-      const newTime = new Date();
-      const dt = (newTime.getTime() - timeRef.current.getTime()) / 1000;
-      timeRef.current = newTime;
+      const dt = (now - timeRef.current) / 1000;
+      timeRef.current = now;
 
       cooldownRef.current -= dt;
 
@@ -99,7 +127,7 @@ export const MorphingText: React.FC<{ className?: string }> = ({ className }) =>
       }
     };
 
-    animate();
+    animationFrameId = requestAnimationFrame(animate);
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
@@ -115,7 +143,7 @@ export const MorphingText: React.FC<{ className?: string }> = ({ className }) =>
     <div
       className={cn(
         "relative h-8 w-full text-base md:text-lg text-accent select-none",
-        isMorphing ? "[filter:url(#threshold)_blur(0.3px)]" : "",
+        isMorphing && !isMobile ? "[filter:url(#threshold)_blur(0.3px)]" : "",
         className
       )}
       style={{ fontFamily: "var(--font-plus-jakarta), sans-serif" }}
@@ -123,7 +151,7 @@ export const MorphingText: React.FC<{ className?: string }> = ({ className }) =>
       {/* Text 1 */}
       <div
         ref={text1Ref}
-        className="absolute inset-y-0 left-0 flex items-center justify-start gap-2.5 w-full text-accent font-bold"
+        className="absolute inset-y-0 left-0 flex items-center justify-start gap-2.5 w-full text-accent font-bold transform-gpu will-change-transform"
         style={{ opacity: 1 }}
       >
         <Icon1 className="h-[18px] w-[18px] md:h-[22px] md:w-[22px] shrink-0" />
@@ -133,28 +161,30 @@ export const MorphingText: React.FC<{ className?: string }> = ({ className }) =>
       {/* Text 2 */}
       <div
         ref={text2Ref}
-        className="absolute inset-y-0 left-0 flex items-center justify-start gap-2.5 w-full text-accent font-bold"
+        className="absolute inset-y-0 left-0 flex items-center justify-start gap-2.5 w-full text-accent font-bold transform-gpu will-change-transform"
         style={{ opacity: 0 }}
       >
         <Icon2 className="h-[18px] w-[18px] md:h-[22px] md:w-[22px] shrink-0" />
         <span>{item2.text}</span>
       </div>
 
-      {/* SVG filter: must not use display:none (hidden) otherwise the filter becomes inactive */}
-      <svg id="filters" style={{ position: "absolute", width: 0, height: 0, pointerEvents: "none", opacity: 0 }} aria-hidden="true">
-        <defs>
-          <filter id="threshold">
-            <feColorMatrix
-              in="SourceGraphic"
-              type="matrix"
-              values="1 0 0 0 0
-                      0 1 0 0 0
-                      0 0 1 0 0
-                      0 0 0 255 -140"
-            />
-          </filter>
-        </defs>
-      </svg>
+      {/* SVG filter (used on desktop only) */}
+      {!isMobile && (
+        <svg id="filters" style={{ position: "absolute", width: 0, height: 0, pointerEvents: "none", opacity: 0 }} aria-hidden="true">
+          <defs>
+            <filter id="threshold">
+              <feColorMatrix
+                in="SourceGraphic"
+                type="matrix"
+                values="1 0 0 0 0
+                        0 1 0 0 0
+                        0 0 1 0 0
+                        0 0 0 255 -140"
+              />
+            </filter>
+          </defs>
+        </svg>
+      )}
     </div>
   );
 };

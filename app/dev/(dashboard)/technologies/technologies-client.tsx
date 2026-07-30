@@ -41,6 +41,17 @@ export function TechnologiesClient({ data }: { data: Technology[] }) {
     else { toast.success(editing ? "Updated" : "Created"); setShowForm(false); setEditing(null); router.refresh(); }
   };
 
+  const handleTogglePublished = async (tech: Technology) => {
+    const nextState = !tech.published;
+    const result = await updateTechnology(tech.id, { published: nextState });
+    if (result.error) {
+      toast.error(result.error);
+    } else {
+      toast.success(nextState ? `Shown in marquee: ${tech.name}` : `Hidden from marquee: ${tech.name}`);
+      router.refresh();
+    }
+  };
+
   const columns = [
     { key: "name", label: "Name", render: (t: Technology) => <span className="font-medium text-[#fafafa]">{t.name}</span> },
     { key: "category", label: "Category", render: (t: Technology) => (
@@ -49,9 +60,22 @@ export function TechnologiesClient({ data }: { data: Technology[] }) {
     { key: "icon", label: "Icon Key", render: (t: Technology) => <span className="font-mono text-xs text-[#71717a]">{t.icon ?? "—"}</span> },
     { key: "order", label: "Order", render: (t: Technology) => <span className="font-mono text-xs">{t.sort_order}</span> },
     { key: "published", label: "Visible", className: "w-20", render: (t: Technology) => (
-      <span title={t.published ? "Visible in marquee" : "Hidden"} aria-label={t.published ? "Visible" : "Hidden"}>
-        {t.published ? <Eye size={16} className="text-emerald-400" /> : <EyeOff size={16} className="text-[#71717a]" />}
-      </span>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleTogglePublished(t);
+        }}
+        title={t.published ? "Click to hide from marquee" : "Click to show in marquee"}
+        aria-label={t.published ? "Hide from marquee" : "Show in marquee"}
+        className="rounded-md p-1.5 transition-all duration-200 hover:bg-[#18181b] active:scale-95 cursor-pointer"
+      >
+        {t.published ? (
+          <Eye size={16} className="text-emerald-400 transition-transform hover:scale-110" />
+        ) : (
+          <EyeOff size={16} className="text-[#71717a] transition-transform hover:scale-110 hover:text-[#fafafa]" />
+        )}
+      </button>
     )},
     { key: "actions", label: "Actions", className: "w-24", render: (t: Technology) => (
       <div className="flex gap-1">
