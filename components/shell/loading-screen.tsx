@@ -88,7 +88,7 @@ export function LoadingScreen() {
         >
           {/* Text Container with Thinner 1px Stroke & Left-to-Right Fill Overlay */}
           <motion.div
-            className="relative flex items-baseline text-4xl font-extrabold tracking-tight md:text-6xl lg:text-7xl select-none"
+            className="relative flex items-baseline py-2 text-4xl font-extrabold tracking-tight md:text-6xl lg:text-7xl select-none"
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -108,9 +108,9 @@ export function LoadingScreen() {
 
             {/* Solid Fill Layer (Animasi Warna KIRI ke KANAN) */}
             <motion.div
-              className="absolute inset-0 flex items-baseline"
-              initial={{ clipPath: "inset(0 100% 0 0)" }}
-              animate={{ clipPath: "inset(0 0% 0 0)" }}
+              className="absolute inset-0 flex items-baseline py-2"
+              initial={{ clipPath: "inset(-20% 100% -20% 0)" }}
+              animate={{ clipPath: "inset(-20% 0% -20% 0)" }}
               transition={{ duration: 1.3, ease: [0.65, 0, 0.35, 1], delay: 0.15 }}
             >
               <span className="text-foreground">Bayu</span>

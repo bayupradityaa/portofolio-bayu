@@ -220,7 +220,7 @@ export function ProjectDetailModal({
             <h3 className="text-xs font-mono font-semibold uppercase tracking-wider text-muted mb-2">
               About Project
             </h3>
-            <p className="font-sans text-sm md:text-base leading-relaxed text-secondary whitespace-pre-line">
+            <p className="font-sans text-sm md:text-base leading-relaxed text-secondary whitespace-pre-line text-justify">
               {project.summary}
             </p>
           </div>

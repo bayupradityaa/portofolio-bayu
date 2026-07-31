@@ -467,7 +467,7 @@ export function Nav() {
         </div>
 
         {/* Mobile Morphing Hamburger Button */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className={cn("flex items-center gap-2 md:hidden transition-opacity duration-200", open && "opacity-0 pointer-events-none")}>
           <ThemeToggle />
           <button
             ref={menuBtnRef}
@@ -518,7 +518,7 @@ export function Nav() {
                   initial={prefersReducedMotion ? false : { opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: prefersReducedMotion ? 0 : 0.3 }}
-                  className="flex items-center justify-between border-b border-border/40 pb-3"
+                  className="flex items-center justify-between border-b border-border/40 pb-3 pt-1"
                 >
                   <span className="font-mono text-xs uppercase tracking-widest text-muted">
                     Navigation
@@ -526,7 +526,7 @@ export function Nav() {
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="p-1.5 text-foreground hover:opacity-80 transition-opacity cursor-pointer"
+                    className="p-1.5 text-foreground hover:opacity-80 transition-opacity cursor-pointer rounded-lg hover:bg-surface"
                     aria-label="Close menu"
                   >
                     <MenuToggleIcon open={true} className="h-5 w-5 text-foreground" />
