@@ -3,6 +3,8 @@
  * All paths are sourced from simple-icons.
  */
 import React from "react";
+import TechStackIcon from "tech-stack-icons";
+import { cn } from "@/lib/utils";
 
 type IconProps = {
   size?: number;
@@ -451,8 +453,62 @@ export function GooglecloudIcon({ size = 20, className }: IconProps) {
   );
 }
 
+const techStackIconMap: Record<string, string> = {
+  react: "react",
+  reactjs: "react",
+  reactdom: "react",
+  nextjs: "nextjs",
+  next: "nextjs",
+  typescript: "typescript",
+  ts: "typescript",
+  javascript: "js",
+  js: "js",
+  tailwind: "tailwindcss",
+  tailwindcss: "tailwindcss",
+  python: "python",
+  node: "nodejs",
+  nodejs: "nodejs",
+  express: "expressjs",
+  expressjs: "expressjs",
+  go: "go",
+  golang: "go",
+  docker: "docker",
+  git: "git",
+  github: "github",
+  postgresql: "postgresql",
+  postgres: "postgresql",
+  mysql: "mysql",
+  firebase: "firebase",
+  supabase: "supabase",
+  googlecloud: "gcloud",
+  gcp: "gcloud",
+  gcloud: "gcloud",
+  cloudflare: "cloudflare",
+  postman: "postman",
+  vscode: "vscode",
+  visualstudiocode: "vscode",
+  figma: "figma",
+  flask: "flask",
+  vite: "vitejs",
+  vitejs: "vitejs",
+  graphql: "graphql",
+  redis: "redis",
+  aws: "aws",
+  html: "html5",
+  css: "css3",
+};
+
 export function TechIcon({ name, className, size = 14 }: { name: string; className?: string; size?: number }) {
   const normalized = name.toLowerCase().trim().replace(/[\.\s-]/g, "");
+  const mappedIcon = techStackIconMap[normalized] || techStackIconMap[name.toLowerCase().trim()];
+
+  if (mappedIcon) {
+    return (
+      <div style={{ width: size, height: size }} className={cn("inline-flex items-center justify-center shrink-0 leading-none", className)}>
+        <TechStackIcon name={mappedIcon} className="w-full h-full object-contain fill-current text-current" />
+      </div>
+    );
+  }
 
   switch (normalized) {
     case "nextjs":

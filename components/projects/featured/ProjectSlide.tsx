@@ -44,7 +44,7 @@ export function ProjectSlide({
       >
         {/* Header — Counter + Category (Mobile only; desktop shows them in the pinned sidebar) */}
         <div className="flex items-baseline gap-3 lg:hidden">
-          <span className="font-sans text-4xl font-thin leading-none tracking-tighter text-secondary/40">
+          <span className="font-jakarta text-4xl font-extrabold leading-none tracking-tighter text-secondary/50">
             {project.index}
           </span>
           <span className="font-mono text-xs font-semibold uppercase tracking-wider text-accent">

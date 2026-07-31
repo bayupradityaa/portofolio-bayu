@@ -13,16 +13,14 @@ const FeaturedProjectsClient = dynamic(
 /** Max panels the pinned experience stays comfortable with. */
 const MAX_FEATURED = 5;
 
-/** Derive an uppercase category label, falling back to the role. */
+/** Derive an uppercase category label. */
 function categoryLabel(project: ProjectWithRelations): string {
-  return (project.category || project.role || "Project").toUpperCase();
+  return (project.category || "Project").toUpperCase();
 }
 
 /** Map the DB relation shape to the flat, serializable client shape. */
 function toFeatured(project: ProjectWithRelations, i: number): FeaturedProject {
   const stats: FeaturedProject["stats"] = [];
-  if (project.year) stats.push({ label: "Year", value: String(project.year) });
-  if (project.role) stats.push({ label: "Role", value: project.role });
 
   return {
     slug: project.slug,

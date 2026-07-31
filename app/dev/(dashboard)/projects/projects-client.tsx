@@ -86,11 +86,6 @@ export function ProjectsClient({ projects }: { projects: ProjectWithRelations[] 
       ),
     },
     {
-      key: "year",
-      label: "Year",
-      render: (p: ProjectWithRelations) => <span className="font-mono text-xs">{p.year}</span>,
-    },
-    {
       key: "featured",
       label: "Featured",
       className: "w-20",

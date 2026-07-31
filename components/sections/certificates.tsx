@@ -32,10 +32,10 @@ export async function Certificates() {
               <Wrapper
                 {...(cert.credential_url
                   ? {
-                      href: cert.credential_url,
-                      target: "_blank",
-                      rel: "noopener noreferrer",
-                    }
+                    href: cert.credential_url,
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                  }
                   : {})}
                 className="group flex h-full flex-col rounded-2xl border border-border bg-card p-6 transition-colors hover:border-secondary/40"
               >

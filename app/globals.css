@@ -15,6 +15,15 @@
   --accent-hover: #4ade80;
   --accent-contrast: #04120a;
 
+  /* Chapter Tonal System — Dark Mode */
+  --ch-hero: #08080a;
+  --ch-about: #0c0c0f;
+  --ch-stack: #12141a;
+  --ch-work: #0b0e14;
+  --ch-journey: #0e0c12;
+  --ch-github: #0a0f0d;
+  --ch-contact: #121318;
+
   --radius: 0.75rem;
 }
 
@@ -31,6 +40,15 @@ html.light,
   --accent: #15803d;
   --accent-hover: #166534;
   --accent-contrast: #ffffff;
+
+  /* Chapter Tonal System — Light Mode */
+  --ch-hero: #f8fafc;
+  --ch-about: #f1f5f9;
+  --ch-stack: #e2e8f0;
+  --ch-work: #f8fafc;
+  --ch-journey: #e2e8f0;
+  --ch-github: #edf2f7;
+  --ch-contact: #e2e8f0;
 }
 
 @theme inline {
@@ -45,7 +63,15 @@ html.light,
   --color-accent-hover: var(--accent-hover);
   --color-accent-contrast: var(--accent-contrast);
 
-  --font-sans: var(--font-geist-sans);
+  --color-ch-hero: var(--ch-hero);
+  --color-ch-about: var(--ch-about);
+  --color-ch-stack: var(--ch-stack);
+  --color-ch-work: var(--ch-work);
+  --color-ch-journey: var(--ch-journey);
+  --color-ch-github: var(--ch-github);
+  --color-ch-contact: var(--ch-contact);
+
+  --font-sans: var(--font-plus-jakarta);
   --font-mono: var(--font-geist-mono);
   --font-jakarta: var(--font-plus-jakarta);
 
@@ -57,6 +83,10 @@ html.light,
 @layer base {
   * {
     border-color: var(--border);
+  }
+
+  body {
+    font-family: var(--font-plus-jakarta), system-ui, sans-serif;
   }
 
   html {
@@ -165,6 +195,10 @@ html.light,
   overflow: hidden;
   display: inline-block;
   vertical-align: top;
+  padding-bottom: 0.25em;
+  margin-bottom: -0.25em;
+  padding-top: 0.05em;
+  margin-top: -0.05em;
 }
 
 .word-mask .word {
@@ -342,6 +376,16 @@ html.light,
   100% {
     transform: translate3d(0, 0, 0);
   }
+}
+
+.animate-marquee {
+  animation: marquee-left var(--duration, 30s) linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-reverse {
+  animation: marquee-right var(--duration, 30s) linear infinite;
+  will-change: transform;
 }
 
 .animate-marquee-left {

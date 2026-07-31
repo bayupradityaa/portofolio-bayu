@@ -29,7 +29,7 @@ export function HeroTitle({ helloRef, bayuRef, pradityaRef, name = "Bayu Pradity
         </span>
       </p>
       <h1
-        className="font-semibold leading-[0.95] tracking-[-0.03em]"
+        className="font-semibold leading-[1.08] tracking-[-0.03em]"
         style={{ fontSize: "clamp(3rem, 7.5vw, 6.5rem)" }}
       >
         <span className="word-mask">

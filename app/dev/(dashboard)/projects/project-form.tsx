@@ -211,27 +211,6 @@ export function ProjectForm({ project, technologies }: ProjectFormProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="pf-year" className="mb-1.5 block text-sm font-medium text-[#fafafa]">Year</label>
-                  <input
-                    id="pf-year"
-                    type="number"
-                    {...register("year", { valueAsNumber: true })}
-                    className="w-full rounded-lg border border-[#27272a] bg-[#0a0a0c] px-3 py-2.5 text-sm text-[#fafafa] focus:border-[#22c55e] focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="pf-role" className="mb-1.5 block text-sm font-medium text-[#fafafa]">Role</label>
-                  <input
-                    id="pf-role"
-                    {...register("role")}
-                    className="w-full rounded-lg border border-[#27272a] bg-[#0a0a0c] px-3 py-2.5 text-sm text-[#fafafa] placeholder:text-[#71717a] focus:border-[#22c55e] focus:outline-none"
-                    placeholder="Web Developer"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
                   <label htmlFor="pf-status" className="mb-1.5 block text-sm font-medium text-[#fafafa]">Status</label>
                   <select
                     id="pf-status"

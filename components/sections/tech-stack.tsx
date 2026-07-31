@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { Section } from "@/components/ui/section";
 import { cn } from "@/lib/utils";
 import { ScrollFloat } from "@/components/motion/scroll-float";
+import { OrganicTransition } from "@/components/ui/organic-transition";
+import { Marquee } from "@/components/ui/marquee";
 
 // Import custom monochrome brand SVG icons
 import {
@@ -125,7 +127,6 @@ const logoIcons: Record<string, React.ComponentType<{ className?: string; size?:
   GitHub: GithubIcon,
   "GitHub Actions": GithubactionsIcon,
   Postman: PostmanIcon,
-  "VS Code": VisualstudiocodeIcon,
   Figma: FigmaIcon,
 };
 
@@ -192,9 +193,12 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
   const row2 = uniqueTechs.slice(midPoint);
 
   return (
-    <Section id="stack" className="bg-background text-foreground pb-32 md:pb-44 lg:pb-56 overflow-hidden">
+    <section id="stack" className="relative w-full bg-ch-stack text-foreground pt-28 pb-32 md:pt-40 md:pb-44 overflow-hidden">
+      {/* Technical engineering grid texture */}
+      <div className="grid-faint opacity-30 pointer-events-none absolute inset-0" aria-hidden="true" />
+
       {/* Centered Minimal Header */}
-      <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-16 md:mb-20">
+      <div className="relative z-10 flex flex-col items-center text-center max-w-2xl mx-auto mb-16 md:mb-20 px-6">
         <span className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-accent">
           STACK
         </span>
@@ -216,17 +220,17 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
       </div>
 
       {/* Technology Marquee Area */}
-      <div className="relative w-full overflow-hidden">
+      <div className="relative z-10 w-full overflow-hidden">
         {/* Edge Fade Masks for Smooth Transitions */}
-        <div className="pointer-events-none absolute left-0 top-0 z-20 h-full w-20 bg-gradient-to-r from-background to-transparent md:w-36 lg:w-48" />
-        <div className="pointer-events-none absolute right-0 top-0 z-20 h-full w-20 bg-gradient-to-l from-background to-transparent md:w-36 lg:w-48" />
+        <div className="pointer-events-none absolute left-0 top-0 z-20 h-full w-20 bg-gradient-to-r from-ch-stack to-transparent md:w-36 lg:w-48" />
+        <div className="pointer-events-none absolute right-0 top-0 z-20 h-full w-20 bg-gradient-to-l from-ch-stack to-transparent md:w-36 lg:w-48" />
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-3 md:gap-4">
           {/* Row 1: moves left */}
           <MarqueeRow
             items={row1}
             direction="left"
-            duration={60}
+            duration={65}
             activeTech={activeTech}
             onTechClick={handleTechClick}
           />
@@ -235,20 +239,23 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
           <MarqueeRow
             items={row2}
             direction="right"
-            duration={50}
+            duration={55}
             activeTech={activeTech}
             onTechClick={handleTechClick}
           />
         </div>
       </div>
-    </Section>
+
+      {/* Organic transition boundary into Featured Projects */}
+      <OrganicTransition fillColor="fill-ch-work" variant="slope-left" />
+    </section>
   );
 }
 
 function MarqueeRow({
   items,
   direction,
-  duration = 140,
+  duration = 50,
   className,
   activeTech,
   onTechClick,
@@ -260,32 +267,22 @@ function MarqueeRow({
   activeTech: string | null;
   onTechClick: (name: string) => void;
 }) {
-  const animClass = direction === "left" ? "animate-marquee-left" : "animate-marquee-right";
-
   return (
-    <div className={cn("marquee-container overflow-hidden py-2 select-none", className)}>
-      <div
-        className={cn(
-          "flex gap-4 w-max transform-gpu will-change-transform",
-          animClass
-        )}
-        style={
-          {
-            "--marquee-duration": `${duration}s`,
-          } as React.CSSProperties
-        }
-      >
-        {/* Double items for 100% seamless infinite looping with smooth motion */}
-        {[...items, ...items].map((logo, idx) => (
-          <LogoPill
-            key={`${logo}-${idx}`}
-            name={logo}
-            isActive={activeTech === logo}
-            onClick={() => onTechClick(logo)}
-          />
-        ))}
-      </div>
-    </div>
+    <Marquee
+      direction={direction}
+      speed={duration}
+      pauseOnHover={true}
+      className={className}
+    >
+      {items.map((logo, idx) => (
+        <LogoPill
+          key={`${logo}-${idx}`}
+          name={logo}
+          isActive={activeTech === logo}
+          onClick={() => onTechClick(logo)}
+        />
+      ))}
+    </Marquee>
   );
 }
 
@@ -312,28 +309,28 @@ function LogoPill({
         }
       }}
       className={cn(
-        "group relative flex h-[52px] items-center gap-3 rounded-full border px-6 py-3 outline-none shadow-sm transition-all duration-300 ease-out transform-gpu will-change-transform cursor-pointer select-none",
+        "group relative flex items-center gap-3.5 px-5 py-3 rounded-2xl outline-none transition-all duration-300 ease-out transform-gpu will-change-transform cursor-pointer select-none",
         isActive
-          ? "border-accent bg-accent text-accent-contrast shadow-[0_0_28px_rgba(34,197,94,0.45)] scale-[1.05] -translate-y-1 font-semibold"
-          : "border-border/80 bg-card/90 text-secondary hover:-translate-y-1 hover:scale-[1.05] hover:border-accent hover:bg-accent hover:text-accent-contrast hover:shadow-[0_0_25px_rgba(34,197,94,0.4)] active:border-accent active:bg-accent active:text-accent-contrast focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:-translate-y-1 focus-visible:scale-[1.05]"
+          ? "bg-accent/15 text-accent scale-[1.06] -translate-y-1 font-semibold shadow-lg shadow-accent/10"
+          : "text-secondary hover:text-foreground hover:bg-foreground/5 hover:-translate-y-1 hover:scale-[1.04] active:scale-95 focus-visible:ring-2 focus-visible:ring-accent/50"
       )}
     >
       <TechIcon
         name={name}
-        size={18}
+        size={24}
         className={cn(
-          "transition-colors duration-300 ease-out",
+          "transition-colors duration-300 ease-out shrink-0",
           isActive
-            ? "text-accent-contrast"
-            : "text-secondary/70 group-hover:text-accent-contrast group-active:text-accent-contrast group-focus:text-accent-contrast"
+            ? "text-accent"
+            : "text-secondary/70 group-hover:text-accent group-focus:text-accent"
         )}
       />
       <span
         className={cn(
-          "font-mono text-[11px] font-medium transition-colors duration-300 ease-out",
+          "font-jakarta text-sm font-semibold tracking-tight transition-colors duration-300 ease-out md:text-base",
           isActive
-            ? "text-accent-contrast font-semibold"
-            : "text-secondary group-hover:text-accent-contrast group-hover:font-semibold group-active:text-accent-contrast group-focus:text-accent-contrast"
+            ? "text-accent font-bold"
+            : "text-secondary group-hover:text-foreground group-focus:text-foreground"
         )}
       >
         {name}
@@ -342,14 +339,14 @@ function LogoPill({
       {/* Floating Tooltip */}
       <div
         className={cn(
-          "pointer-events-none absolute bottom-full left-1/2 mb-3 w-48 -translate-x-1/2 rounded-xl border border-border bg-card p-3 text-center shadow-[0_10px_30px_rgba(0,0,0,0.15)] transition-all duration-300 z-50 transform",
+          "pointer-events-none absolute bottom-full left-1/2 mb-3 w-48 -translate-x-1/2 rounded-xl border border-border bg-card/95 p-3 text-center shadow-[0_10px_30px_rgba(0,0,0,0.2)] backdrop-blur-md transition-all duration-300 z-50 transform",
           isActive
             ? "opacity-100 translate-y-0 border-accent/40"
             : "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0"
         )}
       >
-        <div className="font-mono text-xs font-semibold text-foreground">{name}</div>
-        <div className="mt-1 font-mono text-[10px] leading-relaxed text-muted">{tooltipText}</div>
+        <div className="font-jakarta text-xs font-semibold text-foreground">{name}</div>
+        <div className="mt-1 font-jakarta text-[11px] leading-relaxed text-muted">{tooltipText}</div>
         {/* Subtle arrow pointer */}
         <div className="absolute top-full left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 border-r border-b border-border bg-card" />
       </div>

@@ -1,5 +1,3 @@
-import sharp from "sharp";
-
 /** Input formats we accept for conversion. Everything is normalised to WebP. */
 export const ACCEPTED_IMAGE_TYPES = [
   "image/png",
@@ -20,7 +18,7 @@ type ConvertOptions = {
 
 export type ConvertedImage = {
   buffer: Buffer;
-  /** Always "image/webp". */
+  /** Always "image/webp" or fallback original content type. */
   contentType: string;
   width: number;
   height: number;
@@ -30,8 +28,9 @@ export type ConvertedImage = {
 /**
  * Convert an uploaded image File to an optimised WebP buffer.
  *
+ * Dynamically loads sharp to avoid native C++ binary crashes on OS/environment mismatches.
  * Strips metadata (EXIF/orientation is baked in via .rotate()), optionally
- * downscales, and re-encodes as WebP. Throws on unreadable/corrupt input.
+ * downscales, and re-encodes as WebP. Falls back safely if native sharp fails.
  */
 export async function convertToWebp(
   file: File,
@@ -39,22 +38,36 @@ export async function convertToWebp(
 ): Promise<ConvertedImage> {
   const input = Buffer.from(await file.arrayBuffer());
 
-  let pipeline = sharp(input, { failOn: "error" }).rotate();
+  try {
+    const sharpModule = await import("sharp");
+    const sharp = sharpModule.default || sharpModule;
 
-  const metadata = await pipeline.metadata();
-  if (metadata.width && maxWidth && metadata.width > maxWidth) {
-    pipeline = pipeline.resize({ width: maxWidth, withoutEnlargement: true });
+    let pipeline = sharp(input, { failOn: "error" }).rotate();
+
+    const metadata = await pipeline.metadata();
+    if (metadata.width && maxWidth && metadata.width > maxWidth) {
+      pipeline = pipeline.resize({ width: maxWidth, withoutEnlargement: true });
+    }
+
+    const { data, info } = await pipeline
+      .webp({ quality, effort: 4 })
+      .toBuffer({ resolveWithObject: true });
+
+    return {
+      buffer: data,
+      contentType: "image/webp",
+      width: info.width,
+      height: info.height,
+      size: data.length,
+    };
+  } catch (err) {
+    console.warn("[image] sharp module fallback activated:", err);
+    return {
+      buffer: input,
+      contentType: file.type || "image/webp",
+      width: 0,
+      height: 0,
+      size: input.length,
+    };
   }
-
-  const { data, info } = await pipeline
-    .webp({ quality, effort: 4 })
-    .toBuffer({ resolveWithObject: true });
-
-  return {
-    buffer: data,
-    contentType: "image/webp",
-    width: info.width,
-    height: info.height,
-    size: data.length,
-  };
 }

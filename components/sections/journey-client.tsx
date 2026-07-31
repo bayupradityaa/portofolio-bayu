@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Section } from "@/components/ui/section";
 import { Badge } from "@/components/ui/badge";
 import { ScrollFloat } from "@/components/motion/scroll-float";
+import { OrganicTransition } from "@/components/ui/organic-transition";
 import { cn } from "@/lib/utils";
 import type { Experience } from "@/lib/types/database";
 
@@ -148,8 +149,8 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
   }, [timeline.length]);
 
   return (
-    <Section id="journey">
-      <div ref={sectionRef as React.RefObject<HTMLDivElement>}>
+    <section id="journey" className="relative w-full bg-ch-journey text-foreground pt-28 pb-36 md:pt-36 md:pb-48 overflow-hidden">
+      <div className="mx-auto w-full max-w-6xl px-6" ref={sectionRef as React.RefObject<HTMLDivElement>}>
         {/* Heading — split-char scroll-float, sized to match other section titles */}
         <ScrollFloat
           containerClassName="max-w-3xl text-left text-3xl font-semibold tracking-tight md:text-5xl"
@@ -268,6 +269,9 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
           </ol>
         </div>
       </div>
-    </Section>
+
+      {/* Organic transition boundary into GitHub Activity */}
+      <OrganicTransition fillColor="fill-ch-github" variant="slope-left" />
+    </section>
   );
 }

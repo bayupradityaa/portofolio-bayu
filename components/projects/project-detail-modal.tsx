@@ -206,17 +206,13 @@ export function ProjectDetailModal({
             </p>
 
             {/* Quick Metadata */}
-            <div className="mt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-muted border-b border-border/50 pb-4">
-              <div className="flex items-center gap-1.5">
-                <User size={13} className="text-accent" />
-                <span className="uppercase">{project.role}</span>
-              </div>
-              {project.category && (
-                <div className="rounded-md bg-card border border-border/60 px-2 py-0.5 text-[11px] text-secondary">
+            {project.category && (
+              <div className="mt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-muted border-b border-border/50 pb-4">
+                <div className="rounded-md bg-card border border-border/60 px-2.5 py-1 text-xs text-secondary">
                   {project.category}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Project Summary / Description */}

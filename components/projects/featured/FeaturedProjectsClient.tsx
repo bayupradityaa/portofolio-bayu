@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { PinnedSidebar } from "./PinnedSidebar";
 import { ProjectSlide } from "./ProjectSlide";
 import { useFeaturedProjects } from "./useFeaturedProjects";
+import { OrganicTransition } from "@/components/ui/organic-transition";
 import type { FeaturedProject } from "./types";
 
 /**
@@ -30,10 +31,9 @@ export function FeaturedProjectsClient({ projects }: { projects: FeaturedProject
   } = useFeaturedProjects({ count: projects.length });
 
   return (
-    <section id="work" ref={sectionRef} className="featured-shell relative hairline-t">
+    <section id="work" ref={sectionRef} className="relative bg-ch-work pb-32 md:pb-44">
       {/* Premium background depth — radial glow + soft grid + noise (CSS) */}
-      <div className="featured-bg" aria-hidden="true" />
-      <div className="grid-faint pointer-events-none absolute inset-0" aria-hidden="true" />
+      <div className="featured-bg [mask-image:linear-gradient(to_bottom,transparent_0%,black_100px)]" aria-hidden="true" />
 
       {/* Header — kept minimal; carries the "View All" CTA the old section had */}
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 pt-24 md:flex-row md:items-end md:justify-between md:pt-32">
@@ -89,6 +89,9 @@ export function FeaturedProjectsClient({ projects }: { projects: FeaturedProject
           ))}
         </div>
       </div>
+
+      {/* Organic transition boundary into Journey Timeline */}
+      <OrganicTransition fillColor="fill-ch-journey" variant="slope-right" />
     </section>
   );
 }

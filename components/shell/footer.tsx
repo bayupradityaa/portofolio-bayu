@@ -15,7 +15,7 @@ export async function Footer() {
   ].filter(Boolean) as { label: string; href: string }[];
 
   return (
-    <footer className="hairline-t">
+    <footer className="w-full bg-ch-contact">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-14 md:flex-row md:items-center md:justify-between">
         <div className="space-y-2">
           <a href="#hero" className="text-lg">

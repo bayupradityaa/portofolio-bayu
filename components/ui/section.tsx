@@ -5,7 +5,7 @@ export function Section({
   id,
   className,
   children,
-  hairline = true,
+  hairline = false,
 }: {
   id?: string;
   className?: string;
