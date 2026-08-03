@@ -1,273 +1,354 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Badge } from "@/components/ui/badge";
-import { ScrollFloat } from "@/components/motion/scroll-float";
 import { cn } from "@/lib/utils";
 import type { Experience } from "@/lib/types/database";
 
-// Idempotent — SmoothScroll registers this globally; re-registering keeps the
-// component self-contained and hooks into the shared Lenis ↔ ScrollTrigger tick.
-gsap.registerPlugin(ScrollTrigger);
-
-const EASE = "power3.out";
-const REDUCED_QUERY = "(prefers-reduced-motion: reduce)";
-const MOTION_QUERY = "(prefers-reduced-motion: no-preference)";
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 /**
- * Cinematic, scroll-driven "The path so far" timeline.
+ * Extracts a short 2-digit year display string (e.g., "'23", "'22", "'21", "'19")
+ * from period strings like "2023 — Present" or "Sep 2021 — Oct 2021".
+ */
+function getShortYear(period: string, fallbackIdx: number): string {
+  const match = period.match(/\b(20\d{2}|19\d{2})\b/);
+  if (match && match[1]) {
+    return `'${match[1].slice(-2)}`;
+  }
+  const years = ["'25", "'23", "'22", "'21", "'19"];
+  return years[fallbackIdx % years.length] ?? "'25";
+}
+
+/**
+ * `JourneyClient` — Thicker Lines, Larger Airplane, Ultra-Smooth Organic Curves.
  *
- * All motion is transform/opacity/filter only (90+ Lighthouse safe) and routed
- * through the app's global Lenis ↔ ScrollTrigger tick, so every scrub inherits
- * the same smoothing as the rest of the page.
- *
- * - A center accent rail draws itself (scaleY 0→1) scrubbed to scroll.
- * - Each node lights up while its entry owns the viewport.
- * - Content cards slide in from the rail with a blur-in on first reveal.
- * - Period labels get a whisper of opposing parallax for depth.
- *
- * Reduced-motion collapses everything to its final, fully readable state.
+ * ─── Specifications & Enhancements ─────────────────────────────────────────────
+ *  1. Thicker Progress Line (`strokeWidth="6"`): Bold, prominent green accent line.
+ *  2. High-Visibility Dashed Guideline (`stroke="rgba(255,255,255,0.25)" strokeWidth="3.5"`):
+ *     Crisp, clear dashed path visible across dark mode background.
+ *  3. Larger Airplane Icon (`scale(1.3)`): Proportional to the thicker progress line.
+ *  4. Silky Organic Bezier Trajectory: Symmetric C2 continuous curves for ultra-smooth turns.
  */
 export function JourneyClient({ timeline }: { timeline: Experience[] }) {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const railRef = useRef<HTMLDivElement | null>(null);
-  const progressRef = useRef<HTMLSpanElement | null>(null);
-  const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
-  const nodeRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const periodRefs = useRef<(HTMLParagraphElement | null)[]>([]);
+  const pathRef = useRef<SVGPathElement | null>(null);
+  const planeGroupRef = useRef<SVGGElement | null>(null);
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  useLayoutEffect(() => {
+  const [mounted, setMounted] = useState(false);
+  const [activeNodes, setActiveNodes] = useState<Record<number, boolean>>({});
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || typeof window === "undefined") return;
+    if (!timeline || timeline.length === 0) return;
+
     const section = sectionRef.current;
-    const rail = railRef.current;
-    if (!section || !rail || timeline.length === 0) return;
+    const path = pathRef.current;
+    const planeGroup = planeGroupRef.current;
+    if (!section) return;
 
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
 
-      // ── Reduced motion: paint final state, nothing scrubbed ────────────────
-      mm.add(REDUCED_QUERY, () => {
-        if (progressRef.current) gsap.set(progressRef.current, { scaleY: 1 });
-        gsap.set(contentRefs.current, { opacity: 1, x: 0, filter: "blur(0px)" });
-        gsap.set(periodRefs.current, { y: 0 });
-        nodeRefs.current.forEach((n) => n?.classList.add("is-active"));
-      });
+      mm.add("(min-width: 768px)", () => {
+        if (path && planeGroup) {
+          const pathLength = path.getTotalLength();
 
-      // Shared bits that don't depend on layout: rail draw, node lighting,
-      // period parallax. Registered once for any motion-allowed viewport.
-      const addSharedMotion = () => {
-        // Accent rail draws itself as you scroll the list.
-        if (progressRef.current) {
-          gsap.fromTo(
-            progressRef.current,
-            { scaleY: 0 },
-            {
-              scaleY: 1,
-              ease: "none",
-              scrollTrigger: {
-                trigger: rail,
-                start: "top center",
-                end: "bottom center",
-                scrub: true,
-              },
+          gsap.set(path, {
+            strokeDasharray: pathLength,
+            strokeDashoffset: pathLength,
+          });
+
+          // Airplane starts at Card 1 right edge
+          const startPt = path.getPointAtLength(0);
+          const startPtNext = path.getPointAtLength(Math.min(6, pathLength));
+          const startAngle = Math.atan2(startPtNext.y - startPt.y, startPtNext.x - startPt.x) * (180 / Math.PI);
+
+          gsap.set(planeGroup, {
+            x: startPt.x,
+            y: startPt.y,
+            rotation: startAngle + 90,
+            transformOrigin: "center center",
+          });
+
+          // Scrub starts as soon as Card 1 is visible
+          ScrollTrigger.create({
+            trigger: cardsRef.current[0] ?? section,
+            start: "top 78%",
+            endTrigger: section,
+            end: "bottom 85%",
+            scrub: 1.2,
+            onUpdate: (self) => {
+              const currentLength = pathLength * self.progress;
+              gsap.set(path, { strokeDashoffset: pathLength - currentLength });
+
+              const pt = path.getPointAtLength(currentLength);
+              const ptNext = path.getPointAtLength(Math.min(currentLength + 5, pathLength));
+              const angle = Math.atan2(ptNext.y - pt.y, ptNext.x - pt.x) * (180 / Math.PI);
+
+              gsap.set(planeGroup, {
+                x: pt.x,
+                y: pt.y,
+                rotation: angle + 90,
+                transformOrigin: "center center",
+              });
+
+              // Active card state
+              timeline.forEach((_, idx) => {
+                const nodeThreshold = idx / Math.max(1, timeline.length - 1);
+                if (self.progress >= nodeThreshold * 0.75) {
+                  setActiveNodes((prev) => (prev[idx] ? prev : { ...prev, [idx]: true }));
+                } else {
+                  setActiveNodes((prev) => (!prev[idx] ? prev : { ...prev, [idx]: false }));
+                }
+              });
             },
-          );
+          });
         }
 
-        // Nodes light up while their entry owns the viewport.
-        nodeRefs.current.forEach((node, i) => {
-          if (!node) return;
-          ScrollTrigger.create({
-            trigger: itemRefs.current[i] ?? node,
-            start: "top 62%",
-            end: "bottom 45%",
-            onToggle: (self) => node.classList.toggle("is-active", self.isActive),
-          });
-        });
+        // Staggered Entrance Animations for Cards
+        cardsRef.current.forEach((card, i) => {
+          if (!card) return;
+          const isRight = i % 2 !== 0;
 
-        // Whisper of opposing parallax on the period label — depth, not noise.
-        periodRefs.current.forEach((el) => {
-          if (!el) return;
           gsap.fromTo(
-            el,
-            { y: 14 },
+            card,
             {
-              y: -14,
-              ease: "none",
-              scrollTrigger: {
-                trigger: el,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: true,
-              },
+              opacity: 0,
+              y: 70,
+              x: isRight ? 50 : -50,
+              scale: 0.95,
+              filter: "blur(6px)",
             },
-          );
-        });
-      };
-
-      /** Content reveal — `dir` sets slide-in origin (+1 right, -1 left). */
-      const revealCards = (dir: (i: number) => number) => {
-        contentRefs.current.forEach((el, i) => {
-          if (!el) return;
-          gsap.fromTo(
-            el,
-            { opacity: 0, x: 40 * dir(i), filter: "blur(8px)" },
             {
               opacity: 1,
+              y: 0,
               x: 0,
+              scale: 1,
               filter: "blur(0px)",
-              duration: 0.7,
-              ease: EASE,
+              duration: 0.85,
+              ease: "power3.out",
               scrollTrigger: {
-                trigger: itemRefs.current[i] ?? el,
+                trigger: card,
                 start: "top 82%",
-                once: true,
+                toggleActions: "play none none none",
               },
-            },
+            }
           );
         });
-      };
-
-      // ── Mobile / tablet: left rail, everything slides in from the left ─────
-      mm.add(`(max-width: 1023px) and ${MOTION_QUERY}`, () => {
-        addSharedMotion();
-        revealCards(() => -1);
       });
 
-      // ── Desktop: center rail, entries alternate — even → left, odd → right ─
-      mm.add(`(min-width: 1024px) and ${MOTION_QUERY}`, () => {
-        addSharedMotion();
-        revealCards((i) => (i % 2 === 0 ? -1 : 1));
+      // Mobile vertical reveal
+      mm.add("(max-width: 767px)", () => {
+        cardsRef.current.forEach((card) => {
+          if (!card) return;
+          gsap.fromTo(
+            card,
+            { opacity: 0, y: 45 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.8,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: card,
+                start: "top 85%",
+                toggleActions: "play none none none",
+              },
+            }
+          );
+        });
       });
     }, section);
 
     return () => ctx.revert();
-  }, [timeline.length]);
+  }, [mounted, timeline]);
 
   return (
-    <section id="journey" className="relative w-full bg-ch-journey text-foreground pt-28 pb-36 md:pt-36 md:pb-48 overflow-hidden">
-      <div className="mx-auto w-full max-w-6xl px-6" ref={sectionRef as React.RefObject<HTMLDivElement>}>
-        {/* Heading — split-char scroll-float, sized to match other section titles */}
-        <ScrollFloat
-          containerClassName="max-w-3xl text-left text-3xl font-semibold tracking-tight md:text-5xl"
-          scrollStart="center bottom+=40%"
-          scrollEnd="center center"
-        >
-          The path so far
-        </ScrollFloat>
-        <p className="mt-5 max-w-2xl text-base leading-relaxed text-secondary md:text-lg">
-          How I got from first lines of code to building products end to end.
-          Most recent first.
-        </p>
+    <section
+      id="journey"
+      ref={sectionRef}
+      className="relative w-full bg-background text-foreground py-24 md:py-36 overflow-hidden select-none"
+      aria-label="About Me and My Journey Timeline"
+    >
+      <div className="mx-auto w-full max-w-6xl px-6">
+        {/* Header matching scrolljourney.mp4 reference video */}
+        <header className="flex flex-col items-start gap-4 max-w-3xl mb-16 lg:mb-24">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/10 border border-accent/30 text-accent font-mono text-xs font-bold uppercase tracking-[0.2em]">
+            <span>START SMALL GROW BIG</span>
+          </div>
 
-        {/* Timeline */}
-        <div ref={railRef} className="relative mt-16">
-          {/* Faint static rail — left on mobile, centered on desktop */}
-          <span
-            className="journey-rail pointer-events-none absolute top-1 bottom-1 left-0 w-px bg-border lg:left-1/2 lg:-translate-x-1/2"
-            aria-hidden="true"
-          />
-          {/* Accent progress rail — scaleY scrubbed to scroll */}
-          <span
-            ref={progressRef}
-            className="journey-progress pointer-events-none absolute top-1 bottom-1 left-0 w-px origin-top bg-linear-to-b from-accent via-accent to-transparent lg:left-1/2 lg:-translate-x-1/2"
-            aria-hidden="true"
-          />
+          <h2 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.05]">
+            About Me (&amp;) <br className="hidden sm:inline" />
+            My Journey
+          </h2>
 
-          <ol className="space-y-0">
-            {timeline.map((entry, i) => {
-              const isRight = i % 2 !== 0; // desktop side; ignored on mobile
+          <p className="text-base md:text-lg text-muted leading-relaxed font-normal max-w-2xl pt-2">
+            From vocational computer &amp; network engineering (TKJ) to computer science at Universitas Gunadarma and building digital platforms end to end.
+          </p>
+        </header>
+
+        {/* Timeline Container */}
+        <div className="relative w-full">
+          {/* SVG Bezier Curve with Thicker Line & High Visibility (Desktop) */}
+          <div className="hidden md:block absolute inset-0 pointer-events-none z-0">
+            <svg
+              className="w-full h-full"
+              viewBox="0 0 1000 1400"
+              fill="none"
+              preserveAspectRatio="none"
+            >
+              {/* High-visibility Dashed Background Guideline Path */}
+              <path
+                d="M 460 120 C 620 140, 740 240, 740 360 C 740 520, 260 560, 260 720 C 260 880, 740 920, 740 1080 C 740 1220, 460 1320, 260 1340"
+                stroke="rgba(255, 255, 255, 0.25)"
+                strokeWidth="3.5"
+                strokeDasharray="10 10"
+              />
+
+              {/* Thicker Accent Green Animated Progress Path */}
+              <path
+                ref={pathRef}
+                d="M 460 120 C 620 140, 740 240, 740 360 C 740 520, 260 560, 260 720 C 260 880, 740 920, 740 1080 C 740 1220, 460 1320, 260 1340"
+                stroke="var(--color-accent, #10b981)"
+                strokeWidth="6"
+                strokeLinecap="round"
+              />
+
+              {/* Larger Airplane SVG Icon Group Mounted DIRECTLY at tip of Progress Path */}
+              <g
+                ref={planeGroupRef}
+                className="text-accent drop-shadow-[0_0_18px_rgba(16,185,129,1)]"
+              >
+                <g transform="translate(-18, -18) scale(1.35)">
+                  <path
+                    d="m 14.83626,1023.9633 c -1.27638,-0.022 -2.23322,1.3945 -1.93048,2.5893 -0.0106,2.3825 0.0254,4.5399 -0.0211,6.9222 -0.86563,0.724 -1.95196,1.1101 -2.84804,1.7935 -2.6499502,1.6543 -5.3834402,3.1905 -7.9741805,4.9298 -0.52658,1.0194 -0.12448,2.19 -0.25868,3.2744 0.11289,0.5899 0.9093903,0.7624 1.3520503,0.4239 3.29418,-1.0185 6.53329,-2.2113 9.8415802,-3.184 -0.0136,1.2588 0.0536,2.5172 0.0159,3.7764 -0.0278,0.3845 0.0353,0.8094 -0.0793,1.1678 -0.73435,0.8237 -1.95869,1.1927 -2.42191,2.2475 -0.15271,0.6859 -0.0237,1.3982 -0.0669,2.0926 0.0545,0.4878 0.57437,0.9328 1.06023,0.7042 0.96241,-0.3065 1.93965,-0.5659 2.88352,-0.9103 0.49901,-0.1817 1.0366,-0.1155 1.51212,0.093 1.06199,0.324 2.1249,0.8298 3.24892,0.8142 0.5432,-0.2545 0.45447,-0.9487 0.40024,-1.437 0.0965,-0.7182 0.11746,-1.6418 -0.57108,-2.084 -0.65138,-0.5245 -1.36097,-0.9863 -1.96573,-1.5694 -0.0402,-1.6279 -0.0903,-3.3324 0.0123,-4.9143 1.26835,0.4358 2.56344,0.7925 3.82879,1.2414 2.24148,0.7382 4.46719,1.5504 6.75364,2.1317 0.57349,-0.097 0.70865,-0.8342 0.54603,-1.3122 -0.02,-0.838 0.23484,-1.7759 -0.23779,-2.5329 -1.9355,-1.3961 -4.08122,-2.4651 -6.08613,-3.7567 -1.61971,-0.9718 -3.23783,-1.9463 -4.85386,-2.9243 -0.1822,-1.0478 0.0511,-2.1208 -0.0622,-3.1775 -0.008,-1.8175 0.13456,-3.4277 -0.16148,-5.2296 -0.32567,-0.7305 -1.12107,-1.2029 -1.91639,-1.1695 z"
+                    fill="currentColor"
+                    transform="translate(0,-1022.3622)"
+                  />
+                </g>
+              </g>
+            </svg>
+          </div>
+
+          {/* Staggered Experience Cards List */}
+          <div className="relative z-10 space-y-12 md:space-y-20">
+            {timeline.map((entry, idx) => {
+              const shortYear = getShortYear(entry.period, idx);
+              const isRight = idx % 2 !== 0;
+              const isActive = activeNodes[idx];
+
               return (
-                <li
+                <div
                   key={entry.id}
-                  ref={(el) => {
-                    itemRefs.current[i] = el;
-                  }}
                   className={cn(
-                    "relative pb-14 pl-10 last:pb-0 lg:pl-0",
-                    // Desktop: each entry occupies one half, offset from center.
-                    "lg:grid lg:grid-cols-2 lg:gap-x-16",
+                    "flex flex-col md:grid md:grid-cols-12 items-center gap-8",
+                    isRight ? "md:flex-row-reverse" : ""
                   )}
                 >
-                  {/* Node — on the rail (left on mobile, centered on desktop) */}
-                  <span
-                    ref={(el) => {
-                      nodeRefs.current[i] = el;
-                    }}
-                    className="journey-node absolute top-1.5 -left-1.75 lg:left-1/2 lg:-translate-x-1/2"
-                    aria-hidden="true"
-                  />
-
-                  {/* Opposite-side Period label on desktop for visual symmetry */}
-                  <div
-                    className={cn(
-                      "hidden lg:block pt-1 font-mono text-xs font-medium text-muted",
-                      isRight
-                        ? "lg:col-start-1 lg:pr-16 lg:text-right"
-                        : "lg:col-start-2 lg:pl-16 lg:text-left",
-                    )}
-                  >
-                    <p
-                      ref={(el) => {
-                        periodRefs.current[i] = el;
-                      }}
-                      style={{ willChange: "transform" }}
-                    >
-                      {entry.period}
-                    </p>
-                  </div>
-
-                  {/* Content — alternates columns on desktop, text hugs the rail */}
+                  {/* Card Container */}
                   <div
                     ref={(el) => {
-                      contentRefs.current[i] = el;
+                      cardsRef.current[idx] = el;
                     }}
                     className={cn(
-                      isRight
-                        ? "lg:col-start-2 lg:pl-16 lg:text-left"
-                        : "lg:col-start-1 lg:pr-16 lg:text-right",
+                      "w-full md:col-span-6 max-w-[460px] relative p-6 lg:p-8 rounded-3xl bg-card/85 backdrop-blur-xl border transition-all duration-500 shadow-xl group",
+                      isActive
+                        ? "border-accent/60 shadow-[0_0_30px_rgba(16,185,129,0.15)]"
+                        : "border-border/60 hover:border-accent/40",
+                      isRight ? "md:col-start-7 md:ml-auto" : "md:col-start-1"
                     )}
-                    style={{ willChange: "transform, opacity, filter" }}
                   >
-                    {/* Period label on mobile layout */}
-                    <p className="font-mono text-xs text-muted lg:hidden">
-                      {entry.period}
-                    </p>
-
-                    <h3 className="mt-1 text-xl font-semibold tracking-tight lg:mt-0">
-                      {entry.title}
-                    </h3>
-                    <p className="mt-0.5 text-sm text-accent">{entry.org}</p>
-                    <p
+                    {/* Node Dot Indicator on Card Header */}
+                    <div
                       className={cn(
-                        "mt-3 max-w-[58ch] leading-relaxed text-secondary",
-                        isRight ? "" : "lg:ml-auto",
+                        "absolute -top-3 left-8 px-3 py-1 rounded-full font-mono text-xs font-bold border transition-all duration-500 flex items-center gap-2",
+                        isActive
+                          ? "bg-accent text-accent-contrast border-accent shadow-[0_0_15px_rgba(16,185,129,0.6)]"
+                          : "bg-background text-muted border-border"
                       )}
                     >
+                      <span
+                        className={cn(
+                          "w-2 h-2 rounded-full transition-colors",
+                          isActive ? "bg-accent-contrast animate-ping" : "bg-muted"
+                        )}
+                      />
+                      <span>PHASE 0{idx + 1}</span>
+                    </div>
+
+                    {/* Big Watermark Year Display */}
+                    <div className="text-5xl lg:text-6xl font-black text-accent opacity-90 tracking-tighter leading-none mt-2 mb-3 select-none font-mono">
+                      {shortYear}
+                    </div>
+
+                    {/* Period Label */}
+                    <div className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-accent/80 mb-2">
+                      {entry.period}
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="text-xl lg:text-2xl font-bold tracking-tight text-foreground mb-1 group-hover:text-accent transition-colors">
+                      {entry.title}
+                    </h3>
+
+                    {/* Organization / Company */}
+                    <div className="flex items-center gap-2 text-accent font-medium text-xs lg:text-sm mb-4">
+                      <span>@{entry.org}</span>
+                      {entry.employment_type && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 border border-accent/20 text-accent font-mono">
+                          {entry.employment_type}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-muted text-xs lg:text-sm leading-relaxed mb-5 font-normal">
                       {entry.description}
                     </p>
-                    {entry.tags.length > 0 && (
-                      <div
-                        className={cn(
-                          "mt-4 flex flex-wrap gap-2",
-                          isRight ? "" : "lg:justify-end",
-                        )}
-                      >
-                        {entry.tags.map((t) => (
-                          <Badge key={t}>{t}</Badge>
-                        ))}
-                      </div>
-                    )}
+
+                    {/* Footer Tags & Optional Link */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border/30">
+                      {entry.tags && entry.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {entry.tags.map((tag) => (
+                            <Badge key={tag} className="text-[11px] px-2.5 py-0.5 font-mono">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+
+                      {entry.website && (
+                        <a
+                          href={entry.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[11px] font-mono font-bold uppercase tracking-widest text-foreground hover:text-accent transition-colors ml-auto"
+                        >
+                          <span>Visit</span>
+                          <span>↗</span>
+                        </a>
+                      )}
+                    </div>
                   </div>
-                </li>
+                </div>
               );
             })}
-          </ol>
+          </div>
         </div>
       </div>
-
     </section>
   );
 }
+
+export default JourneyClient;
