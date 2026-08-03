@@ -4,7 +4,6 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
-  SLIDE_MOTION,
   COUNTER_MOTION,
   IMAGE_PARALLAX,
   EASE,
@@ -41,15 +40,23 @@ interface UseFeaturedProjectsReturn {
 }
 
 /**
- * Drives the cinematic Featured Projects showcase.
+ * Drives the Featured Projects showcase.
  *
- * Desktop: the whole section pins for `count` viewport-heights. A single
- * scrubbed timeline fades/blurs each slide in and out, crossfades the giant
- * counter digits, and parallaxes each cover. `activeIndex` is lifted to React
- * state (updated only on change) so the pinned sidebar text can swap.
+ * Desktop: the sidebar holds position via CSS `sticky` while each slide is
+ * scrubbed through three phases as it crosses the viewport —
  *
- * Mobile: no pinning — slides reveal individually on enter, counter shown
- * inline in each slide. Reduced-motion: everything painted in its final state.
+ *   enter   the cover wipes open and the slide settles into place
+ *   hold    the cover drifts against the scroll (parallax)
+ *   exit    the slide recedes slightly as the next one takes over
+ *
+ * The giant counter digit crossfades to match, and `activeIndex` is lifted to
+ * React state (only on change) so the sidebar title can swap.
+ *
+ * Mobile: no parallax or scrub — each slide gets a single wipe reveal on enter
+ * and the counter is rendered inline. Reduced motion: final state, painted.
+ *
+ * Every tween is transform / opacity / clip-path only, so nothing here touches
+ * layout or triggers a repaint on the main thread.
  */
 export function useFeaturedProjects({ count }: UseFeaturedProjectsArgs): UseFeaturedProjectsReturn {
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -71,60 +78,131 @@ export function useFeaturedProjects({ count }: UseFeaturedProjectsArgs): UseFeat
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
 
-      // ── Smooth scroll reveal — slides reveal on scroll enter and STAY visible ──────
-      mm.add(`(not ${REDUCED_QUERY})`, () => {
-        const slides = slideRefs.current.filter(Boolean) as HTMLDivElement[];
-        const numbers = numberRefs.current.filter(Boolean) as HTMLSpanElement[];
-
-        // Initial state for sidebar counter digits
-        numbers.forEach((el, i) => {
-          if (el) gsap.set(el, i === 0 ? COUNTER_MOTION.visible : COUNTER_MOTION.hidden);
-        });
-
+      /**
+       * Tracks which slide owns the viewport and crossfades the giant digit.
+       * Shared by every breakpoint — the counter only renders on desktop but
+       * the state drives the sidebar title, which matters everywhere.
+       */
+      const wireActiveTracking = (slides: HTMLDivElement[], numbers: HTMLSpanElement[]) => {
         slides.forEach((el, idx) => {
-          // 1. Reveal slide smoothly on scroll enter — STAYS fully visible
-          gsap.fromTo(
-            el,
-            { opacity: 0, y: 36, filter: "blur(6px)" },
-            {
-              opacity: 1,
-              y: 0,
-              filter: "blur(0px)",
-              duration: 0.7,
-              ease: EASE,
-              scrollTrigger: {
-                trigger: el,
-                start: "top 85%",
-                once: true, // Only animates once, never fades out on scroll
-              },
-            },
-          );
-
-          // 2. Update pinned sidebar counter digit as each project enters viewport
           ScrollTrigger.create({
             trigger: el,
-            start: "top 50%",
-            end: "bottom 50%",
+            start: "top 55%",
+            end: "bottom 45%",
             onToggle: (self) => {
-              if (self.isActive && activeIndexRef.current !== idx) {
-                activeIndexRef.current = idx;
-                setActiveIndex(idx);
+              if (!self.isActive || activeIndexRef.current === idx) return;
+              activeIndexRef.current = idx;
+              setActiveIndex(idx);
 
-                numbers.forEach((num, nIdx) => {
-                  if (num) {
-                    gsap.to(num, {
-                      opacity: nIdx === idx ? 1 : 0,
-                      scale: nIdx === idx ? 1 : 0.9,
-                      filter: nIdx === idx ? "blur(0px)" : "blur(6px)",
-                      duration: 0.4,
-                      ease: EASE,
-                    });
-                  }
-                });
-              }
+              numbers.forEach((num, nIdx) => {
+                const state = nIdx === idx ? COUNTER_MOTION.visible : COUNTER_MOTION.hidden;
+                gsap.to(num, { ...state, duration: 0.45, ease: EASE, overwrite: "auto" });
+              });
             },
           });
         });
+      };
+
+      // ── Reduced motion: paint the final state, scrub nothing ───────────
+      mm.add(REDUCED_QUERY, () => {
+        const slides = slideRefs.current.filter(Boolean) as HTMLDivElement[];
+        const numbers = numberRefs.current.filter(Boolean) as HTMLSpanElement[];
+
+        gsap.set(slides, { opacity: 1, y: 0, clipPath: "inset(0 0% 0 0)" });
+        gsap.set(imageRefs.current.filter(Boolean), { y: 0, scale: 1 });
+        numbers.forEach((el, i) => {
+          gsap.set(el, i === 0 ? COUNTER_MOTION.visible : COUNTER_MOTION.hidden);
+        });
+      });
+
+      // ── Desktop: full three-phase scrub + parallax ─────────────────────
+      mm.add(`${DESKTOP_QUERY} and (not ${REDUCED_QUERY})`, () => {
+        const slides = slideRefs.current.filter(Boolean) as HTMLDivElement[];
+        const numbers = numberRefs.current.filter(Boolean) as HTMLSpanElement[];
+        const images = imageRefs.current.filter(Boolean) as HTMLDivElement[];
+
+        numbers.forEach((el, i) => {
+          gsap.set(el, i === 0 ? COUNTER_MOTION.visible : COUNTER_MOTION.hidden);
+        });
+
+        slides.forEach((el, idx) => {
+          // Phase 1 — enter. The slide is uncovered by a bottom-up wipe, the
+          // site's signature reveal. One-shot: once seen it stays put, so
+          // scrolling back up never re-hides content.
+          gsap.fromTo(
+            el,
+            { clipPath: "inset(100% 0 0 0)", y: 48 },
+            {
+              clipPath: "inset(0% 0 0 0)",
+              y: 0,
+              duration: 0.9,
+              ease: EASE,
+              scrollTrigger: { trigger: el, start: "top 88%", once: true },
+            },
+          );
+
+          // Phase 2 — hold. The cover drifts upward against the scroll for
+          // the whole time the slide is in view. This is the depth cue the
+          // section was missing entirely.
+          const image = images[idx];
+          if (image) {
+            gsap.fromTo(
+              image,
+              { y: IMAGE_PARALLAX * -0.5 },
+              {
+                y: IMAGE_PARALLAX * 0.5,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: el,
+                  start: "top bottom",
+                  end: "bottom top",
+                  scrub: SCRUB,
+                },
+              },
+            );
+          }
+
+          // Phase 3 — exit. The outgoing slide recedes rather than vanishing,
+          // so attention transfers to the incoming one. Skipped on the last
+          // slide, which should stay fully present as the section ends.
+          if (idx < slides.length - 1) {
+            gsap.to(el, {
+              opacity: 0.25,
+              y: -32,
+              ease: "none",
+              scrollTrigger: {
+                trigger: el,
+                start: "bottom 55%",
+                end: "bottom 15%",
+                scrub: SCRUB,
+              },
+            });
+          }
+        });
+
+        wireActiveTracking(slides, numbers);
+      });
+
+      // ── Mobile / tablet: wipe reveal only, no parallax or fade-out ─────
+      mm.add(`(max-width: 1023px) and (not ${REDUCED_QUERY})`, () => {
+        const slides = slideRefs.current.filter(Boolean) as HTMLDivElement[];
+        const numbers = numberRefs.current.filter(Boolean) as HTMLSpanElement[];
+
+        slides.forEach((el) => {
+          gsap.fromTo(
+            el,
+            { clipPath: "inset(100% 0 0 0)", y: 32 },
+            {
+              clipPath: "inset(0% 0 0 0)",
+              y: 0,
+              duration: 0.8,
+              ease: EASE,
+              scrollTrigger: { trigger: el, start: "top 88%", once: true },
+            },
+          );
+        });
+
+        wireActiveTracking(slides, numbers);
       });
     }, section);
 

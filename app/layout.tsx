@@ -1,24 +1,30 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import { Archivo, IBM_Plex_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { getProfileSettings } from "@/lib/actions/settings";
 import { TabTitleAnimator } from "@/components/shell/tab-title-animator";
+import { EditorialCursor } from "@/components/motion/editorial-interactions";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+/**
+ * ONE grotesque, used from 11px to 18vw. That is the Swiss position:
+ * contrast comes from scale and weight, not from a second family.
+ * Archivo is a variable font (wght 100–900) so the whole ramp — body
+ * copy at 400 through mega headlines at 900 — costs a single request.
+ */
+const archivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+/** Meta voice: eyebrows, counters, timecodes, indices. */
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
   subsets: ["latin"],
-});
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
-  subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -70,7 +76,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${plusJakartaSans.variable} h-full antialiased`}
+      className={`${archivo.variable} ${plexMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
@@ -94,9 +100,10 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col bg-background text-foreground transition-colors duration-300">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <TabTitleAnimator />
+          <EditorialCursor />
           <a
             href="#work"
-            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[110] focus:rounded-md focus:bg-card focus:px-4 focus:py-2 focus:text-sm focus:outline-2 focus:outline-accent"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-110 focus:rounded-md focus:bg-card focus:px-4 focus:py-2 focus:text-sm focus:outline-2 focus:outline-accent"
           >
             Skip to content
           </a>

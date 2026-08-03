@@ -1,0 +1,7 @@
+<svg width="1200" height="750" viewBox="0 0 1200 750" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="750" fill="#0F1715"/>
+  <circle cx="400" cy="375" r="180" fill="#10B981" opacity="0.2"/>
+  <circle cx="800" cy="375" r="180" fill="#3B82F6" opacity="0.2"/>
+  <text x="600" y="380" fill="#F5F3EF" font-family="system-ui, sans-serif" font-size="44" font-weight="900" text-anchor="middle" letter-spacing="6">AI QUOTE ENGINE</text>
+  <text x="600" y="430" fill="#34D399" font-family="monospace" font-size="18" font-weight="600" text-anchor="middle" letter-spacing="4">AI &amp; INTERNAL TOOLING</text>
+</svg>

@@ -70,7 +70,7 @@ export function ProjectGalleryLightbox({
       <button
         type="button"
         onClick={() => open(0)}
-        className="group/image relative block aspect-[16/10] w-full overflow-hidden rounded-2xl border border-border bg-surface focus-visible:outline-2 focus-visible:outline-accent"
+        className="group/image relative block aspect-16/10 w-full overflow-hidden rounded-2xl border border-border bg-surface focus-visible:outline-2 focus-visible:outline-accent"
         aria-label={`View ${slides.length} images for ${projectName}`}
       >
         {coverImage ? (
@@ -88,7 +88,7 @@ export function ProjectGalleryLightbox({
           </span>
         )}
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover/image:opacity-100 backdrop-blur-[2px]">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-background/90 px-3.5 py-1.5 font-mono text-xs font-semibold text-emerald-400 shadow-[0_0_12px_rgba(34,197,94,0.15)]">
+          <span className="inline-flex items-center gap-1.5 border border-accent bg-background/90 px-3.5 py-1.5 font-mono text-xs font-semibold text-accent">
             <Images size={14} strokeWidth={2} aria-hidden="true" />
             View gallery ({slides.length})
           </span>
@@ -100,7 +100,7 @@ export function ProjectGalleryLightbox({
           role="dialog"
           aria-modal="true"
           aria-label={`${projectName} gallery`}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm"
+            className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm"
           onClick={close}
         >
           <button

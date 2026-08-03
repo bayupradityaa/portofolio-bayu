@@ -1,16 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "motion/react";
-import { ImageOff } from "lucide-react";
 import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 import { ProjectPreviewPlaceholder } from "@/components/ui/project-preview-placeholder";
 
 /**
- * Project cover with a GSAP-driven parallax layer (the outer ref) and a
- * Framer Motion hover lift (scale 1.03 + softer shadow). Keeping hover in
- * Framer and parallax in GSAP matches the brief's split of responsibilities.
+ * Project cover.
+ *
+ * The outer element is a hard-edged frame — no radius, no lift-on-hover. The
+ * inner element is the parallax layer driven by GSAP (`ref`), and is
+ * deliberately over-scaled so the vertical drift never exposes an edge:
+ * IMAGE_PARALLAX travels ±28px, and 1.16 scale on a 16/10 box clears that
+ * with margin to spare. Hover is a thin accent frame instead of a scale,
+ * which would fight the parallax transform.
  */
 export const ProjectImage = forwardRef<
   HTMLDivElement,
@@ -22,20 +25,18 @@ export const ProjectImage = forwardRef<
   }
 >(function ProjectImage({ src, alt, priority = false, className }, parallaxRef) {
   return (
-    <motion.div
-      whileHover={{ scale: 1.03 }}
-      transition={{ type: "spring", stiffness: 260, damping: 26 }}
+    <div
       className={cn(
-        "group/image relative aspect-[16/10] w-full overflow-hidden rounded-2xl",
-        "border border-border bg-surface shadow-[0_20px_60px_-30px_rgba(0,0,0,0.7)]",
-        "transition-shadow duration-500 hover:shadow-[0_40px_90px_-40px_rgba(34,197,94,0.28)]",
+        "group/image relative aspect-16/10 w-full overflow-hidden",
+        "border border-border bg-surface",
+        "transition-colors duration-300 hover:border-accent",
         className,
       )}
     >
-      {/* Inner layer carries the parallax/scale from GSAP so hover stays isolated. */}
+      {/* Parallax layer — over-scaled to cover the drift range. */}
       <div
         ref={parallaxRef}
-        className="absolute inset-0 scale-[1.08]"
+        className="absolute inset-0 scale-[1.16]"
         style={{ willChange: "transform" }}
       >
         {src ? (
@@ -51,9 +52,6 @@ export const ProjectImage = forwardRef<
           <ProjectPreviewPlaceholder title={alt} />
         )}
       </div>
-
-      {/* Soft top-down scrim keeps overlaid text legible on bright covers. */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
-    </motion.div>
+    </div>
   );
 });

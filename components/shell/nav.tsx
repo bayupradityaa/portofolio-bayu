@@ -13,9 +13,8 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { id: "about", label: "About" },
   { id: "stack", label: "Stack" },
-  { id: "work", label: "Work" },
+  { id: "work", label: "Project" },
   { id: "journey", label: "Journey" },
-  { id: "github", label: "GitHub" },
   { id: "contact", label: "Contact" },
 ] as const;
 
@@ -26,37 +25,31 @@ const navItemConfig: Record<
   about: {
     icon: <User className="h-4 w-4" />,
     gradient:
-      "radial-gradient(circle, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.05) 50%, rgba(34,197,94,0) 100%)",
+      "radial-gradient(circle, color-mix(in oklab, var(--accent) 18%, transparent) 0%, color-mix(in oklab, var(--accent) 6%, transparent) 50%, transparent 100%)",
     iconColor: "group-hover:text-accent",
   },
   stack: {
     icon: <Cpu className="h-4 w-4" />,
     gradient:
-      "radial-gradient(circle, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.05) 50%, rgba(34,197,94,0) 100%)",
+      "radial-gradient(circle, color-mix(in oklab, var(--accent) 18%, transparent) 0%, color-mix(in oklab, var(--accent) 6%, transparent) 50%, transparent 100%)",
     iconColor: "group-hover:text-accent",
   },
   work: {
     icon: <Briefcase className="h-4 w-4" />,
     gradient:
-      "radial-gradient(circle, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.05) 50%, rgba(34,197,94,0) 100%)",
+      "radial-gradient(circle, color-mix(in oklab, var(--accent) 18%, transparent) 0%, color-mix(in oklab, var(--accent) 6%, transparent) 50%, transparent 100%)",
     iconColor: "group-hover:text-accent",
   },
   journey: {
     icon: <Compass className="h-4 w-4" />,
     gradient:
-      "radial-gradient(circle, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.05) 50%, rgba(34,197,94,0) 100%)",
-    iconColor: "group-hover:text-accent",
-  },
-  github: {
-    icon: <GithubIcon className="h-4 w-4" />,
-    gradient:
-      "radial-gradient(circle, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.05) 50%, rgba(34,197,94,0) 100%)",
+      "radial-gradient(circle, color-mix(in oklab, var(--accent) 18%, transparent) 0%, color-mix(in oklab, var(--accent) 6%, transparent) 50%, transparent 100%)",
     iconColor: "group-hover:text-accent",
   },
   contact: {
     icon: <Mail className="h-4 w-4" />,
     gradient:
-      "radial-gradient(circle, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.05) 50%, rgba(34,197,94,0) 100%)",
+      "radial-gradient(circle, color-mix(in oklab, var(--accent) 18%, transparent) 0%, color-mix(in oklab, var(--accent) 6%, transparent) 50%, transparent 100%)",
     iconColor: "group-hover:text-accent",
   },
 };
@@ -138,19 +131,19 @@ function MenuToggleIcon({
         initial={false}
         animate={open ? { rotate: 45, y: 0 } : { rotate: 0, y: -5 }}
         transition={{ type: "spring", stiffness: 300, damping: 22 }}
-        className="absolute h-[2px] w-5 rounded-full bg-current transform-gpu"
+        className="absolute h-0.5 w-5 rounded-full bg-current transform-gpu"
       />
       <motion.span
         initial={false}
         animate={open ? { opacity: 0, x: -8 } : { opacity: 1, x: 0 }}
         transition={{ duration: 0.15 }}
-        className="absolute h-[2px] w-5 rounded-full bg-current transform-gpu"
+        className="absolute h-0.5 w-5 rounded-full bg-current transform-gpu"
       />
       <motion.span
         initial={false}
         animate={open ? { rotate: -45, y: 0 } : { rotate: 0, y: 5 }}
         transition={{ type: "spring", stiffness: 300, damping: 22 }}
-        className="absolute h-[2px] w-5 rounded-full bg-current transform-gpu"
+        className="absolute h-0.5 w-5 rounded-full bg-current transform-gpu"
       />
     </div>
   );
@@ -272,6 +265,14 @@ export function Nav() {
       return;
     }
 
+    const onSectionActive = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail && typeof detail.id === "string") {
+        setActive(detail.id);
+      }
+    };
+    window.addEventListener("section-active", onSectionActive);
+
     const ids = navItems.map((n) => n.id);
     const sections = ids
       .map((id) => document.getElementById(id))
@@ -284,11 +285,12 @@ export function Nav() {
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
         if (visible[0]) setActive(visible[0].target.id);
       },
-      { rootMargin: "-45% 0px -50% 0px", threshold: [0, 0.25, 0.5] },
+      { rootMargin: "-20% 0px -20% 0px", threshold: [0, 0.1, 0.25, 0.5] },
     );
     sections.forEach((s) => observer.observe(s));
 
     return () => {
+      window.removeEventListener("section-active", onSectionActive);
       observer.disconnect();
     };
   }, [isHomePage, pathname]);
@@ -472,7 +474,7 @@ export function Nav() {
           <button
             ref={menuBtnRef}
             type="button"
-            className="relative z-[70] rounded-lg p-2 text-foreground cursor-pointer hover:bg-surface transition-colors"
+            className="relative z-70 rounded-lg p-2 text-foreground cursor-pointer hover:bg-surface transition-colors"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             onClick={toggleMenu}
@@ -500,7 +502,7 @@ export function Nav() {
                 "--menu-y": origin.y,
               } as React.CSSProperties
             }
-            className="fixed inset-0 z-[60] h-[100dvh] w-full bg-background md:hidden"
+            className="fixed inset-0 z-60 h-dvh w-full bg-background md:hidden"
           >
             {/* faint glow anchored to the reveal origin — pure decoration */}
             <div

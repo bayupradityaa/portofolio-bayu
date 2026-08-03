@@ -1,49 +1,42 @@
 "use client";
 
-import { useEffect, createContext, useContext, useRef } from "react";
+import { useEffect, createContext, useContext } from "react";
 import { usePathname } from "next/navigation";
-import Lenis from "lenis";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "motion/react";
+import { useSmoothScroll, expoOut } from "@/lib/hooks/use-smooth-scroll";
+import type Lenis from "lenis";
 
-gsap.registerPlugin(ScrollTrigger);
-
+/** Subscribe to the current Lenis instance from anywhere in the tree. */
 const LenisContext = createContext<Lenis | null>(null);
 
 export function useLenis() {
   return useContext(LenisContext);
 }
 
+/**
+ * `SmoothScroll` — root-level provider that wires up Lenis smooth scroll
+ * and provides global anchor-link smoothing for the whole page.
+ *
+ * The actual Lenis ↔ ScrollTrigger wiring lives in `useSmoothScroll`; this
+ * component just adds the site-specific extras: anchor-click interception,
+ * URL-hash handling on first load, and the `/dev` route exclusion.
+ */
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const reduce = useReducedMotion();
   const pathname = usePathname();
-  const lenisRef = useRef<Lenis | null>(null);
+
+  // Skip Lenis on /dev (the playground page has its own scroll handling) and
+  // when the user prefers reduced motion.
+  const lenisRef = useSmoothScroll({
+    disabled: reduce || !!pathname?.startsWith("/dev"),
+  });
 
   useEffect(() => {
-    if (reduce || pathname?.startsWith("/dev")) {
-      ScrollTrigger.refresh();
-      return;
-    }
+    const lenis = lenisRef.current;
+    if (!lenis) return;
 
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      wheelMultiplier: 1.0,
-      touchMultiplier: 1.5,
-    });
-
-    lenisRef.current = lenis;
-    lenis.on("scroll", ScrollTrigger.update);
-
-    const onTick = (time: number) => {
-      lenis.raf(time * 1000);
-    };
-    gsap.ticker.add(onTick);
-    gsap.ticker.lagSmoothing(500, 33);
-
-    // Global anchor click handler for smooth navbar and link scrolling
+    // Global anchor click handler — smooth scroll for same-page hash links.
+    // Off-topic links (different route) are left to the browser.
     const handleAnchorClick = (e: MouseEvent) => {
       const target = (e.target as HTMLElement).closest("a");
       if (!target) return;
@@ -52,58 +45,47 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       if (!href) return;
 
       const hashIndex = href.indexOf("#");
-      if (hashIndex !== -1) {
-        const hash = href.slice(hashIndex);
-        const path = href.slice(0, hashIndex);
+      if (hashIndex === -1) return;
 
-        // Check if anchor targets current page or homepage
-        if (!path || path === "/" || path === window.location.pathname) {
-          const targetEl = document.querySelector(hash);
-          if (targetEl) {
-            e.preventDefault();
+      const hash = href.slice(hashIndex);
+      const path = href.slice(0, hashIndex);
 
-            // Smooth physics scroll via Lenis
-            lenis.scrollTo(targetEl as HTMLElement, {
-              offset: hash === "#hero" ? 0 : 0,
-              duration: 1.4,
-              easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            });
+      // Only intercept links targeting the current route.
+      if (path && path !== "/" && path !== window.location.pathname) return;
 
-            // Update URL hash cleanly without instant jump
-            if (window.history.pushState) {
-              window.history.pushState(null, "", hash);
-            }
-          }
-        }
+      const targetEl = document.querySelector(hash);
+      if (!targetEl) return;
+
+      e.preventDefault();
+      lenis.scrollTo(targetEl as HTMLElement, {
+        duration: 1.4,
+        easing: expoOut,
+      });
+
+      if (window.history.pushState) {
+        window.history.pushState(null, "", hash);
       }
     };
 
     document.addEventListener("click", handleAnchorClick);
 
-    // Smooth scroll on initial load if URL contains hash (e.g. #work)
+    // Smooth scroll on initial load if URL contains a hash (e.g. #work).
     if (window.location.hash) {
       const targetEl = document.querySelector(window.location.hash);
       if (targetEl) {
         window.setTimeout(() => {
           lenis.scrollTo(targetEl as HTMLElement, {
             duration: 1.4,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            easing: expoOut,
           });
         }, 300);
       }
     }
 
-    // Let content mount before measuring trigger positions.
-    const id = window.setTimeout(() => ScrollTrigger.refresh(), 200);
-
     return () => {
-      window.clearTimeout(id);
       document.removeEventListener("click", handleAnchorClick);
-      gsap.ticker.remove(onTick);
-      lenis.destroy();
-      lenisRef.current = null;
     };
-  }, [reduce, pathname]);
+  }, [lenisRef, pathname]);
 
   return (
     <LenisContext.Provider value={lenisRef.current}>

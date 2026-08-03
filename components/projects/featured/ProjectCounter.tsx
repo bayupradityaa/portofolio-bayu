@@ -4,12 +4,12 @@ import { cn } from "@/lib/utils";
 import type { FeaturedProject } from "./types";
 
 /**
- * The stack of giant project numbers living inside the pinned sidebar.
- * All numbers are rendered and absolutely stacked; the GSAP hook crossfades
- * between them by index. Only the active one is visible at a time.
+ * The stack of giant project numbers in the pinned sidebar.
+ * All numbers render absolutely stacked; the GSAP hook crossfades between
+ * them by index, so only the active one is visible at a time.
  *
- * `refs` is populated by the parent so the animation hook can address each
- * number element directly without re-querying the DOM.
+ * `numberRefs` is populated by the parent so the animation hook can address
+ * each element directly without re-querying the DOM.
  */
 export function ProjectCounter({
   projects,
@@ -18,11 +18,14 @@ export function ProjectCounter({
   projects: FeaturedProject[];
   numberRefs: React.MutableRefObject<(HTMLSpanElement | null)[]>;
 }) {
+  // Zero-padded, so "01" and "12" occupy the same box — no reflow on swap.
+  const label = (i: number) => String(i + 1).padStart(2, "0");
+
   return (
     <div className="relative select-none" aria-hidden="true">
-      {/* Reserve the box the largest number occupies so nothing shifts. */}
-      <span className="invisible block font-jakarta font-extrabold leading-none tracking-tighter text-[clamp(7rem,11vw,11rem)]">
-        {projects.length}
+      {/* Reserve the box the widest number occupies so nothing shifts. */}
+      <span className="invisible block font-display text-[clamp(5rem,9vw,9rem)] font-bold leading-none tracking-tighter">
+        {label(projects.length - 1)}
       </span>
 
       {projects.map((project, i) => (
@@ -32,14 +35,12 @@ export function ProjectCounter({
             numberRefs.current[i] = el;
           }}
           className={cn(
-            "absolute inset-0 block font-jakarta font-extrabold leading-none tracking-tighter",
-            "text-[clamp(7rem,11vw,11rem)]",
-            // Ghosted outline number — bold, sleek & prominent. Accent bleeds in via the hook.
-            "bg-gradient-to-b from-foreground to-secondary/40 bg-clip-text text-transparent",
+            "absolute inset-0 block font-display text-[clamp(5rem,9vw,9rem)]",
+            "font-bold leading-none tracking-tighter text-accent",
           )}
-          style={{ willChange: "transform, opacity, filter" }}
+          style={{ willChange: "transform, opacity" }}
         >
-          {i + 1}
+          {label(i)}
         </span>
       ))}
     </div>

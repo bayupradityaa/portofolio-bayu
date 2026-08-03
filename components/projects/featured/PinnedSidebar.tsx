@@ -4,10 +4,13 @@ import type { FeaturedProject } from "./types";
 import { ProjectCounter } from "./ProjectCounter";
 
 /**
- * The left 28% pinned column. Contains the giant counter and the metadata
- * labels that change as projects scroll into view. The metadata elements are
- * swapped by the parent hook via data attributes and CSS transitions, while
- * the counter digits are GSAP-crossfaded individually.
+ * The sticky left column (desktop only).
+ *
+ * Holds the giant counter and the metadata that swaps as projects scroll past.
+ * The counter digits are GSAP-crossfaded individually; the text block is
+ * remounted via React `key` so the `.fp-meta` CSS animation re-fires on each
+ * change. Progress is shown as "03 / 07" rather than a bar — it reads as an
+ * index in a printed contents list.
  */
 export function PinnedSidebar({
   projects,
@@ -21,28 +24,31 @@ export function PinnedSidebar({
   metaRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const active = projects[activeIndex] ?? projects[0];
+  const total = String(projects.length).padStart(2, "0");
 
   return (
-    <div className="flex h-full w-full flex-col items-start justify-center gap-10 px-6 lg:px-10">
-      {/* Counter + title sit on one row: the giant number holds its position
-          while the title/category swap beside it as projects scroll by. */}
-      <div className="flex w-full items-center gap-6">
-        {/* Counter */}
-        <ProjectCounter projects={projects} numberRefs={numberRefs} />
+    <div className="flex h-full w-full flex-col justify-center gap-8">
+      <ProjectCounter projects={projects} numberRefs={numberRefs} />
 
-        {/* Metadata labels — crossfade via CSS transition when activeIndex changes */}
-        <div
-          key={active.slug}
-          ref={metaRef}
-          className="fp-meta flex min-w-0 flex-col gap-3"
-          style={{ willChange: "opacity, transform" }}
-        >
-          {/* Title */}
-          <h3 className="max-w-[16ch] text-2xl font-semibold leading-tight tracking-tight text-foreground md:text-3xl">
-            {active.name}
-          </h3>
-        </div>
+      <div className="h-px w-full bg-border" />
+
+      <div
+        key={active.slug}
+        ref={metaRef}
+        className="fp-meta flex min-w-0 flex-col gap-3"
+        style={{ willChange: "opacity, transform" }}
+      >
+        <span className="eyebrow">{active.category}</span>
+        <h3 className="max-w-[18ch] font-display text-3xl font-bold leading-[0.95] tracking-tight text-foreground">
+          {active.name}
+        </h3>
       </div>
+
+      <p className="font-mono text-xs text-muted">
+        {String(activeIndex + 1).padStart(2, "0")}
+        <span className="mx-1.5 text-border">/</span>
+        {total}
+      </p>
     </div>
   );
 }

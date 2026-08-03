@@ -1,6 +1,7 @@
-import { Mail } from "lucide-react";
+import { Mail, ArrowUpRight } from "lucide-react";
 import { Section } from "@/components/ui/section";
 import { Reveal } from "@/components/motion/reveal";
+import { ScrambleText } from "@/components/motion/editorial-interactions";
 import { ContactForm } from "./contact-form";
 import { GithubIcon, LinkedinIcon, InstagramIcon } from "@/components/ui/brand-icons";
 import { getProfileSettings } from "@/lib/actions/settings";
@@ -8,7 +9,7 @@ import { getProfileSettings } from "@/lib/actions/settings";
 export async function Contact() {
   const settings = await getProfileSettings();
 
-  // Build socials array from settings
+  // Build socials array from settings — only those the admin has filled in.
   const socials = [
     settings?.github ? { label: "GitHub", href: settings.github } : null,
     settings?.linkedin ? { label: "LinkedIn", href: settings.linkedin } : null,
@@ -18,28 +19,37 @@ export async function Contact() {
 
   return (
     <div className="relative w-full bg-ch-contact">
-      <Section id="contact" hairline={false} className="relative z-10 pt-28 pb-24 md:pt-40 md:pb-36">
-        <div className="grid grid-cols-1 gap-14 md:grid-cols-2 md:gap-20">
-          <div>
-            <p className="font-mono text-sm text-accent">Contact</p>
-            <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-tight md:text-5xl">
-              Let us build
+      <Section
+        id="contact"
+        hairline={false}
+        className="relative z-10 pt-24 pb-24 md:pt-32 md:pb-36"
+      >
+        <div className="grid grid-cols-1 gap-14 md:grid-cols-[1.05fr_1fr] md:gap-16">
+          {/* Left: editorial statement */}
+          <div className="flex flex-col justify-center">
+            <span className="eyebrow">07 — Contact</span>
+
+            <h2 className="text-display mt-6">
+              <ScrambleText text="Let’s build" as="span" />
               <br />
-              something good.
+              <span className="text-accent">
+                <ScrambleText text="something good." as="span" />
+              </span>
             </h2>
-            <p className="mt-6 max-w-[46ch] text-lg leading-relaxed text-secondary">
+
+            <p className="mt-6 max-w-[44ch] text-lg leading-relaxed text-secondary">
               Open to internships, freelance work, and collaborations. Send a note
-              and I will reply within a day or two.
+              and I&rsquo;ll reply within a day or two.
             </p>
 
-            {/* Social Icons row */}
-            <div className="mt-8 flex flex-wrap gap-3.5">
+            {/* Social icons — editorial tiles, hairline border, no scale on hover. */}
+            <div className="mt-10 flex flex-wrap items-center gap-3">
               {socials.map((s) => {
                 let icon = null;
-                if (s.label === "GitHub") icon = <GithubIcon size={20} />;
-                else if (s.label === "LinkedIn") icon = <LinkedinIcon size={20} />;
-                else if (s.label === "Instagram") icon = <InstagramIcon size={20} />;
-                else if (s.label === "Email") icon = <Mail size={20} />;
+                if (s.label === "GitHub") icon = <GithubIcon size={18} />;
+                else if (s.label === "LinkedIn") icon = <LinkedinIcon size={18} />;
+                else if (s.label === "Instagram") icon = <InstagramIcon size={18} />;
+                else if (s.label === "Email") icon = <Mail size={18} />;
 
                 return (
                   <a
@@ -48,17 +58,27 @@ export async function Contact() {
                     target={s.href.startsWith("http") ? "_blank" : undefined}
                     rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
                     aria-label={s.label}
-                    className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card text-secondary transition-all duration-300 hover:border-accent hover:bg-surface hover:text-accent hover:scale-105"
+                    className="group inline-flex items-center gap-2 border border-border bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-widest text-secondary transition-colors duration-200 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                   >
-                    {icon}
+                    <span className="transition-colors group-hover:text-accent">
+                      {icon}
+                    </span>
+                    <span>{s.label}</span>
+                    <ArrowUpRight
+                      size={13}
+                      strokeWidth={2}
+                      className="text-muted transition-colors group-hover:text-accent"
+                      aria-hidden="true"
+                    />
                   </a>
                 );
               })}
             </div>
           </div>
 
+          {/* Right: the form, framed with a hairline */}
           <Reveal as="div">
-            <div className="rounded-2xl border border-border bg-card p-6 md:p-8 shadow-lg">
+            <div className="border border-border bg-card p-6 md:p-8">
               <ContactForm />
             </div>
           </Reveal>

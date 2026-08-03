@@ -1,0 +1,6 @@
+<svg width="1200" height="750" viewBox="0 0 1200 750" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="750" fill="#121017"/>
+  <rect x="250" y="180" width="700" height="390" rx="16" fill="#1D1A26" stroke="#A855F7" stroke-width="3"/>
+  <text x="600" y="380" fill="#F5F3EF" font-family="system-ui, sans-serif" font-size="44" font-weight="900" text-anchor="middle" letter-spacing="6">E-COMMERCE REBUILD</text>
+  <text x="600" y="430" fill="#C084FC" font-family="monospace" font-size="18" font-weight="600" text-anchor="middle" letter-spacing="4">HEADLESS STOREFRONT</text>
+</svg>

@@ -1,54 +1,81 @@
 @import "tailwindcss";
 
-/* ------------------------------------------------------------------ */
-/*  Design tokens — dark theme, locked page-wide. Single green accent. */
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
+/*  EDITORIAL / SWISS SYSTEM                                          */
+/*  Dark-first. Warm near-black paper stock, single signal accent.    */
+/*  Every colour, easing and duration used on the public site comes   */
+/*  from a token declared here. Change it once, it changes everywhere.*/
+/* ================================================================== */
+
 :root {
-  --background: #09090b;
-  --surface: #111113;
-  --card: #18181b;
-  --border: #27272a;
-  --foreground: #fafafa;
-  --secondary: #b0b0b8;
-  --muted: #94949e;
-  --accent: #22c55e;
-  --accent-hover: #4ade80;
-  --accent-contrast: #04120a;
+  /* ── Surface ramp — warm blacks, never pure #000 ───────────────── */
+  --background: #0a0a0a;
+  --surface: #121211;
+  --card: #171715;
+  --border: #262624;
+  --foreground: #f5f3ef;
+  /* warm paper white */
+  --secondary: #a8a49c;
+  --muted: #78746c;
 
-  /* Chapter Tonal System — Dark Mode */
-  --ch-hero: #08080a;
-  --ch-about: #0c0c0f;
-  --ch-stack: #12141a;
-  --ch-work: #0b0e14;
-  --ch-journey: #0e0c12;
-  --ch-github: #0a0f0d;
-  --ch-contact: #121318;
+  /* ── Signal accent — the one loud decision on the page ─────────── */
+  --accent: #10b981;
+  --accent-hover: #34d399;
+  --accent-contrast: #0a0a0a;
 
-  --radius: 0.75rem;
+  /* ── Chapter tonal system ──────────────────────────────────────── */
+  /* Editorial reads as ONE continuous sheet, not stacked cards.      */
+  /* Variance is deliberately near-invisible; rhythm comes from       */
+  /* typography and negative space, not from background colour.       */
+  --ch-hero: #0a0a0a;
+  --ch-about: #0a0a0a;
+  --ch-stack: #0d0d0c;
+  --ch-work: #0a0a0a;
+  --ch-journey: #0d0d0c;
+  --ch-github: #0a0a0a;
+  --ch-contact: #0d0d0c;
+
+  /* ── Motion tokens ─────────────────────────────────────────────── */
+  /* Three easings, four durations, one stagger. Nothing else.        */
+  /* Consistency is what makes motion read as "designed".             */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --dur-fast: 0.3s;
+  --dur-base: 0.6s;
+  --dur-slow: 0.9s;
+  --dur-slower: 1.2s;
+
+  --stagger: 0.06s;
+
+  /* Editorial = sharp. Radii are near-zero by design. */
+  --radius: 0.125rem;
 }
 
 .light,
 html.light,
 [data-theme="light"] {
-  --background: #f8fafc;
-  --surface: #f1f5f9;
+  /* Paper stock, not "light grey UI". */
+  --background: #f2efe9;
+  --surface: #eae6de;
   --card: #ffffff;
-  --border: #cbd5e1;
-  --foreground: #0f172a;
-  --secondary: #334155;
-  --muted: #475569;
-  --accent: #15803d;
-  --accent-hover: #166534;
+  --border: #d4cec2;
+  --foreground: #111110;
+  --secondary: #4a4741;
+  --muted: #6b665e;
+
+  --accent: #059669;
+  --accent-hover: #047857;
   --accent-contrast: #ffffff;
 
-  /* Chapter Tonal System — Light Mode */
-  --ch-hero: #f8fafc;
-  --ch-about: #f1f5f9;
-  --ch-stack: #e2e8f0;
-  --ch-work: #f8fafc;
-  --ch-journey: #e2e8f0;
-  --ch-github: #edf2f7;
-  --ch-contact: #e2e8f0;
+  --ch-hero: #f2efe9;
+  --ch-about: #f2efe9;
+  --ch-stack: #eae6de;
+  --ch-work: #f2efe9;
+  --ch-journey: #eae6de;
+  --ch-github: #f2efe9;
+  --ch-contact: #eae6de;
 }
 
 @theme inline {
@@ -71,22 +98,27 @@ html.light,
   --color-ch-github: var(--ch-github);
   --color-ch-contact: var(--ch-contact);
 
-  --font-sans: var(--font-plus-jakarta);
-  --font-mono: var(--font-geist-mono);
-  --font-jakarta: var(--font-plus-jakarta);
+  /* One grotesque for text AND display — Swiss doctrine. Scale and
+     weight carry the contrast; the mono is the only second voice. */
+  --font-sans: var(--font-archivo);
+  --font-display: var(--font-archivo);
+  --font-mono: var(--font-plex-mono);
+  /* Legacy aliases — some components still say `font-jakarta` /
+     `font-geist-mono`. They resolve into the new system, so no
+     component needs editing for the typeface change to land. */
+  --font-jakarta: var(--font-archivo);
+  --font-syne: var(--font-archivo);
+  --font-plus-jakarta: var(--font-archivo);
+  --font-geist-mono: var(--font-plex-mono);
 
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 0.25rem);
-  --radius-2xl: calc(var(--radius) + 0.75rem);
+  --radius-xl: calc(var(--radius) + 0.125rem);
+  --radius-2xl: calc(var(--radius) + 0.25rem);
 }
 
 @layer base {
   * {
     border-color: var(--border);
-  }
-
-  body {
-    font-family: var(--font-plus-jakarta), system-ui, sans-serif;
   }
 
   html {
@@ -99,14 +131,14 @@ html.light,
   body {
     background: var(--background);
     color: var(--foreground);
-    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
     font-feature-settings: "ss01", "cv01";
     overflow-x: hidden;
   }
 
   ::selection {
-    background: color-mix(in oklab, var(--accent) 28%, transparent);
-    color: var(--foreground);
+    background: var(--accent);
+    color: var(--accent-contrast);
   }
 
   /* Visible, on-brand keyboard focus everywhere */
@@ -116,11 +148,13 @@ html.light,
     border-radius: 2px;
   }
 
+  /* Headings speak in the display face — tight, editorial, unapologetic. */
   h1,
   h2,
   h3,
   h4 {
-    letter-spacing: -0.02em;
+    font-family: var(--font-syne), var(--font-plus-jakarta), sans-serif;
+    letter-spacing: -0.03em;
     text-wrap: balance;
   }
 
@@ -130,15 +164,46 @@ html.light,
 }
 
 @layer utilities {
+
+  /* ── Editorial type scale ──────────────────────────────────────── */
+
+  /* Section-level heading. */
   .text-display {
-    font-size: clamp(2.75rem, 7vw, 6rem);
-    line-height: 0.98;
-    letter-spacing: -0.03em;
+    font-family: var(--font-syne), sans-serif;
+    font-size: clamp(2.5rem, 6.5vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+  }
+
+  /* Page-level statement. Used sparingly — hero and the closing line. */
+  .text-mega {
+    font-family: var(--font-syne), sans-serif;
+    font-size: clamp(3.25rem, 13vw, 12rem);
+    line-height: 0.84;
+    letter-spacing: -0.045em;
+    font-weight: 700;
+  }
+
+  /* Small mono label that sits above a heading. */
+  .eyebrow {
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--muted);
   }
 
   /* Fine top hairline separates sections without heavy borders */
   .hairline-t {
     border-top: 1px solid var(--border);
+  }
+
+  /* Full-bleed editorial rule. The Swiss workhorse. */
+  .rule {
+    height: 1px;
+    width: 100%;
+    background: var(--border);
   }
 
   /* Subtle background grid, only where it organizes real content */
@@ -150,19 +215,67 @@ html.light,
     -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 0%, transparent 78%);
     mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 0%, transparent 78%);
   }
+
+  /* ── Inverted chapter ──────────────────────────────────────────── */
+  /* Flips the local token scope so an entire section can run as paper
+     on ink. Children keep using `text-foreground` / `bg-card` etc and
+     simply resolve to the opposite ramp. This is the editorial device
+     that breaks the page rhythm without introducing a new colour. */
+  .section-invert {
+    --background: #f2efe9;
+    --surface: #eae6de;
+    --card: #ffffff;
+    --border: #d4cec2;
+    --foreground: #111110;
+    --secondary: #4a4741;
+    --muted: #6b665e;
+    --accent: #059669;
+    --accent-hover: #047857;
+    --accent-contrast: #ffffff;
+
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  /* ── Signature reveal ──────────────────────────────────────────── */
+  /* One motion idea, reused everywhere: content is uncovered by a
+     directional wipe rather than fading in. Cheap (clip-path is
+     GPU-composited) and far more editorial than opacity+y. */
+  .mask-reveal {
+    clip-path: inset(0 100% 0 0);
+    will-change: clip-path;
+  }
+
+  .mask-reveal-up {
+    clip-path: inset(100% 0 0 0);
+    will-change: clip-path;
+  }
+
+  /* Link underline that draws in from the left. */
+  .link-underline {
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 1px;
+    transition: background-size var(--dur-fast) var(--ease-out-expo);
+  }
+
+  .link-underline:hover {
+    background-size: 100% 1px;
+  }
 }
 
 /* ------------------------------------------------------------------ */
 /*  Hero — cinematic scroll experience                                */
 /* ------------------------------------------------------------------ */
 
-/* Soft radial green glow behind portrait */
+/* Soft radial accent glow behind portrait */
 .hero-glow {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background: radial-gradient(ellipse 50% 55% at 50% 45%,
-      color-mix(in oklab, var(--accent) 18%, transparent) 0%,
+      color-mix(in oklab, var(--accent) 16%, transparent) 0%,
       transparent 70%);
   opacity: 0;
   will-change: opacity;
@@ -171,7 +284,7 @@ html.light,
 @media (min-width: 1024px) {
   .hero-glow {
     background: radial-gradient(ellipse 50% 55% at 53% 50%,
-        color-mix(in oklab, var(--accent) 18%, transparent) 0%,
+        color-mix(in oklab, var(--accent) 16%, transparent) 0%,
         transparent 70%);
   }
 }
@@ -259,6 +372,24 @@ html.light,
 }
 
 /* ------------------------------------------------------------------ */
+/*  WorkSection — pinned/sticky "selected work" list                   */
+/* ------------------------------------------------------------------ */
+
+/* Active-card dim.
+   A card carries [data-active="false"] while it isn't crossing the
+   viewport centre. We dim via `filter` (not `opacity`) because the
+   reveal animation already owns the card's `opacity` — `filter` is an
+   independent property so the two effects never fight for the same
+   inline style. The transition runs on the project's standard easing. */
+[data-work-card] {
+  transition: filter var(--dur-base) var(--ease-out-expo);
+}
+
+[data-work-card][data-active="false"] {
+  filter: brightness(0.55) saturate(0.7);
+}
+
+/* ------------------------------------------------------------------ */
 /*  Featured Projects — cinematic showcase depth                       */
 /* ------------------------------------------------------------------ */
 
@@ -275,9 +406,9 @@ html.light,
   z-index: 0;
   background:
     radial-gradient(ellipse 40% 50% at 18% 30%,
-      color-mix(in oklab, var(--accent) 10%, transparent) 0%, transparent 60%),
+      color-mix(in oklab, var(--accent) 8%, transparent) 0%, transparent 60%),
     radial-gradient(ellipse 45% 55% at 85% 75%,
-      color-mix(in oklab, var(--accent) 7%, transparent) 0%, transparent 62%),
+      color-mix(in oklab, var(--accent) 6%, transparent) 0%, transparent 62%),
     linear-gradient(to bottom,
       transparent 0%,
       color-mix(in oklab, var(--surface) 40%, transparent) 100%);
@@ -300,27 +431,23 @@ html.light,
   transform: scaleY(0);
 }
 
-/* Timeline node: a ring that fills + glows while its entry owns the view. */
+/* Timeline node: a square that fills while its entry owns the view.
+   Square, not circle — editorial systems favour the orthogonal. */
 .journey-node {
-  height: 0.875rem;
-  width: 0.875rem;
-  border-radius: 9999px;
+  height: 0.625rem;
+  width: 0.625rem;
   background: var(--background);
-  border: 2px solid color-mix(in oklab, var(--border) 100%, transparent);
+  border: 1px solid var(--border);
   transition:
-    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.5s ease,
-    box-shadow 0.5s ease,
-    background-color 0.5s ease;
+    transform var(--dur-base) var(--ease-out-expo),
+    border-color var(--dur-base) ease,
+    background-color var(--dur-base) ease;
 }
 
 .journey-node.is-active {
   background: var(--accent);
   border-color: var(--accent);
-  transform: scale(1.35);
-  box-shadow:
-    0 0 0 4px color-mix(in oklab, var(--accent) 18%, transparent),
-    0 0 18px color-mix(in oklab, var(--accent) 55%, transparent);
+  transform: scale(1.4);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -332,20 +459,18 @@ html.light,
 /* Featured sidebar meta: crossfade the title/category as it swaps per project.
    Remounted via React `key`, so a fresh entry animation fires each change. */
 .fp-meta {
-  animation: fp-meta-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fp-meta-in var(--dur-base) var(--ease-out-expo) both;
 }
 
 @keyframes fp-meta-in {
   from {
     opacity: 0;
     transform: translateY(12px);
-    filter: blur(6px);
   }
 
   to {
     opacity: 1;
     transform: translateY(0);
-    filter: blur(0);
   }
 }
 
@@ -401,6 +526,14 @@ html.light,
 .marquee-container:hover .animate-marquee-left,
 .marquee-container:hover .animate-marquee-right {
   animation-play-state: paused;
+}
+
+/* Hide native cursor on fine pointer (desktop) when EditorialCursor is active. */
+@media (pointer: fine) {
+  body.custom-cursor,
+  body.custom-cursor * {
+    cursor: none !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

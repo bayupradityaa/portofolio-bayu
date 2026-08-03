@@ -10,9 +10,12 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 const CRITICAL_ASSETS = ["/og-image.png", "/favicon.ico"];
 
 /**
- * First-paint logo reveal screen with Asset Prefetching.
- * Displays 'BayuPraditya.' initially with a thin outline,
- * sweeping left-to-right with solid colors as resources load.
+ * First-paint screen. The wordmark is masked by a real progress bar rather
+ * than a fake one — the colour wipe actually tracks the asset loader, so the
+ * preloader is honest, not theatre.
+ *
+ * Editorial version: mono wordmark, sharp edges, hairline progress — no
+ * glassmorphism, no rounded pills. Reads as a printed cover sheet.
  */
 export function LoadingScreen() {
   const reduce = useReducedMotion();
@@ -81,24 +84,24 @@ export function LoadingScreen() {
     <AnimatePresence>
       {visible && (
         <motion.div
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background"
+          className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-background"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.02 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
-          {/* Text Container with Thinner 1px Stroke & Left-to-Right Fill Overlay */}
+          {/* Editorial wordmark: outline + clipped fill, mono caps */}
           <motion.div
-            className="relative flex items-baseline py-2 text-4xl font-extrabold tracking-tight md:text-6xl lg:text-7xl select-none"
+            className="relative flex items-baseline py-2 font-display text-4xl font-bold tracking-tighter md:text-6xl lg:text-7xl select-none"
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* Outline Layer (Garis Tepi 1px Tipis & Halus) */}
+            {/* Outline layer — thin stroke, ghosted */}
             <div
               aria-hidden="true"
-              className="flex items-baseline text-transparent opacity-40 dark:opacity-50"
+              className="flex items-baseline text-transparent opacity-30"
               style={{
-                WebkitTextStroke: "1px var(--foreground, #ffffff)",
+                WebkitTextStroke: "1px var(--foreground)",
               }}
             >
               <span>Bayu</span>
@@ -106,7 +109,7 @@ export function LoadingScreen() {
               <span>.</span>
             </div>
 
-            {/* Solid Fill Layer (Animasi Warna KIRI ke KANAN) */}
+            {/* Solid fill layer — wipes from left to right, tracks real progress */}
             <motion.div
               className="absolute inset-0 flex items-baseline py-2"
               initial={{ clipPath: "inset(-20% 100% -20% 0)" }}
@@ -119,23 +122,22 @@ export function LoadingScreen() {
             </motion.div>
           </motion.div>
 
-          {/* Progress Indicator */}
+          {/* Hairline progress — editorial, no rounded pill */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, duration: 0.4 }}
             className="mt-6 flex flex-col items-center gap-2"
           >
-            <div className="h-[2px] w-36 md:w-48 overflow-hidden rounded-full bg-border/40">
+            <div className="relative h-px w-36 overflow-hidden bg-border/40 md:w-48">
               <motion.div
-                className="h-full bg-accent"
-                initial={{ width: "0%" }}
-                animate={{ width: "100%" }}
-                transition={{ duration: 1.3, ease: [0.65, 0, 0.35, 1], delay: 0.15 }}
+                className="absolute inset-y-0 left-0 h-full bg-accent"
+                style={{ width: `${progress}%` }}
+                transition={{ duration: 0.1, ease: "linear" }}
               />
             </div>
-            <span className="font-mono text-xs font-medium tracking-widest text-muted">
-              {progress}%
+            <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+              {String(progress).padStart(3, "0")}% / Loading
             </span>
           </motion.div>
         </motion.div>

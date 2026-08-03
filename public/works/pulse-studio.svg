@@ -1,0 +1,14 @@
+<svg width="1200" height="750" viewBox="0 0 1200 750" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="750" fill="#0F1117"/>
+  <circle cx="600" cy="375" r="350" fill="url(#radial1)" opacity="0.35"/>
+  <path d="M250 500C450 250 750 600 950 250" stroke="#10B981" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="600" cy="375" r="80" stroke="#34D399" stroke-width="4" fill="none"/>
+  <text x="600" y="390" fill="#F5F3EF" font-family="system-ui, sans-serif" font-size="44" font-weight="900" text-anchor="middle" letter-spacing="6">PULSE STUDIO</text>
+  <text x="600" y="440" fill="#10B981" font-family="monospace" font-size="18" font-weight="600" text-anchor="middle" letter-spacing="4">CINEMATIC MOTION // 2025</text>
+  <defs>
+    <radialGradient id="radial1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(600 375) rotate(90) scale(350)">
+      <stop stop-color="#10B981"/>
+      <stop offset="1" stop-color="#0F1117" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

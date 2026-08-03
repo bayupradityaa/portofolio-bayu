@@ -1,9 +1,8 @@
-import { Section } from "@/components/ui/section";
 import { Reveal } from "@/components/motion/reveal";
 import { Counter } from "@/components/motion/counter";
 import { MagicText } from "@/components/motion/magic-text";
+import { SectionRule } from "@/components/ui/section-rule";
 import { getProfileSettings } from "@/lib/actions/settings";
-import { OrganicTransition } from "@/components/ui/organic-transition";
 
 // Fallback stats — these can be moved to Supabase later
 const defaultStats = [
@@ -45,8 +44,6 @@ export async function About() {
         </dl>
       </div>
 
-      {/* Organic transition boundary into TechStack */}
-      <OrganicTransition fillColor="fill-ch-stack" variant="slope-right" />
     </section>
   );
 }

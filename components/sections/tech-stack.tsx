@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Section } from "@/components/ui/section";
 import { cn } from "@/lib/utils";
 import { ScrollFloat } from "@/components/motion/scroll-float";
-import { OrganicTransition } from "@/components/ui/organic-transition";
+import { SectionRule } from "@/components/ui/section-rule";
 import { Marquee } from "@/components/ui/marquee";
 
 // Import custom monochrome brand SVG icons
@@ -213,7 +212,7 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
         >
           Technology Ecosystem
         </ScrollFloat>
-        <p className="mt-6 text-base leading-relaxed text-secondary md:text-lg max-w-[580px]">
+        <p className="mt-6 text-base leading-relaxed text-secondary md:text-lg max-w-145">
           The tools behind every product I build.<br />
           Chosen for performance, reliability, and great developer experience.
         </p>
@@ -222,8 +221,8 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
       {/* Technology Marquee Area */}
       <div className="relative z-10 w-full overflow-hidden">
         {/* Edge Fade Masks for Smooth Transitions */}
-        <div className="pointer-events-none absolute left-0 top-0 z-20 h-full w-20 bg-gradient-to-r from-ch-stack to-transparent md:w-36 lg:w-48" />
-        <div className="pointer-events-none absolute right-0 top-0 z-20 h-full w-20 bg-gradient-to-l from-ch-stack to-transparent md:w-36 lg:w-48" />
+        <div className="pointer-events-none absolute left-0 top-0 z-20 h-full w-20 bg-linear-to-r from-ch-stack to-transparent md:w-36 lg:w-48" />
+        <div className="pointer-events-none absolute right-0 top-0 z-20 h-full w-20 bg-linear-to-l from-ch-stack to-transparent md:w-36 lg:w-48" />
 
         <div className="flex flex-col gap-3 md:gap-4">
           {/* Row 1: moves left */}
@@ -246,8 +245,6 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
         </div>
       </div>
 
-      {/* Organic transition boundary into Featured Projects */}
-      <OrganicTransition fillColor="fill-ch-work" variant="slope-left" />
     </section>
   );
 }

@@ -3,10 +3,8 @@
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Section } from "@/components/ui/section";
 import { Badge } from "@/components/ui/badge";
 import { ScrollFloat } from "@/components/motion/scroll-float";
-import { OrganicTransition } from "@/components/ui/organic-transition";
 import { cn } from "@/lib/utils";
 import type { Experience } from "@/lib/types/database";
 
@@ -174,7 +172,7 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
           {/* Accent progress rail — scaleY scrubbed to scroll */}
           <span
             ref={progressRef}
-            className="journey-progress pointer-events-none absolute top-1 bottom-1 left-0 w-px origin-top bg-gradient-to-b from-accent via-accent to-transparent lg:left-1/2 lg:-translate-x-1/2"
+            className="journey-progress pointer-events-none absolute top-1 bottom-1 left-0 w-px origin-top bg-linear-to-b from-accent via-accent to-transparent lg:left-1/2 lg:-translate-x-1/2"
             aria-hidden="true"
           />
 
@@ -198,7 +196,7 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
                     ref={(el) => {
                       nodeRefs.current[i] = el;
                     }}
-                    className="journey-node absolute top-1.5 -left-[7px] lg:left-1/2 lg:-translate-x-1/2"
+                    className="journey-node absolute top-1.5 -left-1.75 lg:left-1/2 lg:-translate-x-1/2"
                     aria-hidden="true"
                   />
 
@@ -270,8 +268,6 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
         </div>
       </div>
 
-      {/* Organic transition boundary into GitHub Activity */}
-      <OrganicTransition fillColor="fill-ch-github" variant="slope-left" />
     </section>
   );
 }

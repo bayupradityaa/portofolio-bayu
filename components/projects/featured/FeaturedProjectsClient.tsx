@@ -5,18 +5,18 @@ import { ArrowRight } from "lucide-react";
 import { PinnedSidebar } from "./PinnedSidebar";
 import { ProjectSlide } from "./ProjectSlide";
 import { useFeaturedProjects } from "./useFeaturedProjects";
-import { OrganicTransition } from "@/components/ui/organic-transition";
+import { Magnetic } from "@/components/motion/editorial-interactions";
 import type { FeaturedProject } from "./types";
 
 /**
- * Cinematic, scroll-driven Featured Projects showcase.
+ * Scroll-driven Featured Projects showcase.
  *
- * Layout: a two-column grid inside a pinned section. The left 28% column is
- * pinned by GSAP and holds a giant crossfading counter + metadata; the right
- * 72% column scrolls its project panels underneath. All motion lives in
- * `useFeaturedProjects`; this component is layout + ref wiring only.
+ * Layout: an asymmetric two-column grid. The left 30% is sticky and holds the
+ * giant counter + metadata; the right column scrolls its project panels past
+ * it. All motion lives in `useFeaturedProjects` — this component is layout and
+ * ref wiring only.
  *
- * Owns the `#work` anchor (replaces the previous grid section).
+ * Owns the `#work` anchor.
  */
 export function FeaturedProjectsClient({ projects }: { projects: FeaturedProject[] }) {
   const {
@@ -31,35 +31,34 @@ export function FeaturedProjectsClient({ projects }: { projects: FeaturedProject
   } = useFeaturedProjects({ count: projects.length });
 
   return (
-    <section id="work" ref={sectionRef} className="relative bg-ch-work pb-32 md:pb-44">
-      {/* Premium background depth — radial glow + soft grid + noise (CSS) */}
-      <div className="featured-bg [mask-image:linear-gradient(to_bottom,transparent_0%,black_100px)]" aria-hidden="true" />
-
-      {/* Header — kept minimal; carries the "View All" CTA the old section had */}
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 pt-24 md:flex-row md:items-end md:justify-between md:pt-32">
-        <div className="max-w-2xl">
-          <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">Featured Work</h2>
-          <p className="mt-5 text-base leading-relaxed text-secondary md:text-lg">
-            A close look at selected projects—each one a deliberate exercise in
-            performance, craft, and meaningful user experience.
-          </p>
+    <section id="work" ref={sectionRef} className="relative bg-ch-work pb-24 md:pb-32">
+      {/* Section masthead — mono label on a full-bleed rule, then the title. */}
+      <div className="mx-auto w-full max-w-7xl px-6 pt-24 md:pt-32">
+        <div className="flex items-center gap-6 border-t border-border pt-5">
+          <span className="eyebrow">02 — Selected Work</span>
+          <span className="h-px flex-1 bg-border" />
+          <Magnetic strength={0.25} radius={110}>
+            <Link
+              href="/projects"
+              className="group inline-flex shrink-0 items-center gap-2 font-mono text-xs uppercase tracking-widest text-secondary transition-colors hover:text-accent"
+            >
+              <span className="link-underline">All projects</span>
+              <ArrowRight
+                size={13}
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              />
+            </Link>
+          </Magnetic>
         </div>
 
-        <Link
-          href="/projects"
-          className="group inline-flex shrink-0 items-center gap-2 self-start rounded-xl border border-accent/30 bg-accent/10 px-5 py-3 font-sans text-xs font-semibold text-accent transition-all duration-300 hover:border-accent hover:bg-accent hover:text-accent-contrast hover:shadow-[0_0_20px_rgba(34,197,94,0.25)] md:self-auto"
-        >
-          <span>View All Projects</span>
-          <ArrowRight
-            size={14}
-            className="transition-transform duration-300 group-hover:translate-x-1"
-          />
-        </Link>
+        <h2 className="text-display mt-10 max-w-[14ch]">
+          Work that had to
+          <span className="text-accent"> hold up</span>.
+        </h2>
       </div>
 
-      {/* Two-column stage */}
-      <div className="relative z-10 mx-auto mt-16 grid w-full max-w-7xl grid-cols-1 px-6 md:mt-24 lg:grid-cols-[34%_1fr] lg:gap-10">
-        {/* Left — sticky sidebar (desktop) */}
+      {/* Asymmetric stage — sticky index left, scrolling specimens right */}
+      <div className="mx-auto mt-16 grid w-full max-w-7xl grid-cols-1 px-6 md:mt-24 lg:grid-cols-[30%_1fr] lg:gap-16">
         <div
           ref={sidebarRef}
           className="hidden self-start lg:sticky lg:top-0 lg:block lg:h-screen"
@@ -72,7 +71,6 @@ export function FeaturedProjectsClient({ projects }: { projects: FeaturedProject
           />
         </div>
 
-        {/* Right — scrolling project track */}
         <div ref={trackRef} className="flex flex-col">
           {projects.map((project, i) => (
             <ProjectSlide
@@ -89,9 +87,6 @@ export function FeaturedProjectsClient({ projects }: { projects: FeaturedProject
           ))}
         </div>
       </div>
-
-      {/* Organic transition boundary into Journey Timeline */}
-      <OrganicTransition fillColor="fill-ch-journey" variant="slope-right" />
     </section>
   );
 }
