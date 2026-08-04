@@ -7,6 +7,7 @@ import { GithubIcon, LinkedinIcon, InstagramIcon } from "@/components/ui/brand-i
 import { ConversationBubble } from "@/components/ui/conversation-bubble";
 import { ContactForm } from "./contact-form";
 import { SectionRule } from "@/components/ui/section-rule";
+import { cn } from "@/lib/utils";
 import type { ProfileSettings } from "@/lib/types/database";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -24,7 +25,7 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
   return (
     <div
       id="contact"
-      className="relative w-full bg-[#FFD177] text-black py-16 lg:py-24 overflow-hidden select-none"
+      className="relative w-full bg-[#FFD177] text-black pt-6 sm:pt-8 lg:pt-10 pb-16 lg:pb-24 overflow-hidden select-none"
     >
       {/* Ambient Lighting Overlays */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/25 rounded-full blur-3xl pointer-events-none" />
@@ -32,7 +33,7 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
 
       <div className="mx-auto w-full max-w-6xl px-6 lg:px-12 relative z-10">
         {/* Section Divider inside Gold Contact Stage */}
-        <SectionRule label="Contact" className="px-0 py-0 pb-10 sm:pb-14 text-black" />
+        <SectionRule label="Contact" className="px-0 py-0 pb-4 sm:pb-6 text-black" />
         <AnimatePresence mode="wait">
           {!showForm ? (
             /* ── OVERVIEW / SHOWCASE STATE (MATCHING AWWWARDS REFERENCE) ── */
@@ -44,21 +45,53 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="flex flex-col items-start space-y-8"
             >
-              {/* Giant Awwwards Headline with Contrast Text Layers */}
-              <div className="flex flex-col text-left font-sans font-extrabold tracking-tighter leading-[0.92]">
-                <h2 className="text-5xl sm:text-7xl lg:text-[92px] text-black">
-                  Transform Your
-                </h2>
-                <h2 className="text-5xl sm:text-7xl lg:text-[92px] text-black">
-                  Digital Vision
-                </h2>
-                <h2 className="text-5xl sm:text-7xl lg:text-[92px] text-white drop-shadow-md">
-                  Into Real
-                </h2>
-                <h2 className="text-5xl sm:text-7xl lg:text-[92px] text-white drop-shadow-md">
-                  Experience
-                </h2>
-              </div>
+              {/* Giant Awwwards Headline with Cinematic Masked Line Reveal Animation */}
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-30px" }}
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: {
+                    opacity: 1,
+                    transition: {
+                      staggerChildren: 0.18,
+                      delayChildren: 0.15,
+                    },
+                  },
+                }}
+                className="flex flex-col text-left font-sans font-extrabold tracking-tighter leading-[0.92]"
+              >
+                {[
+                  { text: "Transform Your", color: "text-black" },
+                  { text: "Digital Vision", color: "text-black" },
+                  { text: "Into Real Experience", color: "text-white drop-shadow-md" },
+                ].map((line, idx) => (
+                  <div key={idx} className="overflow-hidden py-1.5 -my-1.5">
+                    <motion.h2
+                      variants={{
+                        hidden: { y: "120%", rotate: 3.5, filter: "blur(8px)", opacity: 0 },
+                        visible: {
+                          y: "0%",
+                          rotate: 0,
+                          filter: "blur(0px)",
+                          opacity: 1,
+                          transition: {
+                            duration: 1.25,
+                            ease: [0.16, 1, 0.3, 1],
+                          },
+                        },
+                      }}
+                      className={cn(
+                        "text-4xl sm:text-6xl md:text-7xl lg:text-[88px] transform-gpu origin-left will-change-transform whitespace-nowrap",
+                        line.color
+                      )}
+                    >
+                      {line.text}
+                    </motion.h2>
+                  </div>
+                ))}
+              </motion.div>
 
               {/* Portfolio Copywriting */}
               <p className="text-base sm:text-xl text-black/85 leading-relaxed max-w-2xl font-normal pt-2">
@@ -113,6 +146,18 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+
+      {/* SVG Wave Transition to Footer (Zero Subpixel Gap) */}
+      <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none pointer-events-none select-none translate-y-px z-20">
+        <svg
+          className="relative block w-full h-10 sm:h-16 lg:h-20 text-[#000000]"
+          viewBox="0 0 1440 120"
+          preserveAspectRatio="none"
+          fill="currentColor"
+        >
+          <path d="M0,32L60,42.7C120,53,240,75,360,80C480,85,600,75,720,64C840,53,960,43,1080,48C1200,53,1320,75,1380,85.3L1440,96L1440,120L0,120Z" />
+        </svg>
       </div>
     </div>
   );

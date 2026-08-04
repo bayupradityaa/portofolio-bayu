@@ -520,14 +520,6 @@ html.light,
   animation-play-state: paused;
 }
 
-/* Hide native cursor on fine pointer (desktop) when EditorialCursor is active. */
-@media (pointer: fine) {
-  body.custom-cursor,
-  body.custom-cursor * {
-    cursor: none !important;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
 
   *,

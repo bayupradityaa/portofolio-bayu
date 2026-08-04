@@ -7,6 +7,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cn } from "@/lib/utils";
 import { ProjectPreviewPlaceholder } from "@/components/ui/project-preview-placeholder";
+import { motion } from "motion/react";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -325,11 +326,8 @@ export function WorkSection({
           ref={trackContainerRef}
           className="relative z-20 w-full h-full overflow-hidden flex items-center pt-24 pb-12 bg-[#FFD177] text-black"
         >
-          {/* SECTION 03 PROJECT BOUNDARY RULE */}
+          {/* SECTION PROJECT BOUNDARY RULE */}
           <div className="absolute top-8 left-0 right-0 z-30 w-full flex items-center gap-6 px-8 lg:px-16 max-w-[1700px] mx-auto pointer-events-none">
-            <span className="font-mono text-xs font-bold uppercase tracking-[0.22em] text-black">
-              03
-            </span>
             <span className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-black/80">
               PROJECT
             </span>
@@ -345,16 +343,73 @@ export function WorkSection({
               className="w-screen h-screen shrink-0 flex flex-col items-center justify-center text-center px-6 md:px-12 bg-[#FFD177] text-black relative z-10"
             >
               <div className="max-w-3xl space-y-8 flex flex-col items-center justify-center pt-12">
-                <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-black leading-[1.08] select-text">
-                  {heading.includes(" & ") ? (
-                    <>
-                      <span className="block">{heading.split(" & ")[0]}</span>
-                      <span className="block text-black/90">&amp; {heading.split(" & ")[1]}</span>
-                    </>
-                  ) : (
-                    heading
-                  )}
-                </h2>
+                {/* Giant Awwwards Headline with Outline Text & Cinematic Masked Line Reveal */}
+                <motion.div
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-30px" }}
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                      opacity: 1,
+                      transition: {
+                        staggerChildren: 0.18,
+                        delayChildren: 0.15,
+                      },
+                    },
+                  }}
+                  className="flex flex-col items-center justify-center text-center font-sans font-extrabold tracking-tight leading-[1.05] select-text"
+                >
+                  {/* Line 1: Selected + Outline "work" */}
+                  <div className="overflow-hidden py-1.5 -my-1.5">
+                    <motion.h2
+                      variants={{
+                        hidden: { y: "120%", rotate: 3.5, filter: "blur(8px)", opacity: 0 },
+                        visible: {
+                          y: "0%",
+                          rotate: 0,
+                          filter: "blur(0px)",
+                          opacity: 1,
+                          transition: {
+                            duration: 1.25,
+                            ease: [0.16, 1, 0.3, 1],
+                          },
+                        },
+                      }}
+                      className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-black transform-gpu origin-center will-change-transform"
+                    >
+                      <span>Selected </span>
+                      <span className="[text-stroke:2.5px_#000000] [-webkit-text-stroke:2.5px_#000000] text-transparent font-extrabold">
+                        work
+                      </span>
+                    </motion.h2>
+                  </div>
+
+                  {/* Line 2: & + Outline "explorations" */}
+                  <div className="overflow-hidden py-1.5 -my-1.5">
+                    <motion.h2
+                      variants={{
+                        hidden: { y: "120%", rotate: 3.5, filter: "blur(8px)", opacity: 0 },
+                        visible: {
+                          y: "0%",
+                          rotate: 0,
+                          filter: "blur(0px)",
+                          opacity: 1,
+                          transition: {
+                            duration: 1.25,
+                            ease: [0.16, 1, 0.3, 1],
+                          },
+                        },
+                      }}
+                      className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-black transform-gpu origin-center will-change-transform"
+                    >
+                      <span>&amp; </span>
+                      <span className="[text-stroke:2.5px_#000000] [-webkit-text-stroke:2.5px_#000000] text-transparent font-extrabold">
+                        explorations
+                      </span>
+                    </motion.h2>
+                  </div>
+                </motion.div>
 
                 <div>
                   <Link
@@ -461,9 +516,6 @@ export function WorkSection({
       <div className="block md:hidden px-6 py-16 space-y-12 bg-[#FFD177] text-black">
         {/* Mobile Section Boundary Rule */}
         <div className="flex items-center gap-6 pb-2">
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.22em] text-black">
-            03
-          </span>
           <span className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-black/80">
             PROJECT
           </span>
@@ -472,16 +524,73 @@ export function WorkSection({
 
         {/* Mobile Header */}
         <header className="text-center space-y-6 pb-8 border-b border-black/20">
-          <h2 className="text-4xl font-extrabold tracking-tight text-black leading-[1.1]">
-            {heading.includes(" & ") ? (
-              <>
-                <span className="block">{heading.split(" & ")[0]}</span>
-                <span className="block text-black/90">&amp; {heading.split(" & ")[1]}</span>
-              </>
-            ) : (
-              heading
-            )}
-          </h2>
+          {/* Mobile Giant Awwwards Headline with Outline Text */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-20px" }}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.18,
+                  delayChildren: 0.12,
+                },
+              },
+            }}
+            className="flex flex-col items-center justify-center text-center font-sans font-extrabold tracking-tight leading-[1.08] select-text"
+          >
+            {/* Line 1: Selected + Outline "work" */}
+            <div className="overflow-hidden py-1 -my-1">
+              <motion.h2
+                variants={{
+                  hidden: { y: "120%", rotate: 3, filter: "blur(6px)", opacity: 0 },
+                  visible: {
+                    y: "0%",
+                    rotate: 0,
+                    filter: "blur(0px)",
+                    opacity: 1,
+                    transition: {
+                      duration: 1.1,
+                      ease: [0.16, 1, 0.3, 1],
+                    },
+                  },
+                }}
+                className="text-3xl sm:text-4xl font-extrabold text-black transform-gpu origin-center"
+              >
+                <span>Selected </span>
+                <span className="[text-stroke:2px_#000000] [-webkit-text-stroke:2px_#000000] text-transparent font-extrabold">
+                  work
+                </span>
+              </motion.h2>
+            </div>
+
+            {/* Line 2: & + Outline "explorations" */}
+            <div className="overflow-hidden py-1 -my-1">
+              <motion.h2
+                variants={{
+                  hidden: { y: "120%", rotate: 3, filter: "blur(6px)", opacity: 0 },
+                  visible: {
+                    y: "0%",
+                    rotate: 0,
+                    filter: "blur(0px)",
+                    opacity: 1,
+                    transition: {
+                      duration: 1.1,
+                      ease: [0.16, 1, 0.3, 1],
+                    },
+                  },
+                }}
+                className="text-3xl sm:text-4xl font-extrabold text-black transform-gpu origin-center"
+              >
+                <span>&amp; </span>
+                <span className="[text-stroke:2px_#000000] [-webkit-text-stroke:2px_#000000] text-transparent font-extrabold">
+                  explorations
+                </span>
+              </motion.h2>
+            </div>
+          </motion.div>
           <div>
             <Link
               href={viewAllHref}

@@ -9,9 +9,8 @@ export function Logo({ className }: { className?: string }) {
       )}
       aria-label="Bayu Praditya"
     >
-      <span>Bayu</span>
+      <span>Bayu Praditya</span>
       <span className="text-accent">.</span>
-      <span className="sr-only">Praditya</span>
     </span>
   );
 }

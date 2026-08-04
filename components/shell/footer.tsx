@@ -23,10 +23,11 @@ export async function Footer() {
   ].filter(Boolean) as { label: string; href: string }[];
 
   return (
-    <footer className="w-full border-t border-border bg-ch-contact">
+    <footer className="relative w-full bg-[#000000] text-white">
       <div className="mx-auto max-w-7xl px-6">
         {/* Main row: logo + colophon + socials */}
-        <div className="flex flex-col gap-6 py-8 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-6 py-8 md:flex-row md:items-end md:justify-between">
+          {/* Left Column: Logo + Copyright */}
           <div className="space-y-2">
             <a
               href="#hero"
@@ -35,36 +36,41 @@ export async function Footer() {
               <Logo />
             </a>
             <p className="font-mono text-xs uppercase tracking-widest text-muted">
-              {`Designed & built by ${settings?.name || "Bayu Praditya"} · ${year} · All rights reserved`}
+              {`${year} · ALL RIGHTS RESERVED`}
             </p>
           </div>
 
-          {/* Social indices — mono caps, no icon clutter */}
-          <nav aria-label="Social" className="flex flex-wrap items-center gap-x-7 gap-y-2">
-            {socials.map((s) => {
-              let icon = null;
-              if (s.label === "GitHub") icon = <GithubIcon size={16} />;
-              else if (s.label === "LinkedIn") icon = <LinkedinIcon size={16} />;
-              else if (s.label === "Instagram") icon = <InstagramIcon size={16} />;
-              else if (s.label === "Email") icon = <Mail size={16} />;
+          {/* Right Column: Let's Connect! + Social Indices */}
+          <div className="flex flex-col items-start md:items-end gap-2.5">
+            <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#FFD177]">
+              Let&apos;s Connect!
+            </span>
+            <nav aria-label="Social" className="flex flex-wrap items-center gap-x-7 gap-y-2">
+              {socials.map((s) => {
+                let icon = null;
+                if (s.label === "GitHub") icon = <GithubIcon size={16} />;
+                else if (s.label === "LinkedIn") icon = <LinkedinIcon size={16} />;
+                else if (s.label === "Instagram") icon = <InstagramIcon size={16} />;
+                else if (s.label === "Email") icon = <Mail size={16} />;
 
-              return (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target={s.href.startsWith("http") ? "_blank" : undefined}
-                  rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  aria-label={s.label}
-                  className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-secondary transition-colors duration-200 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-                >
-                  <span className="text-muted transition-colors group-hover:text-accent">
-                    {icon}
-                  </span>
-                  <span className="link-underline">{s.label}</span>
-                </a>
-              );
-            })}
-          </nav>
+                return (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target={s.href.startsWith("http") ? "_blank" : undefined}
+                    rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                    aria-label={s.label}
+                    className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-secondary transition-colors duration-200 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  >
+                    <span className="text-muted transition-colors group-hover:text-accent">
+                      {icon}
+                    </span>
+                    <span className="link-underline">{s.label}</span>
+                  </a>
+                );
+              })}
+            </nav>
+          </div>
         </div>
       </div>
     </footer>

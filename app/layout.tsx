@@ -100,7 +100,6 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col bg-background text-foreground transition-colors duration-300">
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}>
           <TabTitleAnimator />
-          <EditorialCursor />
           <a
             href="#work"
             className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-110 focus:rounded-md focus:bg-card focus:px-4 focus:py-2 focus:text-sm focus:outline-2 focus:outline-accent"
