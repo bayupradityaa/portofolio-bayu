@@ -61,137 +61,111 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
     if (!section) return;
 
     const ctx = gsap.context(() => {
-      const mm = gsap.matchMedia();
+      if (path && planeGroup) {
+        const pathLength = path.getTotalLength();
 
-      mm.add("(min-width: 768px)", () => {
-        if (path && planeGroup) {
-          const pathLength = path.getTotalLength();
+        gsap.set(path, {
+          strokeDasharray: pathLength,
+          strokeDashoffset: pathLength,
+        });
 
-          gsap.set(path, {
-            strokeDasharray: pathLength,
-            strokeDashoffset: pathLength,
-          });
+        // Airplane starts at Card 1 right edge
+        const startPt = path.getPointAtLength(0);
+        const startPtNext = path.getPointAtLength(Math.min(6, pathLength));
+        const startAngle = Math.atan2(startPtNext.y - startPt.y, startPtNext.x - startPt.x) * (180 / Math.PI);
 
-          // Airplane starts at Card 1 right edge
-          const startPt = path.getPointAtLength(0);
-          const startPtNext = path.getPointAtLength(Math.min(6, pathLength));
-          const startAngle = Math.atan2(startPtNext.y - startPt.y, startPtNext.x - startPt.x) * (180 / Math.PI);
+        gsap.set(planeGroup, {
+          x: startPt.x,
+          y: startPt.y,
+          rotation: startAngle + 90,
+          transformOrigin: "center center",
+        });
 
-          gsap.set(planeGroup, {
+        if (planePopupGroup) {
+          gsap.set(planePopupGroup, {
             x: startPt.x,
             y: startPt.y,
-            rotation: startAngle + 90,
-            transformOrigin: "center center",
-          });
-
-          if (planePopupGroup) {
-            gsap.set(planePopupGroup, {
-              x: startPt.x,
-              y: startPt.y,
-            });
-          }
-
-          // Scrub starts as soon as Card 1 is visible — near-instant, silky smooth tracking
-          ScrollTrigger.create({
-            trigger: cardsRef.current[0] ?? section,
-            start: "top 78%",
-            endTrigger: section,
-            end: "bottom 85%",
-            scrub: 0.3,
-            onUpdate: (self) => {
-              const currentLength = pathLength * self.progress;
-              gsap.set(path, { strokeDashoffset: pathLength - currentLength });
-
-              const pt = path.getPointAtLength(currentLength);
-              const ptNext = path.getPointAtLength(Math.min(currentLength + 5, pathLength));
-              const angle = Math.atan2(ptNext.y - pt.y, ptNext.x - pt.x) * (180 / Math.PI);
-
-              gsap.set(planeGroup, {
-                x: pt.x,
-                y: pt.y,
-                rotation: angle + 90,
-                transformOrigin: "center center",
-              });
-
-              if (planePopupGroup) {
-                gsap.set(planePopupGroup, {
-                  x: pt.x,
-                  y: pt.y,
-                });
-              }
-
-              // Touchdown / Landed state detection when plane reaches the end of the line
-              if (self.progress >= 0.92) {
-                setIsLanded(true);
-              } else {
-                setIsLanded(false);
-              }
-
-              // Active card state
-              timeline.forEach((_, idx) => {
-                const nodeThreshold = idx / Math.max(1, timeline.length - 1);
-                if (self.progress >= nodeThreshold * 0.75) {
-                  setActiveNodes((prev) => (prev[idx] ? prev : { ...prev, [idx]: true }));
-                } else {
-                  setActiveNodes((prev) => (!prev[idx] ? prev : { ...prev, [idx]: false }));
-                }
-              });
-            },
           });
         }
 
-        // Staggered Entrance Animations for Cards (Synchronized smoothly as plane approaches)
-        cardsRef.current.forEach((card, i) => {
-          if (!card) return;
-          const isRight = i % 2 !== 0;
+        // Scrub starts as soon as Card 1 is visible — near-instant, silky smooth tracking
+        ScrollTrigger.create({
+          trigger: cardsRef.current[0] ?? section,
+          start: "top 78%",
+          endTrigger: section,
+          end: "bottom 85%",
+          scrub: 0.3,
+          onUpdate: (self) => {
+            const currentLength = pathLength * self.progress;
+            gsap.set(path, { strokeDashoffset: pathLength - currentLength });
 
-          gsap.fromTo(
-            card,
-            {
-              opacity: 0,
-              y: 40,
-              x: isRight ? 40 : -40,
-              scale: 0.96,
-              filter: "blur(4px)",
+            const pt = path.getPointAtLength(currentLength);
+            const ptNext = path.getPointAtLength(Math.min(currentLength + 5, pathLength));
+            const angle = Math.atan2(ptNext.y - pt.y, ptNext.x - pt.x) * (180 / Math.PI);
+
+            gsap.set(planeGroup, {
+              x: pt.x,
+              y: pt.y,
+              rotation: angle + 90,
+              transformOrigin: "center center",
+            });
+
+            if (planePopupGroup) {
+              gsap.set(planePopupGroup, {
+                x: pt.x,
+                y: pt.y,
+              });
+            }
+
+            // Touchdown / Landed state detection when plane reaches the end of the line
+            if (self.progress >= 0.92) {
+              setIsLanded(true);
+            } else {
+              setIsLanded(false);
+            }
+
+            // Active card state
+            timeline.forEach((_, idx) => {
+              const nodeThreshold = idx / Math.max(1, timeline.length - 1);
+              if (self.progress >= nodeThreshold * 0.75) {
+                setActiveNodes((prev) => (prev[idx] ? prev : { ...prev, [idx]: true }));
+              } else {
+                setActiveNodes((prev) => (!prev[idx] ? prev : { ...prev, [idx]: false }));
+              }
+            });
+          },
+        });
+      }
+
+      // Card entrance animations for mobile and desktop
+      cardsRef.current.forEach((card, i) => {
+        if (!card) return;
+        const isRight = i % 2 !== 0;
+
+        gsap.fromTo(
+          card,
+          {
+            opacity: 0,
+            y: 40,
+            x: isRight ? 20 : -20,
+            scale: 0.96,
+            filter: "blur(4px)",
+          },
+          {
+            opacity: 1,
+            y: 0,
+            x: 0,
+            scale: 1,
+            filter: "blur(0px)",
+            duration: 0.75,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 88%",
+              toggleActions: "play none none reverse",
             },
-            {
-              opacity: 1,
-              y: 0,
-              x: 0,
-              scale: 1,
-              filter: "blur(0px)",
-              duration: 0.75,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: card,
-                start: "top 88%",
-                toggleActions: "play none none reverse",
-              },
-            }
-          );
-        });
-      });
-
-      // Mobile vertical reveal
-      mm.add("(max-width: 767px)", () => {
-        cardsRef.current.forEach((card) => {
-          if (!card) return;
-          gsap.fromTo(
-            card,
-            { opacity: 0, y: 40 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.75,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: card,
-                start: "top 88%",
-                toggleActions: "play none none reverse",
-              },
-            }
-          );
-        });
+          }
+        );
       });
     }, section);
 
@@ -208,8 +182,8 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
       <div className="mx-auto w-full max-w-6xl px-6">
         {/* Timeline Container */}
         <div className="relative w-full">
-          {/* SVG Bezier Curve with Thicker Line & High Visibility (Desktop) */}
-          <div className="hidden md:block absolute inset-0 pointer-events-none z-0">
+          {/* SVG Bezier Curve with Thicker Line & High Visibility (Mobile & Desktop) */}
+          <div className="absolute inset-0 pointer-events-none z-0">
             <svg
               className="w-full h-full"
               viewBox="0 0 1000 1400"

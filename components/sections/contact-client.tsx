@@ -25,8 +25,20 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
   return (
     <div
       id="contact"
-      className="relative w-full bg-[#FFD177] text-black pt-6 sm:pt-8 lg:pt-10 pb-16 lg:pb-24 overflow-hidden select-none"
+      className="relative w-full bg-[#FFD177] text-black pt-6 sm:pt-8 lg:pt-10 pb-16 lg:pb-24 select-none"
     >
+      {/* Top SVG Wave Transition from Dark Journey (#000000) to Gold Contact Stage (#FFD177) */}
+      <div className="absolute top-0 left-0 right-0 w-full overflow-hidden leading-none pointer-events-none select-none -translate-y-[98%] z-20">
+        <svg
+          className="relative block w-full h-8 sm:h-14 lg:h-18 text-[#FFD177]"
+          viewBox="0 0 1440 120"
+          preserveAspectRatio="none"
+          fill="currentColor"
+        >
+          <path d="M0,64L60,53.3C120,43,240,21,360,26.7C480,32,600,64,720,74.7C840,85,960,75,1080,58.7C1200,43,1320,21,1380,10.7L1440,0L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z" />
+        </svg>
+      </div>
+
       {/* Ambient Lighting Overlays */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/25 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-black/5 rounded-full blur-3xl pointer-events-none" />

@@ -203,9 +203,7 @@ export function Nav() {
         <header className="header">
           <div className="container is--full">
             <nav className="nav-row">
-              <Link href="/" aria-label="home" className="nav-logo-row focus-visible:outline-accent pointer-events-auto">
-                <Logo />
-              </Link>
+              <div />
               <div className="nav-row__right">
                 {/* Restored Menu Button */}
                 <button
