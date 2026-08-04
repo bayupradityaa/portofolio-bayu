@@ -16,11 +16,11 @@ if (typeof window !== "undefined") {
 }
 
 const navItems = [
-  { id: "about", number: "01", label: "About Us", href: "/#about", shape: "1" },
+  { id: "about", number: "01", label: "About Me", href: "/#about", shape: "1" },
   { id: "stack", number: "02", label: "Tech Stack", href: "/#stack", shape: "2" },
   { id: "work", number: "03", label: "Selected Works", href: "/#work", shape: "3" },
   { id: "journey", number: "04", label: "Journey Path", href: "/#journey", shape: "4" },
-  { id: "contact", number: "05", label: "Contact Us", href: "/#contact", shape: "5" },
+  { id: "contact", number: "05", label: "Contact", href: "/#contact", shape: "5" },
 ];
 
 export function Nav() {
@@ -356,10 +356,7 @@ export function Nav() {
                         className="nav-link w-inline-block"
                         onClick={closeMenu}
                       >
-                        <div className="flex items-center gap-3">
-                          <span className="font-mono text-xs font-bold text-[#FFD177]/70">
-                            {item.number}
-                          </span>
+                        <div className="flex items-center">
                           <p className="nav-link-text">{item.label}</p>
                         </div>
                         <ArrowUpRight className="w-5 h-5 md:w-7 md:h-7 text-white/30 group-hover:text-[#FFD177] transition-all duration-300 transform group-hover:translate-x-1 group-hover:-translate-y-1" />

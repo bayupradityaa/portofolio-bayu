@@ -25,17 +25,17 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
   return (
     <div
       id="contact"
-      className="relative w-full bg-[#FFD177] text-black pt-6 sm:pt-8 lg:pt-10 pb-16 lg:pb-24 select-none"
+      className="relative w-full bg-[#FFD177] text-black pt-8 sm:pt-12 lg:pt-16 pb-16 lg:pb-24 overflow-hidden select-none"
     >
-      {/* Top SVG Wave Transition from Dark Journey (#000000) to Gold Contact Stage (#FFD177) */}
-      <div className="absolute top-0 left-0 right-0 w-full overflow-hidden leading-none pointer-events-none select-none -translate-y-[98%] z-20">
+      {/* Top Black SVG Wave Transition flowing from Dark Journey (#000000) into Gold Contact Stage (#FFD177) */}
+      <div className="absolute top-0 left-0 right-0 w-full overflow-hidden leading-none pointer-events-none select-none z-20">
         <svg
-          className="relative block w-full h-8 sm:h-14 lg:h-18 text-[#FFD177]"
+          className="relative block w-full h-7 sm:h-12 lg:h-16 text-[#000000]"
           viewBox="0 0 1440 120"
           preserveAspectRatio="none"
           fill="currentColor"
         >
-          <path d="M0,64L60,53.3C120,43,240,21,360,26.7C480,32,600,64,720,74.7C840,85,960,75,1080,58.7C1200,43,1320,21,1380,10.7L1440,0L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z" />
+          <path d="M0,0 L1440,0 L1440,25 C1320,65 1200,85 1080,70 C960,55 840,25 720,40 C600,55 480,85 360,70 C240,55 120,25 0,40 Z" />
         </svg>
       </div>
 
@@ -43,7 +43,7 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/25 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-black/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="mx-auto w-full max-w-6xl px-6 lg:px-12 relative z-10">
+      <div className="mx-auto w-full max-w-6xl px-6 lg:px-12 relative z-10 pt-4 sm:pt-6">
         {/* Section Divider inside Gold Contact Stage */}
         <SectionRule label="Contact" className="px-0 py-0 pb-4 sm:pb-6 text-black" />
         <AnimatePresence mode="wait">
@@ -72,14 +72,14 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
                     },
                   },
                 }}
-                className="flex flex-col text-left font-sans font-extrabold tracking-tighter leading-[0.92]"
+                className="flex flex-col text-left font-sans font-extrabold tracking-tighter leading-[0.92] max-w-full"
               >
                 {[
                   { text: "Transform Your", color: "text-black" },
                   { text: "Digital Vision", color: "text-black" },
                   { text: "Into Real Experience", color: "text-white drop-shadow-md" },
                 ].map((line, idx) => (
-                  <div key={idx} className="overflow-hidden py-1.5 -my-1.5">
+                  <div key={idx} className="overflow-hidden py-1.5 -my-1.5 max-w-full">
                     <motion.h2
                       variants={{
                         hidden: { y: "120%", rotate: 3.5, filter: "blur(8px)", opacity: 0 },
@@ -95,7 +95,7 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
                         },
                       }}
                       className={cn(
-                        "text-4xl sm:text-6xl md:text-7xl lg:text-[88px] transform-gpu origin-left will-change-transform whitespace-nowrap",
+                        "text-3xl sm:text-5xl md:text-7xl lg:text-[88px] transform-gpu origin-left will-change-transform sm:whitespace-nowrap break-words",
                         line.color
                       )}
                     >
