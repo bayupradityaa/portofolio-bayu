@@ -177,26 +177,10 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
     <section
       id="journey"
       ref={sectionRef}
-      className="relative w-full bg-background text-foreground py-24 md:py-36 overflow-hidden select-none"
+      className="relative w-full bg-background text-foreground pt-4 pb-20 md:pt-8 md:pb-28 overflow-hidden select-none"
       aria-label="About Me and My Journey Timeline"
     >
       <div className="mx-auto w-full max-w-6xl px-6">
-        {/* Header matching scrolljourney.mp4 reference video */}
-        <header className="flex flex-col items-start gap-4 max-w-3xl mb-16 lg:mb-24">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/10 border border-accent/30 text-accent font-mono text-xs font-bold uppercase tracking-[0.2em]">
-            <span>START SMALL GROW BIG</span>
-          </div>
-
-          <h2 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.05]">
-            About Me (&amp;) <br className="hidden sm:inline" />
-            My Journey
-          </h2>
-
-          <p className="text-base md:text-lg text-muted leading-relaxed font-normal max-w-2xl pt-2">
-            From vocational computer &amp; network engineering (TKJ) to computer science at Universitas Gunadarma and building digital platforms end to end.
-          </p>
-        </header>
-
         {/* Timeline Container */}
         <div className="relative w-full">
           {/* SVG Bezier Curve with Thicker Line & High Visibility (Desktop) */}
@@ -261,49 +245,39 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
                       cardsRef.current[idx] = el;
                     }}
                     className={cn(
-                      "w-full md:col-span-6 max-w-[460px] relative p-6 lg:p-8 rounded-3xl bg-card/85 backdrop-blur-xl border transition-all duration-500 shadow-xl group",
+                      "w-full md:col-span-6 max-w-[440px] relative p-5 lg:p-6 rounded-2xl md:rounded-3xl bg-card/85 backdrop-blur-xl border transition-all duration-500 shadow-xl group",
                       isActive
-                        ? "border-accent/60 shadow-[0_0_30px_rgba(16,185,129,0.15)]"
+                        ? "border-accent/60 shadow-[0_0_30px_rgba(255,209,119,0.15)]"
                         : "border-border/60 hover:border-accent/40",
                       isRight ? "md:col-start-7 md:ml-auto" : "md:col-start-1"
                     )}
                   >
-                    {/* Node Dot Indicator on Card Header */}
+                    {/* Period Badge on Card Header */}
                     <div
                       className={cn(
-                        "absolute -top-3 left-8 px-3 py-1 rounded-full font-mono text-xs font-bold border transition-all duration-500 flex items-center gap-2",
+                        "absolute -top-3.5 left-6 lg:left-8 px-3.5 py-1 rounded-full font-mono text-xs font-bold border transition-all duration-500 flex items-center gap-2 uppercase tracking-wider",
                         isActive
-                          ? "bg-accent text-accent-contrast border-accent shadow-[0_0_15px_rgba(16,185,129,0.6)]"
+                          ? "bg-accent text-accent-contrast border-accent shadow-[0_0_15px_rgba(255,209,119,0.5)]"
                           : "bg-background text-muted border-border"
                       )}
                     >
                       <span
                         className={cn(
-                          "w-2 h-2 rounded-full transition-colors",
+                          "w-2 h-2 rounded-full transition-colors shrink-0",
                           isActive ? "bg-accent-contrast animate-ping" : "bg-muted"
                         )}
                       />
-                      <span>PHASE 0{idx + 1}</span>
-                    </div>
-
-                    {/* Big Watermark Year Display */}
-                    <div className="text-5xl lg:text-6xl font-black text-accent opacity-90 tracking-tighter leading-none mt-2 mb-3 select-none font-mono">
-                      {shortYear}
-                    </div>
-
-                    {/* Period Label */}
-                    <div className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-accent/80 mb-2">
-                      {entry.period}
+                      <span>{entry.period}</span>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-xl lg:text-2xl font-bold tracking-tight text-foreground mb-1 group-hover:text-accent transition-colors">
+                    <h3 className="text-xl lg:text-2xl font-bold tracking-tight text-foreground mb-1 mt-1 group-hover:text-accent transition-colors">
                       {entry.title}
                     </h3>
 
                     {/* Organization / Company */}
-                    <div className="flex items-center gap-2 text-accent font-medium text-xs lg:text-sm mb-4">
-                      <span>@{entry.org}</span>
+                    <div className="flex items-center gap-2 text-accent font-medium text-xs lg:text-sm mb-3">
+                      <span>{entry.org}</span>
                       {entry.employment_type && (
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 border border-accent/20 text-accent font-mono">
                           {entry.employment_type}

@@ -184,6 +184,7 @@ export function EditorialCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const [enabled, setEnabled] = useState(false);
   const [hovering, setHovering] = useState(false);
+  const [isYellowBg, setIsYellowBg] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -207,12 +208,24 @@ export function EditorialCursor() {
         dotRef.current.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
       }
       if (!raf) raf = requestAnimationFrame(loop);
-      const t = e.target as HTMLElement | null;
-      const interactive = t?.closest(
+
+      // Detect element directly under pointer for dynamic background contrast adaptation
+      const targetEl = document.elementFromPoint(mx, my) as HTMLElement | null;
+
+      // Check if mouse is over the Warm Gold (#FFD177) section stage
+      const overYellow = Boolean(
+        targetEl?.closest(
+          "#work, [data-intro-card], [data-project-card], .bg-\\[\\#FFD177\\], [data-yellow-bg]",
+        ),
+      );
+      setIsYellowBg(overYellow);
+
+      const interactive = targetEl?.closest(
         "a, button, [role='button'], input, textarea, [data-magnetic]",
       );
       setHovering(Boolean(interactive));
     };
+
     const loop = () => {
       raf = 0;
       ringX += (mx - ringX) * 0.15;
@@ -224,7 +237,10 @@ export function EditorialCursor() {
         raf = requestAnimationFrame(loop);
       }
     };
-    const onLeave = () => setHovering(false);
+    const onLeave = () => {
+      setHovering(false);
+      setIsYellowBg(false);
+    };
 
     window.addEventListener("pointermove", onMove, { passive: true });
     document.addEventListener("mouseleave", onLeave);
@@ -245,17 +261,24 @@ export function EditorialCursor() {
         aria-hidden="true"
         className={cn(
           "pointer-events-none fixed left-0 top-0 z-120 hidden -translate-x-1/2 -translate-y-1/2 rounded-full border md:block",
-          "transition-[width,height,border-color,opacity] duration-200 ease-out",
-          hovering
-            ? "h-10 w-10 border-accent opacity-100"
-            : "h-6 w-6 border-foreground/40 opacity-60",
+          "transition-[width,height,border-color,background-color,opacity] duration-200 ease-out",
+          isYellowBg
+            ? hovering
+              ? "h-10 w-10 border-black bg-black/10 opacity-100"
+              : "h-6 w-6 border-black/60 opacity-80"
+            : hovering
+              ? "h-10 w-10 border-accent bg-accent/10 opacity-100"
+              : "h-6 w-6 border-foreground/40 opacity-60",
         )}
         style={{ willChange: "transform" }}
       />
       <div
         ref={dotRef}
         aria-hidden="true"
-        className="pointer-events-none fixed left-0 top-0 z-120 hidden h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent md:block"
+        className={cn(
+          "pointer-events-none fixed left-0 top-0 z-120 hidden h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full md:block transition-colors duration-200",
+          isYellowBg ? "bg-black" : "bg-accent",
+        )}
         style={{ willChange: "transform" }}
       />
     </>

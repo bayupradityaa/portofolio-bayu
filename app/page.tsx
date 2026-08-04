@@ -30,14 +30,14 @@ export default async function Home() {
   const workItems: WorkItem[] =
     publishedProjects && publishedProjects.length > 0
       ? publishedProjects.map((p, idx) => ({
-          index: String(idx + 1).padStart(2, "0"),
-          title: p.name,
-          category: p.category || "Full-Stack Project",
-          year: p.year ? p.year.toString() : "2025",
-          description: p.summary || p.tagline || "",
-          image: p.cover_image || "/works/pulse-studio.svg",
-          link: p.slug ? `/projects/${p.slug}` : `/projects`,
-        }))
+        index: String(idx + 1).padStart(2, "0"),
+        title: p.name,
+        category: p.category || "Full-Stack Project",
+        year: p.year ? p.year.toString() : "2025",
+        description: p.summary || p.tagline || "",
+        image: p.cover_image || "/works/pulse-studio.svg",
+        link: p.slug ? `/projects/${p.slug}` : `/projects`,
+      }))
       : workSectionData;
 
   return (
@@ -54,10 +54,11 @@ export default async function Home() {
           <About />
           <SectionRule number="02" label="Stack" />
           <TechStack technologies={techNames} />
-          <SectionRule number="03" label="Project" />
           <WorkSection items={workItems} />
-          <SectionRule number="04" label="Journey" />
-          <Journey />
+          <div id="journey-section" className="relative z-10 w-full bg-[#000000] text-white">
+            <SectionRule number="04" label="Journey" />
+            <Journey />
+          </div>
           <SectionRule number="05" label="Certificates" />
           <Certificates />
           <SectionRule number="06" label="Contact" />

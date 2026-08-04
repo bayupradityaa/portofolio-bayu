@@ -1,624 +1,428 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence, useReducedMotion, type Variants } from "motion/react";
-import { User, Cpu, Briefcase, Compass, Mail } from "lucide-react";
-import { Logo } from "@/components/ui/logo";
-import { LinkButton } from "@/components/ui/button";
-import { GithubIcon, LinkedinIcon, InstagramIcon } from "@/components/ui/brand-icons";
-import { cn } from "@/lib/utils";
-import { ThemeToggle } from "@/components/shell/theme-toggle";
+import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import gsap from "gsap";
+import { CustomEase } from "gsap/CustomEase";
+import { Logo } from "@/components/ui/logo";
+import { GithubIcon, LinkedinIcon, InstagramIcon } from "@/components/ui/brand-icons";
+import { Mail, ArrowUpRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+// Register GSAP Plugins safely for SSR
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(CustomEase);
+}
 
 const navItems = [
-  { id: "about", label: "About" },
-  { id: "stack", label: "Stack" },
-  { id: "work", label: "Project" },
-  { id: "journey", label: "Journey" },
-  { id: "contact", label: "Contact" },
-] as const;
-
-const navItemConfig: Record<
-  string,
-  { icon: React.ReactNode; gradient: string; iconColor: string }
-> = {
-  about: {
-    icon: <User className="h-4 w-4" />,
-    gradient:
-      "radial-gradient(circle, color-mix(in oklab, var(--accent) 18%, transparent) 0%, color-mix(in oklab, var(--accent) 6%, transparent) 50%, transparent 100%)",
-    iconColor: "group-hover:text-accent",
-  },
-  stack: {
-    icon: <Cpu className="h-4 w-4" />,
-    gradient:
-      "radial-gradient(circle, color-mix(in oklab, var(--accent) 18%, transparent) 0%, color-mix(in oklab, var(--accent) 6%, transparent) 50%, transparent 100%)",
-    iconColor: "group-hover:text-accent",
-  },
-  work: {
-    icon: <Briefcase className="h-4 w-4" />,
-    gradient:
-      "radial-gradient(circle, color-mix(in oklab, var(--accent) 18%, transparent) 0%, color-mix(in oklab, var(--accent) 6%, transparent) 50%, transparent 100%)",
-    iconColor: "group-hover:text-accent",
-  },
-  journey: {
-    icon: <Compass className="h-4 w-4" />,
-    gradient:
-      "radial-gradient(circle, color-mix(in oklab, var(--accent) 18%, transparent) 0%, color-mix(in oklab, var(--accent) 6%, transparent) 50%, transparent 100%)",
-    iconColor: "group-hover:text-accent",
-  },
-  contact: {
-    icon: <Mail className="h-4 w-4" />,
-    gradient:
-      "radial-gradient(circle, color-mix(in oklab, var(--accent) 18%, transparent) 0%, color-mix(in oklab, var(--accent) 6%, transparent) 50%, transparent 100%)",
-    iconColor: "group-hover:text-accent",
-  },
-};
-
-const glowVariants: Variants = {
-  initial: { opacity: 0, scale: 0.8 },
-  hover: {
-    opacity: 1,
-    scale: 1.4,
-    transition: {
-      opacity: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
-      scale: { duration: 0.4, type: "spring", stiffness: 300, damping: 25 },
-    },
-  },
-};
-
-const sharedTransition = {
-  type: "spring" as const,
-  stiffness: 120,
-  damping: 20,
-  duration: 0.4,
-};
-
-// ── Concept A: Radial clip-path expand ──────────────────────────────────────
-// The overlay is revealed by a circle that grows from the hamburger button's
-// screen position (passed in as CSS vars) until it covers the viewport. Only
-// clip-path + opacity animate — both GPU-composited, zero layout/reflow, so the
-// reveal stays cheap on mobile main-thread (protects the TBT work).
-const EASE_EXPO = [0.76, 0, 0.24, 1] as const;
-
-const OVERLAY_REVEAL: Variants = {
-  initial: { clipPath: "circle(0% at var(--menu-x) var(--menu-y))", opacity: 1 },
-  enter: {
-    clipPath: "circle(150% at var(--menu-x) var(--menu-y))",
-    opacity: 1,
-    transition: { duration: 0.7, ease: EASE_EXPO },
-  },
-  exit: {
-    clipPath: "circle(0% at var(--menu-x) var(--menu-y))",
-    opacity: 1,
-    transition: { duration: 0.55, ease: EASE_EXPO },
-  },
-};
-
-// Stagger container for the nav list — children ride in once the circle opens.
-const MENU_LIST: Variants = {
-  initial: {},
-  enter: {
-    transition: { delayChildren: 0.28, staggerChildren: 0.06 },
-  },
-  exit: {
-    transition: { staggerChildren: 0.03, staggerDirection: -1 },
-  },
-};
-
-// Each item: rises from below + fades in. Wrapper only — the letter-stagger
-// hover on CurvedNavLink stays independent (it uses its own variant names).
-const MENU_ITEM: Variants = {
-  initial: { y: 32, opacity: 0 },
-  enter: {
-    y: 0,
-    opacity: 1,
-    transition: { duration: 0.5, ease: EASE_EXPO },
-  },
-  exit: { y: 20, opacity: 0, transition: { duration: 0.3, ease: EASE_EXPO } },
-};
-
-/** Animated Menu Toggle Icon (Hamburger to X) */
-function MenuToggleIcon({
-  open,
-  className,
-}: {
-  open: boolean;
-  className?: string;
-}) {
-  return (
-    <div className={cn("relative flex h-6 w-6 items-center justify-center overflow-hidden", className)}>
-      <motion.span
-        initial={false}
-        animate={open ? { rotate: 45, y: 0 } : { rotate: 0, y: -5 }}
-        transition={{ type: "spring", stiffness: 300, damping: 22 }}
-        className="absolute h-0.5 w-5 rounded-full bg-current transform-gpu"
-      />
-      <motion.span
-        initial={false}
-        animate={open ? { opacity: 0, x: -8 } : { opacity: 1, x: 0 }}
-        transition={{ duration: 0.15 }}
-        className="absolute h-0.5 w-5 rounded-full bg-current transform-gpu"
-      />
-      <motion.span
-        initial={false}
-        animate={open ? { rotate: -45, y: 0 } : { rotate: 0, y: 5 }}
-        transition={{ type: "spring", stiffness: 300, damping: 22 }}
-        className="absolute h-0.5 w-5 rounded-full bg-current transform-gpu"
-      />
-    </div>
-  );
-}
-
-/** Individual Mobile Nav Link with letter-stagger hover & index number */
-function CurvedNavLink({
-  item,
-  index,
-  isActive,
-  onClick,
-  targetHref,
-}: {
-  item: (typeof navItems)[number];
-  index: number;
-  isActive: boolean;
-  onClick: () => void;
-  targetHref: string;
-}) {
-  const config = navItemConfig[item.id];
-
-  return (
-    <motion.div
-      onClick={onClick}
-      initial="initial"
-      whileHover="whileHover"
-      className="group relative flex items-center justify-between border-b border-border/40 py-3.5"
-    >
-      <a href={targetHref} className="w-full">
-        <div className="relative flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="font-sans text-2xl font-thin text-muted/60 transition-colors group-hover:text-accent">
-              0{index}.
-            </span>
-            <div className="flex flex-row gap-2">
-              <motion.span
-                variants={{
-                  initial: { x: 0 },
-                  whileHover: { x: -6 },
-                }}
-                transition={{
-                  type: "spring",
-                  staggerChildren: 0.03,
-                  delayChildren: 0.05,
-                }}
-                className={cn(
-                  "relative z-10 block text-2xl font-light uppercase tracking-wide transition-colors duration-300",
-                  isActive ? "text-accent font-medium" : "text-foreground group-hover:text-accent",
-                )}
-              >
-                {item.label.split("").map((letter, i) => (
-                  <motion.span
-                    key={i}
-                    variants={{
-                      initial: { x: 0 },
-                      whileHover: { x: 6 },
-                    }}
-                    transition={{ type: "spring" }}
-                    className="inline-block"
-                  >
-                    {letter}
-                  </motion.span>
-                ))}
-              </motion.span>
-            </div>
-          </div>
-
-          <span
-            className={cn(
-              "text-lg transition-colors",
-              isActive ? "text-accent" : "text-muted group-hover:text-accent",
-            )}
-          >
-            {config.icon}
-          </span>
-        </div>
-      </a>
-    </motion.div>
-  );
-}
+  { id: "about", number: "01", label: "About Us", href: "/#about", shape: "1" },
+  { id: "stack", number: "02", label: "Tech Stack", href: "/#stack", shape: "2" },
+  { id: "work", number: "03", label: "Selected Works", href: "/#work", shape: "3" },
+  { id: "journey", number: "04", label: "Journey Path", href: "/#journey", shape: "4" },
+  { id: "contact", number: "05", label: "Contact Us", href: "/#contact", shape: "5" },
+];
 
 export function Nav() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const hasOpenedRef = useRef(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === "/";
-  const [active, setActive] = useState<string>("");
-  const [open, setOpen] = useState(false);
-  const [heroProgress, setHeroProgress] = useState(0);
-  // Screen origin of the hamburger button — the radial reveal grows from here.
-  const [origin, setOrigin] = useState({ x: "100%", y: "0px" });
-  const menuBtnRef = useRef<HTMLButtonElement>(null);
-  const prefersReducedMotion = useReducedMotion();
 
+  // Initial Setup & Hover Effects
   useEffect(() => {
-    if (!isHomePage) return;
-    let rafId: number | null = null;
-    const onHeroScroll = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      if (detail && typeof detail.progress === "number") {
-        const val = detail.progress;
-        if (rafId !== null) return;
-        rafId = requestAnimationFrame(() => {
-          rafId = null;
-          setHeroProgress((prev) => (Math.abs(prev - val) >= 0.01 ? val : prev));
-        });
-      }
-    };
-    window.addEventListener("hero-scroll", onHeroScroll);
-    return () => {
-      window.removeEventListener("hero-scroll", onHeroScroll);
-      if (rafId !== null) cancelAnimationFrame(rafId);
-    };
-  }, [isHomePage]);
+    if (!containerRef.current) return;
 
-  useEffect(() => {
-    if (!isHomePage) {
-      if (pathname?.startsWith("/projects")) {
-        setActive("work");
+    try {
+      if (!gsap.parseEase("main")) {
+        CustomEase.create("main", "0.65, 0.01, 0.05, 0.99");
+        gsap.defaults({ ease: "main", duration: 0.7 });
       }
-      return;
+    } catch (e) {
+      console.warn("CustomEase failed to load, falling back to default.", e);
+      gsap.defaults({ ease: "power2.out", duration: 0.7 });
     }
 
-    const onSectionActive = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      if (detail && typeof detail.id === "string") {
-        setActive(detail.id);
+    const ctx = gsap.context(() => {
+      const menuItems = containerRef.current!.querySelectorAll(".menu-list-item[data-shape]");
+      const shapesContainer = containerRef.current!.querySelector(".ambient-background-shapes");
+
+      menuItems.forEach((item) => {
+        const shapeIndex = item.getAttribute("data-shape");
+        const shape = shapesContainer ? shapesContainer.querySelector(`.bg-shape-${shapeIndex}`) : null;
+
+        if (!shape) return;
+
+        const shapeEls = shape.querySelectorAll(".shape-element");
+
+        const onEnter = () => {
+          if (shapesContainer) {
+            shapesContainer.querySelectorAll(".bg-shape").forEach((s) => s.classList.remove("active"));
+          }
+          shape.classList.add("active");
+
+          gsap.fromTo(
+            shapeEls,
+            { scale: 0.5, opacity: 0, rotation: -10 },
+            {
+              scale: 1,
+              opacity: 1,
+              rotation: 0,
+              duration: 0.6,
+              stagger: 0.08,
+              ease: "back.out(1.7)",
+              overwrite: "auto",
+            }
+          );
+        };
+
+        const onLeave = () => {
+          gsap.to(shapeEls, {
+            scale: 0.8,
+            opacity: 0,
+            duration: 0.3,
+            ease: "power2.in",
+            onComplete: () => shape.classList.remove("active"),
+            overwrite: "auto",
+          });
+        };
+
+        item.addEventListener("mouseenter", onEnter);
+        item.addEventListener("mouseleave", onLeave);
+
+        (item as any)._cleanup = () => {
+          item.removeEventListener("mouseenter", onEnter);
+          item.removeEventListener("mouseleave", onLeave);
+        };
+      });
+    }, containerRef);
+
+    return () => {
+      ctx.revert();
+      if (containerRef.current) {
+        const items = containerRef.current.querySelectorAll(".menu-list-item[data-shape]");
+        items.forEach((item: any) => item._cleanup && item._cleanup());
       }
     };
-    window.addEventListener("section-active", onSectionActive);
+  }, []);
 
-    const ids = navItems.map((n) => n.id);
-    const sections = ids
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => Boolean(el));
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]) setActive(visible[0].target.id);
-      },
-      { rootMargin: "-20% 0px -20% 0px", threshold: [0, 0.1, 0.25, 0.5] },
-    );
-    sections.forEach((s) => observer.observe(s));
-
-    return () => {
-      window.removeEventListener("section-active", onSectionActive);
-      observer.disconnect();
-    };
-  }, [isHomePage, pathname]);
-
-  // Close the mobile drawer on Escape.
+  // Menu Open/Close Animation Effect
   useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+    if (!containerRef.current) return;
 
-  // Lock body scroll while the full-screen overlay is open (mobile only).
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [open]);
+    const ctx = gsap.context(() => {
+      const navWrap = containerRef.current!.querySelector<HTMLElement>(".nav-overlay-wrapper");
+      const menu = containerRef.current!.querySelector<HTMLElement>(".menu-content");
+      const overlay = containerRef.current!.querySelector<HTMLElement>(".overlay");
+      const bgPanels = containerRef.current!.querySelectorAll<HTMLElement>(".backdrop-layer");
+      const menuLinks = containerRef.current!.querySelectorAll<HTMLElement>(".nav-link");
+      const fadeTargets = containerRef.current!.querySelectorAll<HTMLElement>("[data-menu-fade]");
 
-  // Toggle the menu, seeding the radial-reveal origin from the button's center.
-  const toggleMenu = () => {
-    if (!open) {
-      const rect = menuBtnRef.current?.getBoundingClientRect();
-      if (rect) {
-        setOrigin({
-          x: `${Math.round(rect.left + rect.width / 2)}px`,
-          y: `${Math.round(rect.top + rect.height / 2)}px`,
+      const menuButtonTexts = containerRef.current!.querySelectorAll<HTMLParagraphElement>(".nav-close-btn p");
+      const menuButtonIcon = containerRef.current!.querySelector<SVGElement>(".menu-button-icon");
+
+      if (isMenuOpen) {
+        hasOpenedRef.current = true;
+
+        // LOCK BODY SCROLL
+        document.body.style.overflow = "hidden";
+
+        if (navWrap) navWrap.setAttribute("data-nav", "open");
+
+        const tl = gsap.timeline();
+
+        tl.set(navWrap, { display: "block" })
+          .set(menu, { xPercent: 0 });
+
+        if (menuButtonTexts && menuButtonTexts.length > 0) {
+          tl.fromTo(menuButtonTexts, { yPercent: 0 }, { yPercent: -100, duration: 0.4, stagger: 0.1, ease: "power2.out" }, 0);
+        }
+
+        if (menuButtonIcon) {
+          tl.fromTo(menuButtonIcon, { rotate: 0 }, { rotate: 315, duration: 0.45, ease: "back.out(1.7)" }, 0);
+        }
+
+        tl.fromTo(overlay, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, ease: "power2.out" }, 0)
+          .fromTo(bgPanels, { xPercent: 101 }, { xPercent: 0, stagger: 0.08, duration: 0.525, ease: "power3.out" }, 0)
+          .fromTo(menuLinks, { yPercent: 140, rotate: 6 }, { yPercent: 0, rotate: 0, stagger: 0.04, duration: 0.5, ease: "power3.out" }, 0.2);
+
+        if (fadeTargets.length) {
+          tl.fromTo(fadeTargets, { autoAlpha: 0, yPercent: 40 }, { autoAlpha: 1, yPercent: 0, stagger: 0.03, duration: 0.4, ease: "power2.out" }, 0.25);
+        }
+      } else if (hasOpenedRef.current) {
+        // SMOOTH CLOSE ANIMATION
+        const tl = gsap.timeline({
+          onComplete: () => {
+            document.body.style.overflow = "";
+            if (navWrap) {
+              navWrap.setAttribute("data-nav", "closed");
+              gsap.set(navWrap, { display: "none" });
+            }
+          },
         });
-      }
-    }
-    setOpen((v) => !v);
-  };
 
-  const scrolled = !isHomePage || heroProgress > 0.6;
-  const logoOpacity = !isHomePage ? 1 : Math.min(1, Math.max(0.3, (heroProgress - 0.5) / 0.2));
+        if (menuButtonTexts && menuButtonTexts.length > 0) {
+          tl.to(menuButtonTexts, { yPercent: 0, duration: 0.4, stagger: 0.08, ease: "power2.out" }, 0);
+        }
+
+        if (menuButtonIcon) {
+          tl.to(menuButtonIcon, { rotate: 0, duration: 0.4, ease: "power2.out" }, 0);
+        }
+
+        if (fadeTargets.length) {
+          tl.to(fadeTargets, { autoAlpha: 0, yPercent: 20, stagger: 0.02, duration: 0.25, ease: "power2.in" }, 0);
+        }
+
+        tl.to(menuLinks, { yPercent: 100, rotate: -2, stagger: 0.03, duration: 0.35, ease: "power2.in" }, 0)
+          .to(bgPanels, { xPercent: 101, stagger: 0.06, duration: 0.45, ease: "power3.in" }, 0.05)
+          .to(overlay, { autoAlpha: 0, duration: 0.4, ease: "power2.inOut" }, 0.1);
+      }
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, [isMenuOpen]);
+
+  // keydown Escape handling
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isMenuOpen) {
+        setIsMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [isMenuOpen]);
+
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+  const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <header
-      className={cn(
-        "fixed inset-x-0 z-50 transition-all duration-500",
-        scrolled ? "top-4 px-4 md:px-0" : "top-0 px-0",
-      )}
-    >
-      <div
-        className={cn(
-          "mx-auto flex h-16 w-full items-center justify-between transition-all duration-500",
-          scrolled
-            ? "max-w-5xl rounded-full border border-border bg-background/80 backdrop-blur-xl shadow-lg px-8"
-            : "max-w-6xl px-6 border-b border-transparent bg-transparent",
-        )}
-      >
-        {/* Logo */}
-        <a
-          href={isHomePage ? "#hero" : "/"}
-          className="rounded-sm text-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-          style={{
-            opacity: logoOpacity,
-            transition: "opacity 0.4s ease",
-          }}
-        >
-          <Logo />
-        </a>
-
-        {/* Center Interactive Navigation Dock (Desktop) */}
-        <nav
-          className="hidden md:flex items-center gap-1.5 relative z-10"
-          aria-label="Primary"
-          style={{
-            opacity: logoOpacity,
-            transition: "opacity 0.4s ease",
-          }}
-        >
-          {navItems.map((item) => {
-            const config = navItemConfig[item.id];
-            const isActive = active === item.id;
-            const targetHref = isHomePage ? `#${item.id}` : `/#${item.id}`;
-
-            return (
-              <motion.a
-                key={item.id}
-                href={targetHref}
-                className={cn(
-                  "relative block px-3 py-1.5 text-xs md:text-sm font-medium rounded-xl group select-none cursor-pointer overflow-visible",
-                )}
-                style={{ perspective: "600px" }}
-                whileHover="hover"
-                initial="initial"
-              >
-                {/* Active/Hover Glow Background */}
-                <motion.div
-                  className="absolute inset-0 z-0 pointer-events-none rounded-xl"
-                  variants={glowVariants}
-                  style={{
-                    background: config.gradient,
-                    opacity: isActive ? 0.6 : 0,
-                    transform: isActive ? "scale(1.2)" : "scale(0.8)",
-                  }}
-                />
-
-                {/* 3D Card Wrapper */}
-                <motion.div
-                  className="relative flex items-center justify-center"
-                  style={{ transformStyle: "preserve-3d" }}
-                  variants={{
-                    initial: { rotateX: 0 },
-                    hover: { rotateX: -90 },
-                  }}
-                  transition={sharedTransition}
+    <div ref={containerRef}>
+      <div className="site-header-wrapper">
+        <header className="header">
+          <div className="container is--full">
+            <nav className="nav-row">
+              <Link href="/" aria-label="home" className="nav-logo-row focus-visible:outline-accent pointer-events-auto">
+                <Logo />
+              </Link>
+              <div className="nav-row__right">
+                {/* Restored Menu Button */}
+                <button
+                  role="button"
+                  className="nav-close-btn"
+                  onClick={toggleMenu}
+                  aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
                 >
-                  {/* Front-facing Face */}
-                  <span
-                    className={cn(
-                      "flex items-center gap-1.5 relative z-10 transition-colors duration-200",
-                      isActive ? "text-accent" : "text-secondary group-hover:text-foreground",
-                    )}
-                    style={{
-                      backfaceVisibility: "hidden",
-                      transform: "rotateX(0deg) translateZ(8px)",
-                      WebkitBackfaceVisibility: "hidden",
-                    }}
-                  >
-                    <span
-                      className={cn(
-                        "transition-colors duration-300",
-                        isActive ? "text-accent" : config.iconColor,
-                      )}
+                  <div className="menu-button-text">
+                    <p className="p-large">Menu</p>
+                    <p className="p-large">Close</p>
+                  </div>
+                  <div className="icon-wrap">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="100%"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      className="menu-button-icon"
                     >
-                      {config.icon}
-                    </span>
-                    <span>{item.label}</span>
-                  </span>
-
-                  {/* Back-facing Face */}
-                  <span
-                    className={cn(
-                      "flex items-center gap-1.5 absolute inset-0 z-10 transition-colors duration-200 justify-center",
-                      isActive ? "text-accent" : "text-secondary group-hover:text-foreground",
-                    )}
-                    style={{
-                      backfaceVisibility: "hidden",
-                      transform: "rotateX(90deg) translateZ(8px)",
-                      WebkitBackfaceVisibility: "hidden",
-                    }}
-                  >
-                    <span
-                      className={cn(
-                        "transition-colors duration-300",
-                        isActive ? "text-accent" : config.iconColor,
-                      )}
-                    >
-                      {config.icon}
-                    </span>
-                    <span>{item.label}</span>
-                  </span>
-                </motion.div>
-              </motion.a>
-            );
-          })}
-        </nav>
-
-        {/* Right Action CTA Button & Theme Toggle (Desktop) */}
-        <div
-          className="hidden md:flex items-center gap-2.5"
-          style={{
-            opacity: logoOpacity,
-            transition: "opacity 0.4s ease",
-          }}
-        >
-          <ThemeToggle />
-          <LinkButton href={isHomePage ? "#contact" : "/#contact"} size="sm">
-            Get in touch
-          </LinkButton>
-        </div>
-
-        {/* Mobile Morphing Hamburger Button */}
-        <div className={cn("flex items-center gap-2 md:hidden transition-opacity duration-200", open && "opacity-0 pointer-events-none")}>
-          <ThemeToggle />
-          <button
-            ref={menuBtnRef}
-            type="button"
-            className="relative z-70 rounded-lg p-2 text-foreground cursor-pointer hover:bg-surface transition-colors"
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            onClick={toggleMenu}
-          >
-            <MenuToggleIcon open={open} className="h-6 w-6 text-foreground" />
-          </button>
-        </div>
+                      <path
+                        d="M7.33333 16L7.33333 -3.2055e-07L8.66667 -3.78832e-07L8.66667 16L7.33333 16Z"
+                        fill="currentColor"
+                      ></path>
+                      <path
+                        d="M16 8.66667L-2.62269e-07 8.66667L-3.78832e-07 7.33333L16 7.33333L16 8.66667Z"
+                        fill="currentColor"
+                      ></path>
+                      <path
+                        d="M6 7.33333L7.33333 7.33333L7.33333 6C7.33333 6.73637 6.73638 7.33333 6 7.33333Z"
+                        fill="currentColor"
+                      ></path>
+                      <path
+                        d="M10 7.33333L8.66667 7.33333L8.66667 6C8.66667 6.73638 9.26362 7.33333 10 7.33333Z"
+                        fill="currentColor"
+                      ></path>
+                      <path
+                        d="M6 8.66667L7.33333 8.66667L7.33333 10C7.33333 9.26362 6.73638 8.66667 6 8.66667Z"
+                        fill="currentColor"
+                      ></path>
+                      <path
+                        d="M10 8.66667L8.66667 8.66667L8.66667 10C8.66667 9.26362 9.26362 8.66667 10 8.66667Z"
+                        fill="currentColor"
+                      ></path>
+                    </svg>
+                  </div>
+                </button>
+              </div>
+            </nav>
+          </div>
+        </header>
       </div>
 
-      {/* Radial-reveal mobile menu (Concept A) */}
-      <AnimatePresence mode="wait">
-        {open && (
-          // Full-screen radial-reveal overlay (Concept A) — grows from the
-          // hamburger button. Full-viewport + opaque, so it doubles as its own
-          // backdrop; no separate dim layer needed.
-          <motion.div
-            variants={prefersReducedMotion ? undefined : OVERLAY_REVEAL}
-            initial={prefersReducedMotion ? { opacity: 0 } : "initial"}
-            animate={prefersReducedMotion ? { opacity: 1 } : "enter"}
-            exit={prefersReducedMotion ? { opacity: 0 } : "exit"}
-            transition={prefersReducedMotion ? { duration: 0.2 } : undefined}
-            style={
-              {
-                "--menu-x": origin.x,
-                "--menu-y": origin.y,
-              } as React.CSSProperties
-            }
-            className="fixed inset-0 z-60 h-dvh w-full bg-background md:hidden"
-          >
-            {/* faint glow anchored to the reveal origin — pure decoration */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 opacity-70"
-              style={{
-                background:
-                  "radial-gradient(circle at var(--menu-x) var(--menu-y), rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 45%)",
-              }}
-            />
-            <div className="relative flex h-full flex-col justify-between px-6 pt-5 pb-8">
-              <div className="flex flex-col gap-3">
-                {/* Top Bar — NAVIGATION Label & Close Button */}
-                <motion.div
-                  initial={prefersReducedMotion ? false : { opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: prefersReducedMotion ? 0 : 0.3 }}
-                  className="flex items-center justify-between border-b border-border/40 pb-3 pt-1"
-                >
-                  <span className="font-mono text-xs uppercase tracking-widest text-muted">
-                    Navigation
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setOpen(false)}
-                    className="p-1.5 text-foreground hover:opacity-80 transition-opacity cursor-pointer rounded-lg hover:bg-surface"
-                    aria-label="Close menu"
-                  >
-                    <MenuToggleIcon open={true} className="h-5 w-5 text-foreground" />
-                  </button>
-                </motion.div>
+      <section className="fullscreen-menu-container">
+        <div data-nav="closed" className="nav-overlay-wrapper">
+          {/* Backdrop Overlay Click Mask */}
+          <div className="overlay" onClick={closeMenu}></div>
+          <nav className="menu-content">
+            <div className="menu-bg">
+              <div className="backdrop-layer first"></div>
+              <div className="backdrop-layer second"></div>
+              <div className="backdrop-layer"></div>
 
-                <motion.nav
-                  variants={MENU_LIST}
-                  initial={prefersReducedMotion ? false : "initial"}
-                  animate="enter"
-                  exit="exit"
-                  className="mt-1 flex flex-col gap-0.5"
-                  aria-label="Mobile"
-                >
-                  {navItems.map((item, index) => {
-                    const isActive = active === item.id;
-                    const targetHref = isHomePage ? `#${item.id}` : `/#${item.id}`;
+              {/* Ambient Warm Gold (#FFD177) Background Shapes */}
+              <div className="ambient-background-shapes">
+                {/* Shape 1: Floating circles */}
+                <svg className="bg-shape bg-shape-1" viewBox="0 0 400 400" fill="none">
+                  <circle className="shape-element" cx="80" cy="120" r="40" fill="rgba(255, 209, 119, 0.18)" />
+                  <circle className="shape-element" cx="300" cy="80" r="60" fill="rgba(245, 158, 11, 0.15)" />
+                  <circle className="shape-element" cx="200" cy="300" r="80" fill="rgba(255, 209, 119, 0.12)" />
+                  <circle className="shape-element" cx="350" cy="280" r="30" fill="rgba(255, 209, 119, 0.18)" />
+                </svg>
 
-                    return (
-                      <motion.div key={item.id} variants={MENU_ITEM}>
-                        <CurvedNavLink
-                          item={item}
-                          index={index + 1}
-                          isActive={isActive}
-                          onClick={() => setOpen(false)}
-                          targetHref={targetHref}
-                        />
-                      </motion.div>
-                    );
-                  })}
-                </motion.nav>
+                {/* Shape 2: Wave pattern */}
+                <svg className="bg-shape bg-shape-2" viewBox="0 0 400 400" fill="none">
+                  <path
+                    className="shape-element"
+                    d="M0 200 Q100 100, 200 200 T 400 200"
+                    stroke="rgba(255, 209, 119, 0.25)"
+                    strokeWidth="60"
+                    fill="none"
+                  />
+                  <path
+                    className="shape-element"
+                    d="M0 280 Q100 180, 200 280 T 400 280"
+                    stroke="rgba(245, 158, 11, 0.18)"
+                    strokeWidth="40"
+                    fill="none"
+                  />
+                </svg>
+
+                {/* Shape 3: Grid dots */}
+                <svg className="bg-shape bg-shape-3" viewBox="0 0 400 400" fill="none">
+                  <circle className="shape-element" cx="50" cy="50" r="8" fill="rgba(255, 209, 119, 0.35)" />
+                  <circle className="shape-element" cx="150" cy="50" r="8" fill="rgba(245, 158, 11, 0.3)" />
+                  <circle className="shape-element" cx="250" cy="50" r="8" fill="rgba(255, 209, 119, 0.35)" />
+                  <circle className="shape-element" cx="350" cy="50" r="8" fill="rgba(245, 158, 11, 0.3)" />
+                  <circle className="shape-element" cx="100" cy="150" r="12" fill="rgba(255, 209, 119, 0.25)" />
+                  <circle className="shape-element" cx="200" cy="150" r="12" fill="rgba(245, 158, 11, 0.25)" />
+                  <circle className="shape-element" cx="300" cy="150" r="12" fill="rgba(255, 209, 119, 0.25)" />
+                  <circle className="shape-element" cx="50" cy="250" r="10" fill="rgba(255, 209, 119, 0.3)" />
+                  <circle className="shape-element" cx="150" cy="250" r="10" fill="rgba(245, 158, 11, 0.3)" />
+                  <circle className="shape-element" cx="250" cy="250" r="10" fill="rgba(255, 209, 119, 0.3)" />
+                  <circle className="shape-element" cx="350" cy="250" r="10" fill="rgba(245, 158, 11, 0.3)" />
+                </svg>
+
+                {/* Shape 4: Organic blobs */}
+                <svg className="bg-shape bg-shape-4" viewBox="0 0 400 400" fill="none">
+                  <path
+                    className="shape-element"
+                    d="M100 100 Q150 50, 200 100 Q250 150, 200 200 Q150 250, 100 200 Q50 150, 100 100"
+                    fill="rgba(255, 209, 119, 0.16)"
+                  />
+                  <path
+                    className="shape-element"
+                    d="M250 200 Q300 150, 350 200 Q400 250, 350 300 Q400 250, 350 300 Q300 350, 250 300 Q200 250, 250 200"
+                    fill="rgba(245, 158, 11, 0.14)"
+                  />
+                </svg>
+
+                {/* Shape 5: Diagonal lines */}
+                <svg className="bg-shape bg-shape-5" viewBox="0 0 400 400" fill="none">
+                  <line className="shape-element" x1="0" y1="100" x2="300" y2="400" stroke="rgba(255, 209, 119, 0.2)" strokeWidth="30" />
+                  <line className="shape-element" x1="100" y1="0" x2="400" y2="300" stroke="rgba(245, 158, 11, 0.16)" strokeWidth="25" />
+                  <line className="shape-element" x1="200" y1="0" x2="400" y2="200" stroke="rgba(255, 209, 119, 0.14)" strokeWidth="20" />
+                </svg>
+              </div>
+            </div>
+
+            <div className="menu-content-wrapper">
+              {/* Header Label inside Drawer */}
+              <div className="flex items-center justify-between border-b border-white/10 pb-2.5 mb-3">
+                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-[#FFD177]">
+                  EXPLORE PORTFOLIO
+                </span>
+                <span className="font-mono text-[11px] text-white/50">
+                  BAYU PRADITYA
+                </span>
               </div>
 
-              {/* Footer with Social Icons & CTA */}
-              <motion.div
-                initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: prefersReducedMotion ? 0 : 0.55, duration: 0.4, ease: EASE_EXPO }}
-                className="flex flex-col gap-5 border-t border-border/40 pt-5"
-              >
-                <div className="flex items-center justify-around text-muted">
-                    <a
-                      href="https://github.com/bayupradityaa"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="transition-colors hover:text-accent"
-                      aria-label="GitHub"
-                    >
-                      <GithubIcon size={20} />
-                    </a>
-                    <a
-                      href="https://linkedin.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="transition-colors hover:text-accent"
-                      aria-label="LinkedIn"
-                    >
-                      <LinkedinIcon size={20} />
-                    </a>
-                    <a
-                      href="https://instagram.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="transition-colors hover:text-accent"
-                      aria-label="Instagram"
-                    >
-                      <InstagramIcon size={20} />
-                    </a>
-                    <a
-                      href="mailto:contact@example.com"
-                      className="transition-colors hover:text-accent"
-                      aria-label="Email"
-                    >
-                      <Mail size={20} />
-                    </a>
-                  </div>
+              {/* Main Navigation Links */}
+              <ul className="menu-list">
+                {navItems.map((item) => {
+                  const targetHref = isHomePage ? `#${item.id}` : `/#${item.id}`;
 
-                <LinkButton
-                  href={isHomePage ? "#contact" : "/#contact"}
-                  size="md"
-                  className="w-full justify-center"
-                  onClick={() => setOpen(false)}
+                  return (
+                    <li key={item.id} className="menu-list-item" data-shape={item.shape}>
+                      <a
+                        href={targetHref}
+                        className="nav-link w-inline-block"
+                        onClick={closeMenu}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="font-mono text-xs font-bold text-[#FFD177]/70">
+                            {item.number}
+                          </span>
+                          <p className="nav-link-text">{item.label}</p>
+                        </div>
+                        <ArrowUpRight className="w-5 h-5 md:w-7 md:h-7 text-white/30 group-hover:text-[#FFD177] transition-all duration-300 transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              {/* Drawer Footer with Mail & Social Links */}
+              <div className="pt-4 mt-3 border-t border-white/10 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-5 text-white/80">
+                  <a
+                    href="mailto:bayuupraditya@gmail.com"
+                    className="hover:text-[#FFD177] transition-colors"
+                    aria-label="Email Bayu Praditya"
+                    title="Email me (bayuupraditya@gmail.com)"
+                  >
+                    <Mail size={18} />
+                  </a>
+                  <a
+                    href="https://github.com/bayupradityaa"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#FFD177] transition-colors"
+                    aria-label="GitHub"
+                  >
+                    <GithubIcon size={18} />
+                  </a>
+                  <a
+                    href="https://linkedin.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#FFD177] transition-colors"
+                    aria-label="LinkedIn"
+                  >
+                    <LinkedinIcon size={18} />
+                  </a>
+                  <a
+                    href="https://instagram.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#FFD177] transition-colors"
+                    aria-label="Instagram"
+                  >
+                    <InstagramIcon size={18} />
+                  </a>
+                </div>
+
+                <Link
+                  href="/#contact"
+                  className="font-mono text-[11px] font-bold uppercase tracking-widest text-black bg-[#FFD177] px-4 py-2 rounded-full hover:bg-white transition-all shadow-md"
+                  onClick={closeMenu}
                 >
-                  Get in touch
-                </LinkButton>
-              </motion.div>
+                  GET IN TOUCH ↗
+                </Link>
+              </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+          </nav>
+        </div>
+      </section>
+    </div>
   );
 }

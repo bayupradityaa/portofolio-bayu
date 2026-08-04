@@ -7,14 +7,10 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cn } from "@/lib/utils";
 
-// Idempotent plugin registration safely gated for SSR
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-/**
- * Shape of a single project card rendered by {@link WorkSection}.
- */
 export interface WorkItem {
   index?: string;
   title: string;
@@ -28,45 +24,21 @@ export interface WorkItem {
 export type WorkSectionProps = {
   items: WorkItem[];
   className?: string;
-  /** Main section heading text. */
   heading?: string;
-  /** Link target for the "view all" CTA. */
   viewAllHref?: string;
-  /** Label for the "view all" CTA. */
   viewAllLabel?: string;
 };
 
-// ── Helper Utilities ─────────────────────────────────────────────────────────
-
-/** Safely formats zero-padded double-digit index strings ("01", "02", etc.) */
 function getFormattedIndex(item: WorkItem, idx: number): string {
   if (item.index) return item.index;
   const num = idx + 1;
   return num < 10 ? `0${num}` : `${num}`;
 }
 
-/** Fallback resolver for category text */
 function getItemCategory(item: WorkItem): string {
   return item.category || "Selected Work";
 }
 
-/** Fallback resolver for publication year */
-function getItemYear(item: WorkItem): string {
-  return item.year || "2025";
-}
-
-/**
- * `WorkSection` — Exact TRIONN-Style Pinned Horizontal Scroll Section.
- *
- * ─── Layout & Motion Specifications (Matching Reference Video) ─────────────────────
- *  1. Layout: Large featured image frame with rounded corners (`rounded-3xl`), title +
- *     description on bottom-left, and "EXPLORE PROJECT →" link on bottom-right.
- *  2. Bottom-Right Smooth Entrance: Each project card enters smoothly from the bottom-right
- *     (`y: 60, x: 40, opacity: 0.3, scale: 0.95` -> `y: 0, x: 0, opacity: 1, scale: 1`).
- *  3. Right-to-Left Clip-Path Wipe Over Journey Stage: Layer 1 (behind) renders the Section 04
- *     Journey stage header. Layer 2 (top) wipes closed from right to left (`clipPath: inset(0% 0% 0% 0%)` ->
- *     `inset(0% 100% 0% 0%)`), directly revealing Section 04 Journey right behind the wipe edge.
- */
 export function WorkSection({
   items,
   className,
@@ -76,8 +48,6 @@ export function WorkSection({
 }: WorkSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const pinTargetRef = useRef<HTMLDivElement | null>(null);
-  const workStageRef = useRef<HTMLDivElement | null>(null);
-  const nextSectionLayerRef = useRef<HTMLDivElement | null>(null);
   const trackContainerRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
 
@@ -87,29 +57,23 @@ export function WorkSection({
     setMounted(true);
   }, []);
 
-  // ── GSAP ScrollTrigger Master Timeline Setup ─────────────────────────────
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
     if (!items || items.length === 0) return;
 
     const section = sectionRef.current;
     const pinTarget = pinTargetRef.current;
-    const workStage = workStageRef.current;
-    const nextSectionLayer = nextSectionLayerRef.current;
     const trackContainer = trackContainerRef.current;
     const track = trackRef.current;
-    if (!section || !pinTarget || !workStage || !trackContainer || !track) return;
+    if (!section || !pinTarget || !trackContainer || !track) return;
 
-    // Scoped GSAP context for safe selector isolation and React unmount teardown
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
 
-      // ───────────────────────────────────────────────────────────────────────
-      // DESKTOP & TABLET: Pinned Horizontal Scrub + Right-to-Left Closing Wipe Over Journey (>= 768px)
-      // ───────────────────────────────────────────────────────────────────────
       mm.add("(min-width: 768px)", () => {
         const cards = track.querySelectorAll<HTMLElement>("[data-project-card]");
-        
+        const journeySection = typeof document !== "undefined" ? document.getElementById("journey-section") : null;
+
         const getScrollAmount = () => {
           const totalWidth = track.scrollWidth;
           const containerWidth = trackContainer.clientWidth;
@@ -117,7 +81,7 @@ export function WorkSection({
         };
 
         const scrollAmount = getScrollAmount();
-        const closingDistance = 900;
+        const closingDistance = Math.min(window.innerHeight, 900);
         const totalScrollDistance = scrollAmount + closingDistance;
 
         const masterTl = gsap.timeline({
@@ -126,7 +90,7 @@ export function WorkSection({
             pin: pinTarget,
             start: "top top",
             end: () => `+=${totalScrollDistance}`,
-            scrub: 1, // Smooth catch-up momentum scrub
+            scrub: 1,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             fastScrollEnd: true,
@@ -142,7 +106,7 @@ export function WorkSection({
           },
         });
 
-        // 1. Horizontal Track Translation (from 0 to scrollAmount)
+        // 1. Horizontal Track Translation
         masterTl.to(
           track,
           {
@@ -153,40 +117,41 @@ export function WorkSection({
           0
         );
 
-        // 2. Per-Card Bottom-Right Entrance Animation & Parallax
+        // 2. Per-Card Bottom-Right Entrance Animation
+        const step = scrollAmount / Math.max(cards.length, 1);
         cards.forEach((card, idx) => {
-          if (idx > 0) {
-            const cardOffset = (idx / (cards.length - 1)) * scrollAmount;
-            const startTime = Math.max(cardOffset - 250, 0);
+          const startTime = Math.max(idx * step - 50, 0);
+          const animDuration = Math.max(step * 0.9, 350);
 
-            masterTl.fromTo(
-              card,
-              {
-                y: 60,
-                x: 40,
-                opacity: 0.3,
-                scale: 0.95,
-              },
-              {
-                y: 0,
-                x: 0,
-                opacity: 1,
-                scale: 1,
-                ease: "power2.out",
-                duration: 300,
-              },
-              startTime
-            );
-          }
+          masterTl.fromTo(
+            card,
+            {
+              y: 340,
+              x: 220,
+              opacity: 0,
+              scale: 0.78,
+              rotate: 4,
+              transformOrigin: "bottom right",
+            },
+            {
+              y: 0,
+              x: 0,
+              opacity: 1,
+              scale: 1,
+              rotate: 0,
+              ease: "power3.out",
+              duration: animDuration,
+            },
+            startTime
+          );
 
-          // Subtle horizontal parallax offset for inner image
           const img = card.querySelector<HTMLElement>("[data-card-image]");
           if (img) {
             masterTl.fromTo(
               img,
-              { xPercent: 8 },
+              { scale: 1.08 },
               {
-                xPercent: -8,
+                scale: 1,
                 ease: "none",
                 duration: scrollAmount,
               },
@@ -195,11 +160,9 @@ export function WorkSection({
           }
         });
 
-        // 3. Right-to-Left Closing Clip-Path Wipe of Work Stage (workStageRef)
-        // Sweeps workStage away from right to left (`clipPath: inset(0% 0% 0% 0%)` -> `inset(0% 100% 0% 0%)`),
-        // directly revealing Section 04 Journey stage underneath right behind the wipe edge!
+        // 3. Phase 2: Right-to-Left Closing Clip-Path Wipe of Gold Stage (trackContainer)
         masterTl.fromTo(
-          workStage,
+          trackContainer,
           {
             clipPath: "inset(0% 0% 0% 0%)",
           },
@@ -211,17 +174,31 @@ export function WorkSection({
           scrollAmount
         );
 
-        // 4. Subtle entrance scale-up for Section 04 Journey preview layer as it is revealed
-        if (nextSectionLayer) {
+        // Inertia track push off-stage
+        masterTl.to(
+          track,
+          {
+            x: () => -getScrollAmount() - 220,
+            ease: "power1.in",
+            duration: closingDistance,
+          },
+          scrollAmount
+        );
+
+        // Layer 2 Intro Header animation as gold stage wipes open
+        const revealHeader = pinTarget.querySelector<HTMLElement>("[data-reveal-header]");
+        if (revealHeader) {
           masterTl.fromTo(
-            nextSectionLayer,
+            revealHeader,
             {
-              scale: 0.96,
-              opacity: 0.8,
+              scale: 0.92,
+              opacity: 0.3,
+              y: 30,
             },
             {
               scale: 1,
               opacity: 1,
+              y: 0,
               ease: "power2.out",
               duration: closingDistance,
             },
@@ -230,9 +207,7 @@ export function WorkSection({
         }
       });
 
-      // ───────────────────────────────────────────────────────────────────────
       // MOBILE: Stacked Vertical Reveal (< 768px)
-      // ───────────────────────────────────────────────────────────────────────
       mm.add("(max-width: 767px)", () => {
         const mobileCards = section.querySelectorAll<HTMLElement>("[data-mobile-card]");
         mobileCards.forEach((card) => {
@@ -264,7 +239,7 @@ export function WorkSection({
     <section
       id="work"
       ref={sectionRef}
-      className={cn("relative w-full bg-background text-foreground select-none", className)}
+      className={cn("relative w-full bg-[#000000] text-white select-none", className)}
       aria-label="Selected Work Portfolio Showcase"
     >
       {/* ────────────────────────────────────────────────────────────────────── */}
@@ -272,157 +247,165 @@ export function WorkSection({
       {/* ────────────────────────────────────────────────────────────────────── */}
       <div
         ref={pinTargetRef}
-        className="hidden md:block relative w-full h-screen overflow-hidden"
+        className="hidden md:block relative w-full h-screen overflow-hidden bg-[#000000] text-white z-20 shadow-2xl"
       >
-        {/* ── LAYER 1 (BEHIND): SECTION 04 JOURNEY REVEAL STAGE ── */}
-        <div
-          ref={nextSectionLayerRef}
-          className="absolute inset-0 w-full h-full bg-background z-0 flex flex-col justify-center px-8 lg:px-16 max-w-[1700px] mx-auto pointer-events-none"
-        >
-          <div className="space-y-6 max-w-3xl">
-            <div className="flex items-center gap-3">
-              <span className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
-              <span className="font-mono text-xs font-semibold uppercase tracking-[0.25em] text-accent">
-                04 // JOURNEY
-              </span>
-              <span className="h-px w-12 bg-accent/30" />
+        {/* ── LAYER 2: REVEAL INTRO HEADER (PINNED AT Z-10 BEHIND GOLD STAGE) ── */}
+        <div className="absolute inset-0 z-10 w-full h-full flex items-center justify-center px-8 lg:px-16 pointer-events-none">
+          <header data-reveal-header className="flex flex-col items-center text-center gap-5 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFD177]/10 border border-[#FFD177]/30 text-[#FFD177] font-mono text-xs font-bold uppercase tracking-[0.2em]">
+              <span>CAREER &amp; EXPERIENCE</span>
             </div>
 
-            <h2 className="text-5xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.05]">
-              The path so far.
+            <h2 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-white leading-[1.05]">
+              My Journey
             </h2>
 
-            <p className="text-base lg:text-lg text-muted font-normal leading-relaxed max-w-xl">
-              How I got from first lines of code to building products end to end. Most recent experience &amp; milestones.
+            <p className="text-base md:text-lg text-white/70 leading-relaxed font-normal max-w-2xl pt-1">
+              A chronological timeline of education, career milestones, and technical experience built step by step over the years.
             </p>
 
-            <div className="pt-4">
-              <div className="inline-flex items-center gap-3 px-7 py-3.5 rounded-full border border-accent/40 bg-accent/10 text-accent font-mono text-xs font-semibold uppercase tracking-widest">
-                <span>SCROLL TO EXPLORE JOURNEY</span>
-                <span>↓</span>
+            {/* Scroll Down Hint Indicator */}
+            <div className="pt-6 flex flex-col items-center gap-2.5">
+              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/15 text-[#FFD177] font-mono text-xs font-semibold uppercase tracking-[0.22em] shadow-md backdrop-blur-sm">
+                <span>SCROLL DOWN TO EXPLORE</span>
+                <span className="inline-block animate-bounce font-bold text-sm">↓</span>
               </div>
             </div>
-          </div>
+          </header>
         </div>
 
-        {/* ── LAYER 2 (TOP): SECTION 03 WORK STAGE (WIPES RIGHT-TO-LEFT) ── */}
+        {/* ── GOLD STAGE CONTAINER (Z-20 ON TOP OF LAYER 2) ── */}
         <div
-          ref={workStageRef}
-          className="absolute inset-0 w-full h-full bg-background z-10 flex items-center justify-between px-8 lg:px-16 max-w-[1700px] mx-auto overflow-hidden"
+          ref={trackContainerRef}
+          className="relative z-20 w-full h-full overflow-hidden flex items-center pt-24 pb-12 bg-[#FFD177] text-black"
         >
-          {/* Left Column: Fixed Pinned Section Header & View All CTA */}
-          <header className="w-full md:w-[35%] lg:w-[30%] flex flex-col justify-between h-full py-10 lg:py-14 pr-8 lg:pr-12 z-20 shrink-0 border-r border-border/30 bg-background">
-            <div className="space-y-6 pt-4">
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.1]">
-                {heading}
-              </h2>
-            </div>
-
-            {/* Bottom Left CTA */}
-            <div className="pt-8">
-              <Link
-                href={viewAllHref}
-                className="group inline-flex items-center gap-3 text-xs md:text-sm font-mono font-semibold uppercase tracking-widest text-muted hover:text-foreground transition-colors"
-              >
-                <span>{viewAllLabel}</span>
-                <span className="w-9 h-9 rounded-full border border-border flex items-center justify-center group-hover:border-accent group-hover:text-accent group-hover:bg-accent/10 transition-all duration-300">
-                  ↗
-                </span>
-              </Link>
-            </div>
-          </header>
-
-          {/* Right Column: Horizontal Scroll Track Container */}
+          {/* SECTION 03 PROJECT BOUNDARY RULE */}
+          <div className="absolute top-8 left-0 right-0 z-30 w-full flex items-center gap-6 px-8 lg:px-16 max-w-[1700px] mx-auto pointer-events-none">
+            <span className="font-mono text-xs font-bold uppercase tracking-[0.22em] text-black">
+              03
+            </span>
+            <span className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-black/80">
+              PROJECT
+            </span>
+            <span className="h-px flex-1 bg-black/30" />
+          </div>
           <div
-            ref={trackContainerRef}
-            className="w-full md:w-[65%] lg:w-[70%] overflow-hidden flex items-center h-full pl-8 lg:pl-12 shrink-0 bg-background"
+            ref={trackRef}
+            className="flex items-center gap-10 lg:gap-16 w-max pr-16 lg:pr-32 pl-0"
           >
-            <div
-              ref={trackRef}
-              className="flex items-center gap-8 lg:gap-14 w-max pr-16 lg:pr-32"
+            {/* ── SLIDE 0: CENTERED TITLE & INTRO CTA (#FFD177 STAGE) ── */}
+            <article
+              data-intro-card
+              className="w-screen h-screen shrink-0 flex flex-col items-center justify-center text-center px-6 md:px-12 bg-[#FFD177] text-black relative z-10"
             >
-              {items.map((item, idx) => {
-                const formattedIdx = getFormattedIndex(item, idx);
-                const category = getItemCategory(item);
-
-                return (
-                  <article
-                    key={item.link + idx}
-                    data-project-card
-                    className="w-[82vw] sm:w-[480px] md:w-[540px] lg:w-[600px] shrink-0 flex flex-col gap-4 group"
-                  >
-                    {/* Image Frame: Constrained height (h-[48vh] max-h-[440px]) */}
-                    <div className="relative h-[48vh] max-h-[440px] aspect-[16/10] w-full rounded-2xl md:rounded-3xl overflow-hidden bg-card border border-border/50 shadow-xl group">
-                      <div
-                        data-card-image
-                        className="relative w-[116%] h-full -left-[8%]"
-                      >
-                        <Image
-                          src={item.image || "/works/pulse-studio.svg"}
-                          alt={item.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
-                          priority={idx === 0}
-                          className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
-                        />
-                      </div>
-
-                      {/* Category & Index Tag */}
-                      <div className="absolute top-4 left-4 font-mono text-xs font-bold px-3.5 py-1.5 rounded-full bg-background/90 text-accent backdrop-blur-md border border-accent/20">
-                        {formattedIdx} // {category}
-                      </div>
-                    </div>
-
-                    {/* Content Area Below Image: Completely visible typography, zero cutoffs */}
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pt-1">
-                      <div className="space-y-1 max-w-md">
-                        <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground font-sans group-hover:text-accent transition-colors">
-                          {item.title}
-                        </h3>
-
-                        {item.description && (
-                          <p className="text-sm md:text-base text-muted font-normal leading-relaxed line-clamp-2">
-                            {item.description}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="shrink-0 pt-1 md:pt-0">
-                        <Link
-                          href={item.link}
-                          className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-[0.18em] text-foreground hover:text-accent transition-colors group/link whitespace-nowrap"
-                        >
-                          <span>EXPLORE PROJECT</span>
-                          <span className="transition-transform duration-300 group-hover/link:translate-x-1">
-                            →
-                          </span>
-                        </Link>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
-
-              {/* Final Summary CTA Slide at the end of track */}
-              <article
-                data-project-card
-                className="w-[82vw] sm:w-[420px] md:w-[460px] shrink-0 flex flex-col justify-center gap-8 p-8 lg:p-12 rounded-2xl md:rounded-3xl bg-surface/90 border border-border/60 shadow-2xl backdrop-blur-md"
-              >
-                <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-foreground leading-snug">
-                  Discover our complete collection of digital experiences, brands, and platforms.
-                </h3>
+              <div className="max-w-3xl space-y-8 flex flex-col items-center justify-center pt-12">
+                <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-black leading-[1.08] select-text">
+                  {heading.includes(" & ") ? (
+                    <>
+                      <span className="block">{heading.split(" & ")[0]}</span>
+                      <span className="block text-black/90">&amp; {heading.split(" & ")[1]}</span>
+                    </>
+                  ) : (
+                    heading
+                  )}
+                </h2>
 
                 <div>
                   <Link
                     href={viewAllHref}
-                    className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-foreground text-background font-mono text-xs font-semibold uppercase tracking-widest hover:bg-accent hover:text-accent-contrast transition-all duration-300 shadow-lg"
+                    className="group inline-flex items-center gap-3 font-mono text-xs md:text-sm font-semibold uppercase tracking-widest text-black/80 hover:text-black transition-all duration-300 border-b border-black/30 hover:border-black pb-1"
                   >
                     <span>{viewAllLabel}</span>
-                    <span>↗</span>
+                    <span className="transition-transform duration-300 group-hover:translate-x-1.5">
+                      →
+                    </span>
                   </Link>
                 </div>
-              </article>
-            </div>
+              </div>
+            </article>
+
+            {/* ── PROJECT SLIDES (PROPORTIONAL REFINED SIZING) ── */}
+            {items.map((item, idx) => {
+              const formattedIdx = getFormattedIndex(item, idx);
+              const category = getItemCategory(item);
+
+              return (
+                <article
+                  key={item.link + idx}
+                  data-project-card
+                  className="w-[82vw] sm:w-[480px] md:w-[540px] lg:w-[590px] shrink-0 flex flex-col gap-4 group"
+                >
+                  {/* Desktop Image Frame with Max Height Constraint */}
+                  <div className="relative aspect-[16/10] max-h-[350px] lg:max-h-[380px] w-full rounded-[20px] md:rounded-[24px] overflow-hidden bg-black/10 border border-black/20 shadow-xl group transition-all duration-500 group-hover:border-black/40">
+                    <div
+                      data-card-image
+                      className="relative w-full h-full overflow-hidden"
+                    >
+                      <Image
+                        src={item.image || "/works/pulse-studio.svg"}
+                        alt={item.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 35vw"
+                        priority={idx === 0}
+                        className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                      />
+                    </div>
+
+                    {/* High Contrast Black Category Badge */}
+                    <div className="absolute top-3.5 left-3.5 font-mono text-[11px] font-bold px-3 py-1 rounded-full bg-black text-[#FFD177] shadow-md border border-black/30">
+                      {formattedIdx} // {category}
+                    </div>
+                  </div>
+
+                  {/* Content Area Below Image */}
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 pt-0.5">
+                    <div className="space-y-1.5 max-w-md">
+                      <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-black font-sans group-hover:text-black/70 transition-colors duration-300">
+                        {item.title}
+                      </h3>
+
+                      {item.description && (
+                        <p className="text-xs md:text-sm text-black/80 font-normal leading-relaxed line-clamp-2">
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="shrink-0 pt-1 md:pt-0">
+                      <Link
+                        href={item.link}
+                        className="group/link inline-flex items-center gap-2.5 font-mono text-xs font-semibold uppercase tracking-widest text-black/80 hover:text-black transition-all duration-300 border-b border-black/30 hover:border-black pb-0.5 whitespace-nowrap"
+                      >
+                        <span>EXPLORE PROJECT</span>
+                        <span className="transition-transform duration-300 group-hover/link:translate-x-1.5">
+                          →
+                        </span>
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+
+            {/* Final Summary CTA Slide */}
+            <article
+              data-project-card
+              className="w-[78vw] sm:w-[380px] md:w-[420px] shrink-0 flex flex-col justify-center gap-6 p-7 lg:p-10 rounded-2xl md:rounded-3xl bg-black text-white border border-black/20 shadow-2xl"
+            >
+              <h3 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-white leading-snug">
+                Discover our complete collection of digital experiences, brands, and platforms.
+              </h3>
+
+              <div>
+                <Link
+                  href={viewAllHref}
+                  className="inline-flex items-center gap-3 px-6 py-3.5 rounded-full bg-[#FFD177] text-black font-mono text-xs font-semibold uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-300 shadow-lg"
+                >
+                  <span>{viewAllLabel}</span>
+                  <span>↗</span>
+                </Link>
+              </div>
+            </article>
           </div>
         </div>
       </div>
@@ -430,12 +413,39 @@ export function WorkSection({
       {/* ────────────────────────────────────────────────────────────────────── */}
       {/* MOBILE STACKED VIEW (< 768px)                                         */}
       {/* ────────────────────────────────────────────────────────────────────── */}
-      <div className="block md:hidden px-6 py-16 space-y-16">
+      <div className="block md:hidden px-6 py-16 space-y-12 bg-[#FFD177] text-black">
+        {/* Mobile Section Boundary Rule */}
+        <div className="flex items-center gap-6 pb-2">
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.22em] text-black">
+            03
+          </span>
+          <span className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-black/80">
+            PROJECT
+          </span>
+          <span className="h-px flex-1 bg-black/30" />
+        </div>
+
         {/* Mobile Header */}
-        <header className="space-y-3 pb-6 border-b border-border/40">
-          <h2 className="text-3xl font-bold tracking-tight text-foreground">
-            {heading}
+        <header className="text-center space-y-6 pb-8 border-b border-black/20">
+          <h2 className="text-4xl font-extrabold tracking-tight text-black leading-[1.1]">
+            {heading.includes(" & ") ? (
+              <>
+                <span className="block">{heading.split(" & ")[0]}</span>
+                <span className="block text-black/90">&amp; {heading.split(" & ")[1]}</span>
+              </>
+            ) : (
+              heading
+            )}
           </h2>
+          <div>
+            <Link
+              href={viewAllHref}
+              className="inline-flex items-center gap-3 font-mono text-xs font-semibold uppercase tracking-widest text-black/80 hover:text-black transition-all border-b border-black/30 pb-1"
+            >
+              <span>{viewAllLabel}</span>
+              <span>→</span>
+            </Link>
+          </div>
         </header>
 
         {/* Mobile Project Cards List */}
@@ -451,59 +461,46 @@ export function WorkSection({
                 className="space-y-4 flex flex-col"
               >
                 {/* Image Container */}
-                <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden border border-border/50 bg-card shadow-lg">
+                <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden border border-black/20 bg-black/10 shadow-lg">
                   <Image
                     src={item.image || "/works/pulse-studio.svg"}
                     alt={item.title}
                     fill
                     sizes="100vw"
-                    className="object-cover object-center"
+                    className="object-cover object-top"
                   />
-                  <div className="absolute top-3 left-3 font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-background/80 text-accent backdrop-blur-md border border-accent/20">
+                  <div className="absolute top-3 left-3 font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-black text-[#FFD177]">
                     {formattedIdx} // {category}
                   </div>
                 </div>
 
                 {/* Details */}
                 <div className="space-y-2 pt-1">
-                  <h3 className="text-2xl font-bold tracking-tight text-foreground">
+                  <h3 className="text-2xl font-bold tracking-tight text-black">
                     {item.title}
                   </h3>
 
                   {item.description && (
-                    <p className="text-sm text-muted leading-relaxed">
+                    <p className="text-sm md:text-base text-black/80 font-normal leading-relaxed line-clamp-3">
                       {item.description}
                     </p>
                   )}
+                </div>
 
-                  <div className="pt-2">
-                    <Link
-                      href={item.link}
-                      className="inline-flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-widest text-accent hover:underline"
-                    >
-                      <span>EXPLORE PROJECT</span>
-                      <span>→</span>
-                    </Link>
-                  </div>
+                <div>
+                  <Link
+                    href={item.link}
+                    className="inline-flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-widest text-black/80 hover:text-black border-b border-black/30 pb-0.5"
+                  >
+                    <span>EXPLORE PROJECT</span>
+                    <span>→</span>
+                  </Link>
                 </div>
               </article>
             );
           })}
         </div>
-
-        {/* Mobile View All Footer */}
-        <div className="pt-8 text-center border-t border-border/30">
-          <Link
-            href={viewAllHref}
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-foreground/20 text-xs font-mono font-semibold uppercase tracking-widest text-foreground hover:bg-accent hover:text-accent-contrast transition-colors"
-          >
-            <span>{viewAllLabel}</span>
-            <span>↗</span>
-          </Link>
-        </div>
       </div>
     </section>
   );
 }
-
-export default WorkSection;
