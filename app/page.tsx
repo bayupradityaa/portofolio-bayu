@@ -7,7 +7,6 @@ import dynamic from "next/dynamic";
 import { WorkSection, WorkItem } from "@/components/sections/work-section";
 import { workSectionData } from "@/components/sections/work-section-data";
 import { Journey } from "@/components/sections/journey";
-import { Certificates } from "@/components/sections/certificates";
 import { Contact } from "@/components/sections/contact";
 import { SectionRule } from "@/components/ui/section-rule";
 import { getPublishedTechnologies } from "@/lib/actions/technologies";
@@ -50,18 +49,15 @@ export default async function Home() {
           id="content-container"
           className="relative z-20 w-full bg-background"
         >
-          <SectionRule number="01" label="About" />
+          <SectionRule label="About" />
           <About />
-          <SectionRule number="02" label="Stack" />
+          <SectionRule label="Stack" />
           <TechStack technologies={techNames} />
           <WorkSection items={workItems} />
           <div id="journey-section" className="relative z-10 w-full bg-[#000000] text-white">
-            <SectionRule number="04" label="Journey" />
+            <SectionRule label="Journey" />
             <Journey />
           </div>
-          <SectionRule number="05" label="Certificates" />
-          <Certificates />
-          <SectionRule number="06" label="Contact" />
           <Contact />
         </div>
       </main>

@@ -6,6 +6,7 @@ import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cn } from "@/lib/utils";
+import { ProjectPreviewPlaceholder } from "@/components/ui/project-preview-placeholder";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -18,7 +19,49 @@ export interface WorkItem {
   year?: string;
   description?: string;
   image?: string;
+  status?: string;
   link: string;
+}
+
+function WorkCardImage({
+  src,
+  title,
+  category,
+  status,
+  priority,
+}: {
+  src?: string;
+  title: string;
+  category?: string;
+  status?: string;
+  priority?: boolean;
+}) {
+  const [hasError, setHasError] = useState(false);
+
+  const isComingSoon = status?.toLowerCase().includes("coming") || status?.toLowerCase().includes("dev");
+  const isValidSrc = src && src !== "/works/pulse-studio.svg" && !hasError && !isComingSoon;
+
+  if (!isValidSrc) {
+    return (
+      <ProjectPreviewPlaceholder
+        title={title}
+        category={category}
+        status={status || "Coming Soon"}
+      />
+    );
+  }
+
+  return (
+    <Image
+      src={src}
+      alt={title}
+      fill
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 35vw"
+      priority={priority}
+      onError={() => setHasError(true)}
+      className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+    />
+  );
 }
 
 export type WorkSectionProps = {
@@ -252,22 +295,25 @@ export function WorkSection({
         {/* ── LAYER 2: REVEAL INTRO HEADER (PINNED AT Z-10 BEHIND GOLD STAGE) ── */}
         <div className="absolute inset-0 z-10 w-full h-full flex items-center justify-center px-8 lg:px-16 pointer-events-none">
           <header data-reveal-header className="flex flex-col items-center text-center gap-5 max-w-3xl mx-auto">
+            {/* Top Pill Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFD177]/10 border border-[#FFD177]/30 text-[#FFD177] font-mono text-xs font-bold uppercase tracking-[0.2em]">
-              <span>CAREER &amp; EXPERIENCE</span>
+              <span>MY JOURNEY</span>
             </div>
 
+            {/* Main Title */}
             <h2 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-white leading-[1.05]">
-              My Journey
+              The <span className="text-[#FFD177]">Path</span> That Shaped Me
             </h2>
 
+            {/* Subtitle */}
             <p className="text-base md:text-lg text-white/70 leading-relaxed font-normal max-w-2xl pt-1">
-              A chronological timeline of education, career milestones, and technical experience built step by step over the years.
+              A timeline of my education, career milestones, and technical experiences that built who I am today.
             </p>
 
             {/* Scroll Down Hint Indicator */}
             <div className="pt-6 flex flex-col items-center gap-2.5">
-              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/15 text-[#FFD177] font-mono text-xs font-semibold uppercase tracking-[0.22em] shadow-md backdrop-blur-sm">
-                <span>SCROLL DOWN TO EXPLORE</span>
+              <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/5 border border-[#FFD177]/30 text-[#FFD177] font-mono text-xs font-semibold uppercase tracking-[0.22em] shadow-md backdrop-blur-sm">
+                <span>SCROLL TO EXPLORE</span>
                 <span className="inline-block animate-bounce font-bold text-sm">↓</span>
               </div>
             </div>
@@ -341,13 +387,12 @@ export function WorkSection({
                       data-card-image
                       className="relative w-full h-full overflow-hidden"
                     >
-                      <Image
-                        src={item.image || "/works/pulse-studio.svg"}
-                        alt={item.title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 35vw"
+                      <WorkCardImage
+                        src={item.image}
+                        title={item.title}
+                        category={category}
+                        status={item.status}
                         priority={idx === 0}
-                        className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.02]"
                       />
                     </div>
 
@@ -462,12 +507,11 @@ export function WorkSection({
               >
                 {/* Image Container */}
                 <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden border border-black/20 bg-black/10 shadow-lg">
-                  <Image
-                    src={item.image || "/works/pulse-studio.svg"}
-                    alt={item.title}
-                    fill
-                    sizes="100vw"
-                    className="object-cover object-top"
+                  <WorkCardImage
+                    src={item.image}
+                    title={item.title}
+                    category={category}
+                    status={item.status}
                   />
                   <div className="absolute top-3 left-3 font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-black text-[#FFD177]">
                     {formattedIdx} // {category}

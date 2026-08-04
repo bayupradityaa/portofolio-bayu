@@ -25,9 +25,9 @@ export async function Footer() {
   return (
     <footer className="w-full border-t border-border bg-ch-contact">
       <div className="mx-auto max-w-7xl px-6">
-        {/* Top row: logo + colophon + socials */}
-        <div className="flex flex-col gap-8 py-14 md:flex-row md:items-center md:justify-between">
-          <div className="space-y-3">
+        {/* Main row: logo + colophon + socials */}
+        <div className="flex flex-col gap-6 py-8 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-2">
             <a
               href="#hero"
               className="inline-block rounded-sm text-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
@@ -35,7 +35,7 @@ export async function Footer() {
               <Logo />
             </a>
             <p className="font-mono text-xs uppercase tracking-widest text-muted">
-              {`Designed & built by ${settings?.name || "Bayu Praditya"} · ${year}`}
+              {`Designed & built by ${settings?.name || "Bayu Praditya"} · ${year} · All rights reserved`}
             </p>
           </div>
 
@@ -65,16 +65,6 @@ export async function Footer() {
               );
             })}
           </nav>
-        </div>
-
-        {/* Bottom rule + colophon meta */}
-        <div className="flex flex-col items-start justify-between gap-2 border-t border-border py-5 sm:flex-row sm:items-center">
-          <span className="font-mono text-[11px] uppercase tracking-widest text-muted">
-            Portfolio · v1.0
-          </span>
-          <span className="font-mono text-[11px] uppercase tracking-widest text-muted">
-            All rights reserved
-          </span>
         </div>
       </div>
     </footer>

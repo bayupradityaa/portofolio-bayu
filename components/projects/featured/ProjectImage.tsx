@@ -1,20 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ProjectPreviewPlaceholder } from "@/components/ui/project-preview-placeholder";
 
-/**
- * Project cover.
- *
- * The outer element is a hard-edged frame — no radius, no lift-on-hover. The
- * inner element is the parallax layer driven by GSAP (`ref`), and is
- * deliberately over-scaled so the vertical drift never exposes an edge:
- * IMAGE_PARALLAX travels ±28px, and 1.16 scale on a 16/10 box clears that
- * with margin to spare. Hover is a thin accent frame instead of a scale,
- * which would fight the parallax transform.
- */
 export const ProjectImage = forwardRef<
   HTMLDivElement,
   {
@@ -24,6 +14,10 @@ export const ProjectImage = forwardRef<
     className?: string;
   }
 >(function ProjectImage({ src, alt, priority = false, className }, parallaxRef) {
+  const [hasError, setHasError] = useState(false);
+
+  const isValidSrc = src && !hasError;
+
   return (
     <div
       className={cn(
@@ -39,13 +33,14 @@ export const ProjectImage = forwardRef<
         className="absolute inset-0 scale-[1.16]"
         style={{ willChange: "transform" }}
       >
-        {src ? (
+        {isValidSrc ? (
           <Image
             src={src}
             alt={alt}
             fill
             sizes="(max-width: 1024px) 100vw, 66vw"
             priority={priority}
+            onError={() => setHasError(true)}
             className="object-cover"
           />
         ) : (

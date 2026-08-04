@@ -34,6 +34,18 @@ import {
   GoogleappsscriptIcon,
   GooglesheetsIcon,
   GooglecloudIcon,
+  MongodbIcon,
+  LaravelIcon,
+  AstroIcon,
+  StreamlitIcon,
+  ThreejsIcon,
+  DjangoIcon,
+  TensorflowIcon,
+  VuejsIcon,
+  CypressIcon,
+  FastifyIcon,
+  JupyternotebookIcon,
+  NuxtjsIcon,
   TechIcon,
 } from "@/components/ui/tech-icons";
 
@@ -116,6 +128,35 @@ const logoIcons: Record<string, React.ComponentType<{ className?: string; size?:
   "Google Sheets": GooglesheetsIcon,
   PostgreSQL: PostgresqlIcon,
   MySQL: MysqlIcon,
+  MongoDB: MongodbIcon,
+  mongoDB: MongodbIcon,
+  mongodb: MongodbIcon,
+  Laravel: LaravelIcon,
+  laravel: LaravelIcon,
+  Astro: AstroIcon,
+  astro: AstroIcon,
+  Streamlit: StreamlitIcon,
+  streamlit: StreamlitIcon,
+  "Three.js": ThreejsIcon,
+  Threejs: ThreejsIcon,
+  threejs: ThreejsIcon,
+  Django: DjangoIcon,
+  django: DjangoIcon,
+  TensorFlow: TensorflowIcon,
+  tensorflow: TensorflowIcon,
+  "Vue.js": VuejsIcon,
+  Vue: VuejsIcon,
+  vue: VuejsIcon,
+  Cypress: CypressIcon,
+  cypress: CypressIcon,
+  Fastify: FastifyIcon,
+  fastify: FastifyIcon,
+  "Jupyter Notebook": JupyternotebookIcon,
+  Jupyter: JupyternotebookIcon,
+  jupyter: JupyternotebookIcon,
+  "Nuxt.js": NuxtjsIcon,
+  Nuxt: NuxtjsIcon,
+  nuxt: NuxtjsIcon,
   Firebase: FirebaseIcon,
   Supabase: SupabaseIcon,
   "Google Cloud": GooglecloudIcon,
@@ -151,6 +192,20 @@ const logoTooltips: Record<string, string> = {
   "Google Sheets": "Data management & structured reporting",
   PostgreSQL: "Advanced SQL database",
   MySQL: "Relational SQL storage",
+  MongoDB: "Document-based NoSQL database",
+  mongoDB: "Document-based NoSQL database",
+  mongodb: "Document-based NoSQL database",
+  Laravel: "PHP web application framework",
+  Astro: "All-in-one web framework for content-driven sites",
+  Streamlit: "Turn Python scripts into interactive web apps",
+  "Three.js": "3D WebGL JavaScript library",
+  Django: "High-level Python web framework",
+  TensorFlow: "Open-source machine learning platform",
+  "Vue.js": "Progressive JavaScript framework",
+  Cypress: "Next generation front-end testing tool",
+  Fastify: "Fast and low overhead web framework for Node.js",
+  "Jupyter Notebook": "Interactive computing environment",
+  "Nuxt.js": "Intuitive Vue framework",
   Firebase: "Realtime backend & cloud platform",
   Supabase: "Open-source Firebase alternative",
   "Google Cloud": "Cloud infrastructure & enterprise services",
@@ -174,12 +229,12 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
 
   // Balanced 2-Row Layout Configuration
   const defaultRow1 = [
-    "React", "Next.js", "TypeScript", "Tailwind CSS", "GSAP", "Framer Motion", "Lenis",
-    "Go", "Fiber", "Node.js", "Express", "REST API", "Python", "Flask", "Apps Script"
+    "React", "Next.js", "Vue.js", "Nuxt.js", "Astro", "TypeScript", "Tailwind CSS", "GSAP", "Framer Motion", "Lenis",
+    "Go", "Fiber", "Node.js", "Express", "Fastify", "REST API", "Python", "Django", "Flask", "Laravel", "Apps Script"
   ];
   const defaultRow2 = [
-    "Spreadsheet", "Firebase", "Google Cloud", "PostgreSQL", "MySQL", "Supabase", "Cloudflare", "Docker",
-    "Git", "GitHub", "GitHub Actions", "Postman", "VS Code", "Figma"
+    "Spreadsheet", "Firebase", "Google Cloud", "PostgreSQL", "MySQL", "MongoDB", "Supabase", "Cloudflare", "Docker",
+    "TensorFlow", "Jupyter Notebook", "Three.js", "Cypress", "Streamlit", "Git", "GitHub", "GitHub Actions", "Postman", "VS Code", "Figma"
   ];
 
   // Deduplicate and split technology list

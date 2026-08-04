@@ -14,7 +14,7 @@ export function SectionRule({
   id,
   className,
 }: {
-  number: string;
+  number?: string;
   label: string;
   id?: string;
   className?: string;
@@ -27,13 +27,15 @@ export function SectionRule({
         className,
       )}
     >
-      <span className="font-mono text-xs font-semibold uppercase tracking-[0.22em] text-accent">
-        {number}
-      </span>
-      <span className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+      {number && (
+        <span className="font-mono text-xs font-semibold uppercase tracking-[0.22em] text-accent">
+          {number}
+        </span>
+      )}
+      <span className="font-mono text-xs uppercase tracking-[0.18em] opacity-80">
         {label}
       </span>
-      <span className="h-px flex-1 bg-border" />
+      <span className="h-px flex-1 bg-current opacity-25" />
     </div>
   );
 }

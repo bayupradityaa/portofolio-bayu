@@ -97,7 +97,8 @@ function ProjectCard({
   const highlights = project.highlights.map((h) => h.text);
   const coverAlt = project.cover_alt || `${project.name} — ${project.tagline}`;
   const coverUrl = project.cover_image || project.images[0]?.image_url || "";
-  const hasCover = Boolean(coverUrl);
+  const [imageError, setImageError] = useState(false);
+  const showPlaceholder = !coverUrl || imageError || project.status === "Coming Soon";
 
   return (
     <Reveal as="div">
@@ -107,12 +108,13 @@ function ProjectCard({
       >
         {/* Cover Media Container */}
         <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-border bg-surface">
-          {hasCover ? (
+          {!showPlaceholder ? (
             <Image
               src={coverUrl}
               alt={coverAlt}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              onError={() => setImageError(true)}
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             />
           ) : (
