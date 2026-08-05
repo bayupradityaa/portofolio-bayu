@@ -62,10 +62,11 @@ export function AllProjectsClient({ projects }: AllProjectsClientProps) {
         {/* Projects Grid — 3 Columns on Desktop */}
         {projects.length > 0 ? (
           <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project) => (
+            {projects.map((project, idx) => (
               <ProjectCard
                 key={project.id}
                 project={project}
+                priority={idx === 0}
                 onSelectProject={(proj) => setSelectedProject(proj)}
               />
             ))}
@@ -89,9 +90,11 @@ export function AllProjectsClient({ projects }: AllProjectsClientProps) {
 
 function ProjectCard({
   project,
+  priority = false,
   onSelectProject,
 }: {
   project: ProjectWithRelations;
+  priority?: boolean;
   onSelectProject: (project: ProjectWithRelations) => void;
 }) {
   const stackNames = project.technologies.map((t) => t.name);
@@ -115,6 +118,8 @@ function ProjectCard({
               alt={coverAlt}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={priority}
+              loading={priority ? "eager" : undefined}
               onError={() => setImageError(true)}
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             />

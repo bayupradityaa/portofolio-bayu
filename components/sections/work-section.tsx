@@ -60,6 +60,7 @@ function WorkCardImage({
       fill
       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 35vw"
       priority={priority}
+      loading={priority ? "eager" : undefined}
       onError={() => setHasError(true)}
       className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.02]"
     />
@@ -327,13 +328,18 @@ export function WorkSection({
           ref={trackContainerRef}
           className="relative z-20 w-full h-full overflow-hidden flex items-center pt-24 pb-12 bg-[#FFD177] text-black"
         >
-          {/* SECTION PROJECT BOUNDARY RULE */}
-          <div className="absolute top-8 left-0 right-0 z-30 w-full flex items-center gap-6 px-8 lg:px-16 max-w-[1700px] mx-auto pointer-events-none">
-            <span className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-black/80">
-              PROJECT
-            </span>
-            <span className="h-px flex-1 bg-black/30" />
+          {/* Top Dark SVG Wave Transition flowing from Tech Stack (#0c0c0c) into Gold Project Stage (#FFD177) */}
+          <div className="absolute top-0 left-0 right-0 w-full overflow-hidden leading-none pointer-events-none select-none z-20">
+            <svg
+              className="relative block w-full h-5 sm:h-8 lg:h-10 text-[#0c0c0c]"
+              viewBox="0 0 1440 120"
+              preserveAspectRatio="none"
+              fill="currentColor"
+            >
+              <path d="M0,0 L1440,0 L1440,25 C1320,65 1200,85 1080,70 C960,55 840,25 720,40 C600,55 480,85 360,70 C240,55 120,25 0,40 Z" />
+            </svg>
           </div>
+
           <div
             ref={trackRef}
             className="flex items-center gap-10 lg:gap-16 w-max pr-16 lg:pr-32 pl-0"
@@ -514,13 +520,17 @@ export function WorkSection({
       {/* ────────────────────────────────────────────────────────────────────── */}
       {/* MOBILE STACKED VIEW (< 768px)                                         */}
       {/* ────────────────────────────────────────────────────────────────────── */}
-      <div className="block md:hidden px-6 py-16 space-y-12 bg-[#FFD177] text-black">
-        {/* Mobile Section Boundary Rule */}
-        <div className="flex items-center gap-6 pb-2">
-          <span className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-black/80">
-            PROJECT
-          </span>
-          <span className="h-px flex-1 bg-black/30" />
+      <div className="block md:hidden relative px-6 pt-8 pb-16 space-y-12 bg-[#FFD177] text-black overflow-hidden">
+        {/* Top Dark SVG Wave Transition for Mobile */}
+        <div className="absolute top-0 left-0 right-0 w-full overflow-hidden leading-none pointer-events-none select-none z-20">
+          <svg
+            className="relative block w-full h-5 sm:h-8 text-[#000000]"
+            viewBox="0 0 1440 120"
+            preserveAspectRatio="none"
+            fill="currentColor"
+          >
+            <path d="M0,0 L1440,0 L1440,25 C1320,65 1200,85 1080,70 C960,55 480,85 360,70 C240,55 120,25 0,40 Z" />
+          </svg>
         </div>
 
         {/* Mobile Header */}
@@ -622,6 +632,7 @@ export function WorkSection({
                     title={item.title}
                     category={category}
                     status={item.status}
+                    priority={idx === 0}
                   />
                   <div className="absolute top-3 left-3 font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-black text-[#FFD177]">
                     {formattedIdx} // {category}

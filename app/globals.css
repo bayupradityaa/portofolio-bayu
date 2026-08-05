@@ -28,7 +28,11 @@
   --ch-stack: #0c0c0c;
   --ch-work: #FFD177;
   --ch-journey: #080808;
-  --ch-github: #040404;
+  --ch-about: #FFD177;
+  --ch-stack: #000000;
+  --ch-work: #FFD177;
+  --ch-journey: #000000;
+  --ch-github: #000000;
   --ch-contact: #000000;
 
   /* ── Motion tokens ─────────────────────────────────────────────── */
@@ -62,11 +66,11 @@ html.light,
   --accent-contrast: #000000;
 
   --ch-hero: #000000;
-  --ch-about: #050505;
-  --ch-stack: #0c0c0c;
+  --ch-about: #FFD177;
+  --ch-stack: #000000;
   --ch-work: #FFD177;
-  --ch-journey: #080808;
-  --ch-github: #040404;
+  --ch-journey: #000000;
+  --ch-github: #000000;
   --ch-contact: #000000;
 }
 

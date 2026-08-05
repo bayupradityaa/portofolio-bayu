@@ -8,7 +8,6 @@ import { WorkSection, WorkItem } from "@/components/sections/work-section";
 import { workSectionData } from "@/components/sections/work-section-data";
 import { Journey } from "@/components/sections/journey";
 import { Contact } from "@/components/sections/contact";
-import { SectionRule } from "@/components/ui/section-rule";
 import { getPublishedTechnologies } from "@/lib/actions/technologies";
 import { getPublishedProjects } from "@/lib/actions/projects";
 
@@ -49,13 +48,10 @@ export default async function Home() {
           id="content-container"
           className="relative z-20 w-full bg-background"
         >
-          <SectionRule label="About" />
           <About />
-          <SectionRule label="Stack" />
           <TechStack technologies={techNames} />
           <WorkSection items={workItems} />
           <div id="journey-section" className="relative z-10 w-full bg-[#000000] text-white">
-            <SectionRule label="Journey" />
             <Journey />
           </div>
           <Contact />

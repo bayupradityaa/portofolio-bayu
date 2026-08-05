@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { ScrollFloat } from "@/components/motion/scroll-float";
-import { SectionRule } from "@/components/ui/section-rule";
 import { Marquee } from "@/components/ui/marquee";
 
 // Import custom monochrome brand SVG icons
@@ -247,7 +246,7 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
   const row2 = uniqueTechs.slice(midPoint);
 
   return (
-    <section id="stack" className="relative w-full bg-ch-stack text-foreground pt-28 pb-32 md:pt-40 md:pb-44 overflow-hidden">
+    <section id="stack" className="relative w-full bg-[#000000] text-foreground pt-28 pb-32 md:pt-40 md:pb-44 overflow-hidden">
       {/* Technical engineering grid texture */}
       <div className="grid-faint opacity-30 pointer-events-none absolute inset-0" aria-hidden="true" />
 
@@ -276,8 +275,8 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
       {/* Technology Marquee Area */}
       <div className="relative z-10 w-full overflow-hidden">
         {/* Edge Fade Masks for Smooth Transitions */}
-        <div className="pointer-events-none absolute left-0 top-0 z-20 h-full w-20 bg-linear-to-r from-ch-stack to-transparent md:w-36 lg:w-48" />
-        <div className="pointer-events-none absolute right-0 top-0 z-20 h-full w-20 bg-linear-to-l from-ch-stack to-transparent md:w-36 lg:w-48" />
+        <div className="pointer-events-none absolute left-0 top-0 z-20 h-full w-20 bg-linear-to-r from-[#000000] to-transparent md:w-36 lg:w-48" />
+        <div className="pointer-events-none absolute right-0 top-0 z-20 h-full w-20 bg-linear-to-l from-[#000000] to-transparent md:w-36 lg:w-48" />
 
         <div className="flex flex-col gap-3 md:gap-4">
           {/* Row 1: moves left */}

@@ -6,7 +6,6 @@ import { ArrowLeft, MessageSquare, ArrowUpRight, Sparkles, Mail } from "lucide-r
 import { GithubIcon, LinkedinIcon, InstagramIcon } from "@/components/ui/brand-icons";
 import { ConversationBubble } from "@/components/ui/conversation-bubble";
 import { ContactForm } from "./contact-form";
-import { SectionRule } from "@/components/ui/section-rule";
 import { cn } from "@/lib/utils";
 import type { ProfileSettings } from "@/lib/types/database";
 import { motion, AnimatePresence } from "motion/react";
@@ -44,8 +43,6 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-black/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="mx-auto w-full max-w-6xl px-6 lg:px-12 relative z-10 pt-4 sm:pt-6">
-        {/* Section Divider inside Gold Contact Stage */}
-        <SectionRule label="Contact" className="px-0 py-0 pb-4 sm:pb-6 text-black" />
         <AnimatePresence mode="wait">
           {!showForm ? (
             /* ── OVERVIEW / SHOWCASE STATE (MATCHING AWWWARDS REFERENCE) ── */
