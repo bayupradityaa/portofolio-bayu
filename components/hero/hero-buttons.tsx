@@ -3,6 +3,7 @@
 import { useCallback, useRef } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { GithubIcon } from "@/components/ui/brand-icons";
+import { TextAnimate } from "@/registry/magicui/text-animate";
 
 interface HeroButtonsProps {
   button1Ref: React.RefObject<HTMLDivElement | null>;
@@ -16,7 +17,7 @@ export function HeroButtons({ button1Ref }: HeroButtonsProps) {
     <div className="mt-9 flex flex-wrap items-center gap-3">
       <div ref={button1Ref} style={{ opacity: 0 }}>
         <MagneticLink href="#work" className={`${btnBase} ${btnPrimary}`}>
-          View Projects
+          <TextAnimate>View Projects</TextAnimate>
           <ArrowUpRight size={18} strokeWidth={2} />
         </MagneticLink>
       </div>

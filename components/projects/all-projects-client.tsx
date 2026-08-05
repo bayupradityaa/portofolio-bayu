@@ -16,6 +16,7 @@ import { TechIcon } from "@/components/ui/tech-icons";
 import { Reveal } from "@/components/motion/reveal";
 import { ProjectDetailModal } from "@/components/projects/project-detail-modal";
 import { ProjectPreviewPlaceholder } from "@/components/ui/project-preview-placeholder";
+import { TextAnimate } from "@/registry/magicui/text-animate";
 import type { ProjectWithRelations } from "@/lib/types/database";
 
 interface AllProjectsClientProps {
@@ -125,7 +126,7 @@ function ProjectCard({
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/60 opacity-0 backdrop-blur-[3px] transition-all duration-300 group-hover:opacity-100 p-4 text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-accent/60 bg-accent/20 px-4 py-2 font-sans text-xs font-semibold text-accent backdrop-blur-md shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-transform duration-300 scale-90 group-hover:scale-100">
               <Eye size={15} />
-              <span>View Detail Project</span>
+              <TextAnimate>View Detail Project</TextAnimate>
             </span>
           </div>
         </div>
@@ -188,7 +189,7 @@ function ProjectCard({
               }}
               className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-accent hover:underline cursor-pointer"
             >
-              <span>View Details</span>
+              <TextAnimate>View Details</TextAnimate>
               <ArrowUpRight size={13} />
             </button>
 

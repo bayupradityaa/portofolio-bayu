@@ -8,6 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cn } from "@/lib/utils";
 import { ProjectPreviewPlaceholder } from "@/components/ui/project-preview-placeholder";
 import { motion } from "motion/react";
+import { TextAnimate } from "@/registry/magicui/text-animate";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -342,7 +343,7 @@ export function WorkSection({
               data-intro-card
               className="w-screen h-screen shrink-0 flex flex-col items-center justify-center text-center px-6 md:px-12 bg-[#FFD177] text-black relative z-10"
             >
-              <div className="max-w-3xl space-y-8 flex flex-col items-center justify-center pt-12">
+              <div className="max-w-4xl space-y-8 flex flex-col items-center justify-center pt-12">
                 {/* Giant Awwwards Headline with Outline Text & Cinematic Masked Line Reveal */}
                 <motion.div
                   initial="hidden"
@@ -376,7 +377,7 @@ export function WorkSection({
                           },
                         },
                       }}
-                      className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-black transform-gpu origin-center will-change-transform"
+                      className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold text-black transform-gpu origin-center will-change-transform"
                     >
                       <span>Selected </span>
                       <span className="[text-stroke:2.5px_#000000] [-webkit-text-stroke:2.5px_#000000] text-transparent font-extrabold">
@@ -401,7 +402,7 @@ export function WorkSection({
                           },
                         },
                       }}
-                      className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-black transform-gpu origin-center will-change-transform"
+                      className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold text-black transform-gpu origin-center will-change-transform"
                     >
                       <span>&amp; </span>
                       <span className="[text-stroke:2.5px_#000000] [-webkit-text-stroke:2.5px_#000000] text-transparent font-extrabold">
@@ -416,7 +417,7 @@ export function WorkSection({
                     href={viewAllHref}
                     className="group inline-flex items-center gap-3 font-mono text-xs md:text-sm font-semibold uppercase tracking-widest text-black/80 hover:text-black transition-all duration-300 border-b border-black/30 hover:border-black pb-1"
                   >
-                    <span>{viewAllLabel}</span>
+                    <TextAnimate>{viewAllLabel}</TextAnimate>
                     <span className="transition-transform duration-300 group-hover:translate-x-1.5">
                       →
                     </span>
@@ -476,7 +477,7 @@ export function WorkSection({
                         href={item.link}
                         className="group/link inline-flex items-center gap-2.5 font-mono text-xs font-semibold uppercase tracking-widest text-black/80 hover:text-black transition-all duration-300 border-b border-black/30 hover:border-black pb-0.5 whitespace-nowrap"
                       >
-                        <span>EXPLORE PROJECT</span>
+                        <TextAnimate>EXPLORE PROJECT</TextAnimate>
                         <span className="transition-transform duration-300 group-hover/link:translate-x-1.5">
                           →
                         </span>
@@ -501,7 +502,7 @@ export function WorkSection({
                   href={viewAllHref}
                   className="inline-flex items-center gap-3 px-6 py-3.5 rounded-full bg-[#FFD177] text-black font-mono text-xs font-semibold uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-300 shadow-lg"
                 >
-                  <span>{viewAllLabel}</span>
+                  <TextAnimate>{viewAllLabel}</TextAnimate>
                   <span>↗</span>
                 </Link>
               </div>
@@ -557,7 +558,7 @@ export function WorkSection({
                     },
                   },
                 }}
-                className="text-3xl sm:text-4xl font-extrabold text-black transform-gpu origin-center"
+                className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black transform-gpu origin-center"
               >
                 <span>Selected </span>
                 <span className="[text-stroke:2px_#000000] [-webkit-text-stroke:2px_#000000] text-transparent font-extrabold">
@@ -582,7 +583,7 @@ export function WorkSection({
                     },
                   },
                 }}
-                className="text-3xl sm:text-4xl font-extrabold text-black transform-gpu origin-center"
+                className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black transform-gpu origin-center"
               >
                 <span>&amp; </span>
                 <span className="[text-stroke:2px_#000000] [-webkit-text-stroke:2px_#000000] text-transparent font-extrabold">
@@ -596,7 +597,7 @@ export function WorkSection({
               href={viewAllHref}
               className="inline-flex items-center gap-3 font-mono text-xs font-semibold uppercase tracking-widest text-black/80 hover:text-black transition-all border-b border-black/30 pb-1"
             >
-              <span>{viewAllLabel}</span>
+              <TextAnimate>{viewAllLabel}</TextAnimate>
               <span>→</span>
             </Link>
           </div>
@@ -645,7 +646,7 @@ export function WorkSection({
                     href={item.link}
                     className="inline-flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-widest text-black/80 hover:text-black border-b border-black/30 pb-0.5"
                   >
-                    <span>EXPLORE PROJECT</span>
+                    <TextAnimate>EXPLORE PROJECT</TextAnimate>
                     <span>→</span>
                   </Link>
                 </div>

@@ -16,11 +16,11 @@ if (typeof window !== "undefined") {
 }
 
 const navItems = [
-  { id: "about", number: "01", label: "About Me", href: "/#about", shape: "1" },
-  { id: "stack", number: "02", label: "Tech Stack", href: "/#stack", shape: "2" },
-  { id: "work", number: "03", label: "Selected Works", href: "/#work", shape: "3" },
-  { id: "journey", number: "04", label: "Journey Path", href: "/#journey", shape: "4" },
-  { id: "contact", number: "05", label: "Contact", href: "/#contact", shape: "5" },
+  { id: "about", number: "01", label: "About Me", href: "/about", shape: "1" },
+  { id: "stack", number: "02", label: "Tech Stack", href: "/stack", shape: "2" },
+  { id: "work", number: "03", label: "Selected Works", href: "/work", shape: "3" },
+  { id: "journey", number: "04", label: "Journey Path", href: "/journey", shape: "4" },
+  { id: "contact", number: "05", label: "Contact", href: "/contact", shape: "5" },
 ];
 
 export function Nav() {
