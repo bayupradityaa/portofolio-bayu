@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Code2, Boxes, Palette, BrainCircuit, Store } from "lucide-react";
+import { Code2, Boxes, ShieldCheck, BrainCircuit, Store } from "lucide-react";
 
 // 2 seconds readable time, 1 second morph animation time
 const morphTime = 1.0;
@@ -16,7 +16,7 @@ interface MorphItem {
 const morphItems: MorphItem[] = [
   { icon: Code2, text: "Software Engineer" },
   { icon: Boxes, text: "Web Developer" },
-  { icon: Palette, text: "Graphic Designer" },
+  { icon: ShieldCheck, text: "QA Engineer" },
   { icon: BrainCircuit, text: "AI Enthusiast" },
   { icon: Store, text: "Founder @CLT.STORE" },
 ];

@@ -38,21 +38,26 @@ export function ConversationBubble({
   const idleTweenRef = useRef<gsap.core.Tween | null>(null);
 
   const [displayedText, setDisplayedText] = useState("");
+  const [displayedCtaText, setDisplayedCtaText] = useState("");
   const [showDots, setShowDots] = useState(true);
+  const [showCtaDots, setShowCtaDots] = useState(false);
+  const [isCtaTypingDone, setIsCtaTypingDone] = useState(false);
   const [activeDotIndex, setActiveDotIndex] = useState(0);
+  const [activeCtaDotIndex, setActiveCtaDotIndex] = useState(0);
 
-  // 1. Three Dots Continuous Typing Animation Loop (Step 3)
+  // 1. Three Dots Continuous Typing Animation Loop
   useEffect(() => {
-    if (!showDots) return;
+    if (!showDots && !showCtaDots) return;
 
     const interval = setInterval(() => {
       setActiveDotIndex((prev) => (prev + 1) % 3);
+      setActiveCtaDotIndex((prev) => (prev + 1) % 3);
     }, 350);
 
     return () => clearInterval(interval);
-  }, [showDots]);
+  }, [showDots, showCtaDots]);
 
-  // 2. Master GSAP Animation Timeline (Steps 1 to 8)
+  // 2. Master GSAP Animation Timeline for Message & CTA Typing Sequences
   useEffect(() => {
     const container = containerRef.current;
     const avatar = avatarRef.current;
@@ -112,10 +117,10 @@ export function ConversationBubble({
         "+=0.25"
       );
 
-      // STEP 3: Typing dots loop runs for ~1.4s so the user experiences the typing animation
-      tl.to({}, { duration: 1.4 });
+      // STEP 3: Typing dots loop runs for ~1.2s for messageText
+      tl.to({}, { duration: 1.2 });
 
-      // STEP 4: Morph Bubble Expansion (0.7s, smooth fluid ease)
+      // STEP 4: Morph Bubble Expansion (0.6s)
       tl.call(() => {
         setShowDots(false);
       });
@@ -123,11 +128,11 @@ export function ConversationBubble({
       tl.to(bubble, {
         width: "auto",
         height: "auto",
-        duration: 0.7,
+        duration: 0.6,
         ease: "power3.inOut",
       });
 
-      // STEP 5 & 6: Character-by-character Typing Animation (65ms/char for deliberate human pace)
+      // STEP 5: Character-by-character Typing Animation for messageText ("Have something in mind?")
       tl.call(() => {
         let currentIdx = 0;
         const typeInterval = setInterval(() => {
@@ -137,26 +142,41 @@ export function ConversationBubble({
           } else {
             clearInterval(typeInterval);
 
-            // STEP 7: Reveal CTA Button with subtle delay
+            // STEP 6: Reveal CTA Button & Start CTA Typing Sequence ("Let's Talk")
             gsap.to(cta, {
               opacity: 1,
               y: 0,
-              duration: 0.6,
+              duration: 0.5,
               ease: "power3.out",
               pointerEvents: "auto",
-              delay: 0.2,
-            });
+              onComplete: () => {
+                setShowCtaDots(true);
+                setTimeout(() => {
+                  setShowCtaDots(false);
+                  let ctaIdx = 0;
+                  const ctaTypeInterval = setInterval(() => {
+                    if (ctaIdx <= ctaText.length) {
+                      setDisplayedCtaText(ctaText.slice(0, ctaIdx));
+                      ctaIdx++;
+                    } else {
+                      clearInterval(ctaTypeInterval);
+                      setIsCtaTypingDone(true);
 
-            // STEP 8: Start Ultra-Gentle Floating Idle Animation (4.2s sine loop)
-            idleTweenRef.current = gsap.to(container, {
-              y: -4,
-              duration: 4.2,
-              repeat: -1,
-              yoyo: true,
-              ease: "sine.inOut",
+                      // STEP 7: Start Ultra-Gentle Floating Idle Animation (4.2s sine loop)
+                      idleTweenRef.current = gsap.to(container, {
+                        y: -4,
+                        duration: 4.2,
+                        repeat: -1,
+                        yoyo: true,
+                        ease: "sine.inOut",
+                      });
+                    }
+                  }, 65);
+                }, 500);
+              },
             });
           }
-        }, 65);
+        }, 60);
       });
     }, container);
 
@@ -164,9 +184,9 @@ export function ConversationBubble({
       ctx.revert();
       if (idleTweenRef.current) idleTweenRef.current.kill();
     };
-  }, [messageText]);
+  }, [messageText, ctaText]);
 
-  // 3. Mouse Parallax Effect (Step 10: Max 8px Movement)
+  // 3. Mouse Parallax Effect (Max 8px Movement)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
@@ -198,7 +218,7 @@ export function ConversationBubble({
       onMouseLeave={handleMouseLeave}
       className={cn("flex items-start gap-3.5 select-none", className)}
     >
-      {/* Profile Avatar (Step 1 Animation) */}
+      {/* Profile Avatar */}
       <div
         ref={avatarRef}
         className="relative h-12 w-12 sm:h-14 sm:w-14 rounded-full overflow-hidden border-2 border-black/15 shadow-md shrink-0 bg-black/10 transition-transform duration-300 mt-0.5"
@@ -212,15 +232,15 @@ export function ConversationBubble({
         />
       </div>
 
-      {/* Vertical Column: Speech Bubble + CTA Button 100% Perfectly Flush Aligned */}
+      {/* Vertical Column: Speech Bubble + CTA Button */}
       <div className="flex flex-col items-start gap-3">
-        {/* Morphing Chat Bubble (Step 2 to 6, Step 9 Hover Glow & Scale 1.02) */}
+        {/* Morphing Chat Bubble for messageText ("Have something in mind?") */}
         <div
           ref={bubbleRef}
           className="relative flex items-center justify-center min-h-[44px] bg-black/10 border border-black/15 text-black px-5 py-3 rounded-2xl font-sans text-sm sm:text-base md:text-lg font-medium shadow-md backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:border-black/30 group"
         >
           {showDots ? (
-            /* STEP 2 & 3: Typing Indicator (● ○ ○ -> ○ ● ○ -> ○ ○ ●) */
+            /* Typing Indicator (● ○ ○ -> ○ ● ○ -> ○ ○ ●) */
             <div ref={dotsRef} className="flex items-center gap-1.5 px-1 py-0.5">
               <span
                 className={cn(
@@ -242,7 +262,7 @@ export function ConversationBubble({
               />
             </div>
           ) : (
-            /* STEP 5 & 6: Typewriter Message Text */
+            /* Typewriter Message Text */
             <span ref={textContainerRef} className="whitespace-nowrap leading-snug">
               {displayedText}
               {displayedText.length < messageText.length && (
@@ -252,28 +272,66 @@ export function ConversationBubble({
           )}
         </div>
 
-        {/* Bottom Row: CTA Button Reveal (Step 7) — 100% Flush Aligned */}
+        {/* Bottom Row: CTA Button ("Let's Talk") with Animated Typing & Roll-over Hover */}
         <button
           ref={ctaRef}
           onClick={onCtaClick}
-          className="group relative inline-flex items-center gap-2.5 overflow-hidden rounded-2xl bg-black px-7 py-3.5 text-sm sm:text-base font-extrabold text-[#FFD177] shadow-xl border border-black hover:bg-[#111111] hover:scale-105 hover:shadow-[0_12px_35px_rgba(0,0,0,0.4)] active:scale-95 transition-all duration-300 cursor-pointer"
+          className="group relative inline-flex items-center gap-2.5 overflow-hidden rounded-2xl bg-black px-7 py-3.5 text-sm sm:text-base font-extrabold text-[#FFD177] shadow-xl border border-black hover:bg-[#111111] hover:scale-105 hover:shadow-[0_12px_35px_rgba(0,0,0,0.4)] active:scale-95 transition-all duration-300 cursor-pointer min-h-[48px]"
         >
-          {/* Vertical Rolling Text Animation Container */}
-          <div className="relative overflow-hidden h-5 flex flex-col items-center justify-center">
-            {/* Primary Text */}
-            <span className="block transform transition-transform duration-300 ease-out group-hover:-translate-y-full">
-              {ctaText}
-            </span>
-            {/* Secondary Rolling Text */}
-            <span className="absolute block transform translate-y-full transition-transform duration-300 ease-out group-hover:translate-y-0 text-[#FFEE00]">
-              {ctaText}
-            </span>
-          </div>
+          {showCtaDots ? (
+            /* CTA Typing Dots Indicator */
+            <div className="flex items-center gap-1.5 px-2 py-0.5">
+              <span
+                className={cn(
+                  "h-2 w-2 rounded-full transition-all duration-200",
+                  activeCtaDotIndex === 0 ? "bg-[#FFD177] scale-125" : "bg-[#FFD177]/40 scale-90"
+                )}
+              />
+              <span
+                className={cn(
+                  "h-2 w-2 rounded-full transition-all duration-200",
+                  activeCtaDotIndex === 1 ? "bg-[#FFD177] scale-125" : "bg-[#FFD177]/40 scale-90"
+                )}
+              />
+              <span
+                className={cn(
+                  "h-2 w-2 rounded-full transition-all duration-200",
+                  activeCtaDotIndex === 2 ? "bg-[#FFD177] scale-125" : "bg-[#FFD177]/40 scale-90"
+                )}
+              />
+            </div>
+          ) : !isCtaTypingDone ? (
+            /* CTA Typewriter Text */
+            <div className="flex items-center gap-2">
+              <span className="whitespace-nowrap leading-snug">
+                {displayedCtaText}
+                {displayedCtaText.length < ctaText.length && (
+                  <span className="inline-block w-0.5 h-4 ml-0.5 bg-[#FFD177] animate-pulse align-middle" />
+                )}
+              </span>
+              <ArrowUpRight className="h-4 w-4 text-[#FFD177] shrink-0 opacity-80" />
+            </div>
+          ) : (
+            /* Interactive Rolling Text when typing is complete */
+            <>
+              <div className="relative overflow-hidden h-5 flex flex-col items-center justify-center">
+                {/* Primary Text */}
+                <span className="block transform transition-transform duration-300 ease-out group-hover:-translate-y-full">
+                  {ctaText}
+                </span>
+                {/* Secondary Rolling Text */}
+                <span className="absolute block transform translate-y-full transition-transform duration-300 ease-out group-hover:translate-y-0 text-[#FFEE00]">
+                  {ctaText}
+                </span>
+              </div>
 
-          {/* Sliding Arrow Icon */}
-          <ArrowUpRight className="h-4 w-4 text-[#FFD177] group-hover:text-[#FFEE00] transform transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:-translate-y-1" />
+              {/* Sliding Arrow Icon */}
+              <ArrowUpRight className="h-4 w-4 text-[#FFD177] group-hover:text-[#FFEE00] transform transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:-translate-y-1" />
+            </>
+          )}
         </button>
       </div>
     </div>
   );
 }
+
