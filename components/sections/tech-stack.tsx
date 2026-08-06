@@ -45,6 +45,11 @@ import {
   FastifyIcon,
   JupyternotebookIcon,
   NuxtjsIcon,
+  SqliteIcon,
+  NginxIcon,
+  NestjsIcon,
+  NumpyIcon,
+  AzureIcon,
   TechIcon,
 } from "@/components/ui/tech-icons";
 
@@ -167,6 +172,17 @@ const logoIcons: Record<string, React.ComponentType<{ className?: string; size?:
   "GitHub Actions": GithubactionsIcon,
   Postman: PostmanIcon,
   Figma: FigmaIcon,
+  SQLite: SqliteIcon,
+  sqlite: SqliteIcon,
+  SQLite3: SqliteIcon,
+  Nginx: NginxIcon,
+  nginx: NginxIcon,
+  NestJS: NestjsIcon,
+  nestjs: NestjsIcon,
+  NumPy: NumpyIcon,
+  numpy: NumpyIcon,
+  Azure: AzureIcon,
+  azure: AzureIcon,
 };
 
 // Custom brand-specific tooltips for the marquee
@@ -217,6 +233,11 @@ const logoTooltips: Record<string, string> = {
   Postman: "API testing & debugging",
   "VS Code": "Extensible code workspace",
   Figma: "Vector design & prototyping",
+  SQLite: "Lightweight relational database engine",
+  Nginx: "High-performance web server & reverse proxy",
+  NestJS: "Progressive Node.js framework",
+  NumPy: "Scientific computing & array processing in Python",
+  Azure: "Microsoft cloud computing platform",
 };
 
 export function TechStack({ technologies = [] }: { technologies?: string[] }) {
