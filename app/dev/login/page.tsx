@@ -23,7 +23,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#09090b] px-4">
+    <div className="flex min-h-[100dvh] items-center justify-center bg-[#09090b] px-4">
       <div className="w-full max-w-sm">
         {/* Brand */}
         <div className="mb-8 text-center">

@@ -30,6 +30,7 @@ export function ProjectGalleryLightbox({
 }: ProjectGalleryLightboxProps) {
   const [openAt, setOpenAt] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [failedUrls, setFailedUrls] = useState<Record<string, boolean>>({});
   const isOpen = openAt !== null;
 
   useEffect(() => setMounted(true), []);
@@ -73,13 +74,14 @@ export function ProjectGalleryLightbox({
         className="group/image relative block aspect-16/10 w-full overflow-hidden rounded-2xl border border-border bg-surface focus-visible:outline-2 focus-visible:outline-accent"
         aria-label={`View ${slides.length} images for ${projectName}`}
       >
-        {coverImage ? (
+        {coverImage && !failedUrls[coverImage] ? (
           <Image
             src={coverImage}
             alt={coverAlt}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             priority={priority}
+            onError={() => setFailedUrls((prev) => ({ ...prev, [coverImage]: true }))}
             className="object-cover transition-transform duration-700 ease-out group-hover/image:scale-[1.03] group-hover:scale-[1.03]"
           />
         ) : (
@@ -129,15 +131,23 @@ export function ProjectGalleryLightbox({
 
             <figure className="flex max-h-full flex-col items-center">
               <div className="relative max-h-[75vh] w-full">
-                <Image
-                  key={active.url}
-                  src={active.url}
-                  alt={active.alt || `${projectName} screenshot`}
-                  width={1600}
-                  height={1000}
-                  sizes="(max-width: 1152px) 100vw, 1152px"
-                  className="max-h-[75vh] w-auto rounded-lg object-contain"
-                />
+                {!failedUrls[active.url] ? (
+                  <Image
+                    key={active.url}
+                    src={active.url}
+                    alt={active.alt || `${projectName} screenshot`}
+                    width={1600}
+                    height={1000}
+                    sizes="(max-width: 1152px) 100vw, 1152px"
+                    onError={() => setFailedUrls((prev) => ({ ...prev, [active.url]: true }))}
+                    className="max-h-[75vh] w-auto rounded-lg object-contain"
+                  />
+                ) : (
+                  <div className="flex h-64 w-96 flex-col items-center justify-center rounded-lg bg-surface text-secondary">
+                    <ImageOff size={36} className="mb-2" />
+                    <p className="text-sm">Failed to load image</p>
+                  </div>
+                )}
               </div>
               {active.caption && (
                 <figcaption className="mt-4 max-w-2xl text-center text-sm text-white/70">

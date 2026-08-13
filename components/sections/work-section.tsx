@@ -313,13 +313,6 @@ export function WorkSection({
               A timeline of my education, career milestones, and technical experiences that built who I am today.
             </p>
 
-            {/* Scroll Down Hint Indicator */}
-            <div className="pt-6 flex flex-col items-center gap-2.5">
-              <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/5 border border-[#FFD177]/30 text-[#FFD177] font-mono text-xs font-semibold uppercase tracking-[0.22em] shadow-md backdrop-blur-sm">
-                <span>SCROLL TO EXPLORE</span>
-                <span className="inline-block animate-bounce font-bold text-sm">↓</span>
-              </div>
-            </div>
           </header>
         </div>
 
@@ -328,18 +321,6 @@ export function WorkSection({
           ref={trackContainerRef}
           className="relative z-20 w-full h-full overflow-hidden flex items-center pt-24 pb-12 bg-[#FFD177] text-black"
         >
-          {/* Top Dark SVG Wave Transition flowing from Tech Stack (#0c0c0c) into Gold Project Stage (#FFD177) */}
-          <div className="absolute top-0 left-0 right-0 w-full overflow-hidden leading-none pointer-events-none select-none z-20">
-            <svg
-              className="relative block w-full h-5 sm:h-8 lg:h-10 text-[#0c0c0c]"
-              viewBox="0 0 1440 120"
-              preserveAspectRatio="none"
-              fill="currentColor"
-            >
-              <path d="M0,0 L1440,0 L1440,25 C1320,65 1200,85 1080,70 C960,55 840,25 720,40 C600,55 480,85 360,70 C240,55 120,25 0,40 Z" />
-            </svg>
-          </div>
-
           <div
             ref={trackRef}
             className="flex items-center gap-10 lg:gap-16 w-max pr-16 lg:pr-32 pl-0"
@@ -521,18 +502,6 @@ export function WorkSection({
       {/* MOBILE STACKED VIEW (< 768px)                                         */}
       {/* ────────────────────────────────────────────────────────────────────── */}
       <div className="block md:hidden relative px-6 pt-8 pb-16 space-y-12 bg-[#FFD177] text-black overflow-hidden">
-        {/* Top Dark SVG Wave Transition for Mobile */}
-        <div className="absolute top-0 left-0 right-0 w-full overflow-hidden leading-none pointer-events-none select-none z-20">
-          <svg
-            className="relative block w-full h-5 sm:h-8 text-[#000000]"
-            viewBox="0 0 1440 120"
-            preserveAspectRatio="none"
-            fill="currentColor"
-          >
-            <path d="M0,0 L1440,0 L1440,25 C1320,65 1200,85 1080,70 C960,55 480,85 360,70 C240,55 120,25 0,40 Z" />
-          </svg>
-        </div>
-
         {/* Mobile Header */}
         <header className="text-center space-y-6 pb-8 border-b border-black/20">
           {/* Mobile Giant Awwwards Headline with Outline Text */}

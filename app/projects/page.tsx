@@ -3,7 +3,8 @@ import { Nav } from "@/components/shell/nav";
 import { Footer } from "@/components/shell/footer";
 import { LoadingScreen } from "@/components/shell/loading-screen";
 import { AllProjectsClient } from "@/components/projects/all-projects-client";
-import { getPublishedProjects } from "@/lib/actions/projects";
+import { getPublicProjects } from "@/lib/actions/projects";
+import { getProfileSettings } from "@/lib/actions/settings";
 
 export const metadata: Metadata = {
   title: "All Projects — Bayu Praditya",
@@ -12,7 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default async function ProjectsPage() {
-  const projects = await getPublishedProjects();
+  const [projects, settings] = await Promise.all([
+    getPublicProjects(),
+    getProfileSettings(),
+  ]);
 
   return (
     <>
@@ -21,7 +25,7 @@ export default async function ProjectsPage() {
       <main id="main" className="flex-1">
         <AllProjectsClient projects={projects} />
       </main>
-      <Footer />
+      <Footer settings={settings} />
     </>
   );
 }

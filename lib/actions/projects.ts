@@ -116,6 +116,35 @@ export const getPublishedProjects = unstable_cache(
   { tags: [CACHE_TAGS.PROJECTS], revalidate: 3600 },
 );
 
+/** Fetch projects for the public /projects page — only show_on_public + published */
+export const getPublicProjects = unstable_cache(
+  async (): Promise<ProjectWithRelations[]> => {
+    const supabase = getSupabaseAdmin();
+    if (!supabase) return [];
+
+    const { data, error } = await supabase
+      .from("projects")
+      .select("*")
+      .eq("published", true)
+      .eq("show_on_public", true)
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("[projects] public fetch error:", error.message);
+      return [];
+    }
+
+    const projects = (data ?? []) as Project[];
+    const ids = projects.map((p) => p.id);
+    const { techMap, highlightMap, imageMap } = await loadProjectRelations(supabase, ids);
+
+    return attachRelations(projects, techMap, highlightMap, imageMap);
+  },
+  ["public-projects"],
+  { tags: [CACHE_TAGS.PROJECTS], revalidate: 3600 },
+);
+
 /** Fetch single project by slug (for detail page if needed) */
 export async function getProjectBySlug(slug: string): Promise<ProjectWithRelations | null> {
   const supabase = getSupabaseAdmin();
@@ -328,6 +357,24 @@ export async function toggleFeatured(id: string) {
 
   revalidateProjects();
   return { success: true, featured: !project.featured };
+}
+
+export async function toggleShowOnPublic(id: string) {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) return { error: "Supabase not configured" };
+
+  const { data: project } = await supabase.from("projects").select("show_on_public").eq("id", id).single();
+  if (!project) return { error: "Project not found" };
+
+  const { error } = await supabase
+    .from("projects")
+    .update({ show_on_public: !project.show_on_public })
+    .eq("id", id);
+
+  if (error) return { error: error.message };
+
+  revalidateProjects();
+  return { success: true, show_on_public: !project.show_on_public };
 }
 
 export async function duplicateProject(id: string) {

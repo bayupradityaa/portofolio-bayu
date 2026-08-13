@@ -80,24 +80,25 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <link
-          rel="preload"
-          href="/sequence-mobile/ezgif-frame-001.webp"
-          as="image"
-          type="image/webp"
-          fetchPriority="high"
-          media="(max-width: 1023px)"
-        />
-        <link
-          rel="preload"
-          href="/sequence-desktop/ezgif-frame-001.webp"
-          as="image"
-          type="image/webp"
-          fetchPriority="high"
-          media="(min-width: 1024px)"
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: "Bayu Praditya",
+              url: "https://bayupraditya.dev",
+              jobTitle: "Web Developer & AI Engineer",
+              sameAs: [
+                "https://github.com/bayupradityaa",
+                "https://linkedin.com/in/bayupraditya",
+                "https://instagram.com/bayupraditya",
+              ],
+            }),
+          }}
         />
       </head>
-      <body className="flex min-h-full flex-col bg-background text-foreground transition-colors duration-300">
+      <body className="flex min-h-full flex-col bg-background text-foreground transition-colors duration-300" suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}>
           <TabTitleAnimator />
           <a

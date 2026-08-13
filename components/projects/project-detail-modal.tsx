@@ -33,6 +33,7 @@ export function ProjectDetailModal({
 }: ProjectDetailModalProps) {
   const [mounted, setMounted] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
   const lenis = useLenis();
 
   useEffect(() => {
@@ -128,7 +129,7 @@ export function ProjectDetailModal({
         >
           {/* Header Image Gallery */}
           <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-border/60 bg-card">
-            {currentImage?.url ? (
+            {currentImage?.url && !failedImages[currentImage.url] ? (
               <Image
                 src={currentImage.url}
                 alt={currentImage.alt || project.name}
@@ -136,6 +137,9 @@ export function ProjectDetailModal({
                 sizes="(max-width: 1024px) 100vw, 896px"
                 className="object-cover"
                 priority
+                onError={() =>
+                  setFailedImages((prev) => ({ ...prev, [currentImage.url]: true }))
+                }
               />
             ) : (
               <ProjectPreviewPlaceholder title={project.name} category={project.category} status={project.status} />
@@ -179,12 +183,21 @@ export function ProjectDetailModal({
                       : "border-border/60 opacity-60 hover:opacity-100"
                   )}
                 >
-                  <Image
-                    src={img.url}
-                    alt={img.alt}
-                    fill
-                    className="object-cover"
-                  />
+                  {!failedImages[img.url] ? (
+                    <Image
+                      src={img.url}
+                      alt={img.alt}
+                      fill
+                      className="object-cover"
+                      onError={() =>
+                        setFailedImages((prev) => ({ ...prev, [img.url]: true }))
+                      }
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-surface text-xs text-muted">
+                      <ImageOff size={16} />
+                    </div>
+                  )}
                 </button>
               ))}
             </div>

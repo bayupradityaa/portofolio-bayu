@@ -4,11 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, Copy, Star, Eye, EyeOff, FolderKanban } from "lucide-react";
+import { Plus, Pencil, Trash2, Copy, Star, Eye, EyeOff, Globe, FolderKanban } from "lucide-react";
 import { DataTable } from "@/components/admin/data-table";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
-import { deleteProject, togglePublished, toggleFeatured, duplicateProject } from "@/lib/actions/projects";
+import { deleteProject, togglePublished, toggleFeatured, toggleShowOnPublic, duplicateProject } from "@/lib/actions/projects";
 import type { ProjectWithRelations } from "@/lib/types/database";
 import { toast } from "sonner";
 
@@ -36,6 +36,12 @@ export function ProjectsClient({ projects }: { projects: ProjectWithRelations[] 
 
   const handleToggleFeatured = async (id: string) => {
     const result = await toggleFeatured(id);
+    if (result.error) toast.error(result.error);
+    else router.refresh();
+  };
+
+  const handleToggleShowOnPublic = async (id: string) => {
+    const result = await toggleShowOnPublic(id);
     if (result.error) toast.error(result.error);
     else router.refresh();
   };
@@ -116,6 +122,21 @@ export function ProjectsClient({ projects }: { projects: ProjectWithRelations[] 
           ) : (
             <EyeOff size={16} className="text-[#71717a]" />
           )}
+        </button>
+      ),
+    },
+    {
+      key: "show_on_public",
+      label: "Public",
+      className: "w-16",
+      render: (p: ProjectWithRelations) => (
+        <button
+          onClick={(e) => { e.stopPropagation(); handleToggleShowOnPublic(p.id); }}
+          title={p.show_on_public ? "Visible on /projects page — click to hide" : "Hidden from /projects page — click to show"}
+          aria-label={p.show_on_public ? "Visible on public page" : "Hidden from public page"}
+          className="transition-colors hover:scale-110"
+        >
+          <Globe size={16} className={p.show_on_public ? "text-[#FFD177]" : "text-[#52525b]"} />
         </button>
       ),
     },

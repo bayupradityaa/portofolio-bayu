@@ -1,6 +1,6 @@
 import { Mail } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
-import { getProfileSettings } from "@/lib/actions/settings";
+import type { ProfileSettings } from "@/lib/types/database";
 import { GithubIcon, LinkedinIcon, InstagramIcon } from "@/components/ui/brand-icons";
 
 /**
@@ -11,8 +11,7 @@ import { GithubIcon, LinkedinIcon, InstagramIcon } from "@/components/ui/brand-i
  * mono caption underneath. No icons inside the brand mark — that line
  * already carries enough weight.
  */
-export async function Footer() {
-  const settings = await getProfileSettings();
+export async function Footer({ settings }: { settings: ProfileSettings | null }) {
   const year = new Date().getFullYear();
 
   const socials = [

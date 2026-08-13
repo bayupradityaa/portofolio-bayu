@@ -21,6 +21,7 @@ export const projectSchema = z.object({
   cover_alt: z.string().trim().max(300),
   featured: z.boolean(),
   published: z.boolean(),
+  show_on_public: z.boolean(),
   is_open_source: z.boolean(),
   is_personal: z.boolean(),
   sort_order: z.number().int().min(0),

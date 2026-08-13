@@ -52,6 +52,7 @@ export type Project = {
   cover_alt: string;
   featured: boolean;
   published: boolean;
+  show_on_public: boolean;
   is_open_source: boolean;
   is_personal: boolean;
   sort_order: number;

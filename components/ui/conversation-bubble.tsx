@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 import { ArrowUpRight } from "lucide-react";
@@ -36,6 +37,7 @@ export function ConversationBubble({
   const textContainerRef = useRef<HTMLSpanElement | null>(null);
   const ctaRef = useRef<HTMLButtonElement | null>(null);
   const idleTweenRef = useRef<gsap.core.Tween | null>(null);
+  const reduce = useReducedMotion();
 
   const [displayedText, setDisplayedText] = useState("");
   const [displayedCtaText, setDisplayedCtaText] = useState("");
@@ -75,9 +77,8 @@ export function ConversationBubble({
 
     gsap.set(bubble, {
       opacity: 0,
-      scale: 0.8,
-      width: 72,
-      height: 44,
+      scaleX: 0.4,
+      scaleY: 0.5,
       transformOrigin: "left center",
     });
 
@@ -120,14 +121,14 @@ export function ConversationBubble({
       // STEP 3: Typing dots loop runs for ~1.2s for messageText
       tl.to({}, { duration: 1.2 });
 
-      // STEP 4: Morph Bubble Expansion (0.6s)
+      // STEP 4: Morph Bubble Expansion via scale (GPU-composited)
       tl.call(() => {
         setShowDots(false);
       });
 
       tl.to(bubble, {
-        width: "auto",
-        height: "auto",
+        scaleX: 1,
+        scaleY: 1,
         duration: 0.6,
         ease: "power3.inOut",
       });
@@ -188,7 +189,7 @@ export function ConversationBubble({
 
   // 3. Mouse Parallax Effect (Max 8px Movement)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
+    if (reduce || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const relativeX = (e.clientX - rect.left) / rect.width - 0.5;
     const relativeY = (e.clientY - rect.top) / rect.height - 0.5;
@@ -237,7 +238,7 @@ export function ConversationBubble({
         {/* Morphing Chat Bubble for messageText ("Have something in mind?") */}
         <div
           ref={bubbleRef}
-          className="relative flex items-center justify-center min-h-[44px] bg-black/10 border border-black/15 text-black px-5 py-3 rounded-2xl font-sans text-sm sm:text-base md:text-lg font-medium shadow-md backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:border-black/30 group"
+          className="relative flex items-center justify-center min-h-[44px] bg-white/10 border border-white/15 text-white px-5 py-3 rounded-2xl font-sans text-sm sm:text-base md:text-lg font-medium shadow-md backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:border-white/30 group"
         >
           {showDots ? (
             /* Typing Indicator (● ○ ○ -> ○ ● ○ -> ○ ○ ●) */
@@ -245,19 +246,19 @@ export function ConversationBubble({
               <span
                 className={cn(
                   "h-2 w-2 rounded-full transition-all duration-200",
-                  activeDotIndex === 0 ? "bg-black scale-125" : "bg-black/35 scale-90"
+                  activeDotIndex === 0 ? "bg-accent scale-125" : "bg-white/35 scale-90"
                 )}
               />
               <span
                 className={cn(
                   "h-2 w-2 rounded-full transition-all duration-200",
-                  activeDotIndex === 1 ? "bg-black scale-125" : "bg-black/35 scale-90"
+                  activeDotIndex === 1 ? "bg-accent scale-125" : "bg-white/35 scale-90"
                 )}
               />
               <span
                 className={cn(
                   "h-2 w-2 rounded-full transition-all duration-200",
-                  activeDotIndex === 2 ? "bg-black scale-125" : "bg-black/35 scale-90"
+                  activeDotIndex === 2 ? "bg-accent scale-125" : "bg-white/35 scale-90"
                 )}
               />
             </div>
@@ -266,7 +267,7 @@ export function ConversationBubble({
             <span ref={textContainerRef} className="whitespace-nowrap leading-snug">
               {displayedText}
               {displayedText.length < messageText.length && (
-                <span className="inline-block w-0.5 h-4 ml-0.5 bg-black animate-pulse align-middle" />
+                <span className="inline-block w-0.5 h-4 ml-0.5 bg-accent animate-pulse align-middle" />
               )}
             </span>
           )}
@@ -276,7 +277,7 @@ export function ConversationBubble({
         <button
           ref={ctaRef}
           onClick={onCtaClick}
-          className="group relative inline-flex items-center gap-2.5 overflow-hidden rounded-2xl bg-black px-7 py-3.5 text-sm sm:text-base font-extrabold text-[#FFD177] shadow-xl border border-black hover:bg-[#111111] hover:scale-105 hover:shadow-[0_12px_35px_rgba(0,0,0,0.4)] active:scale-95 transition-all duration-300 cursor-pointer min-h-[48px]"
+          className="group relative inline-flex items-center gap-2.5 overflow-hidden rounded-2xl bg-[#FFD177] px-7 py-3.5 text-sm sm:text-base font-extrabold text-black shadow-xl border border-[#FFD177] hover:bg-[#ffe099] hover:scale-105 hover:shadow-[0_0_30px_rgba(255,209,119,0.4)] active:scale-95 transition-all duration-300 cursor-pointer min-h-[48px]"
         >
           {showCtaDots ? (
             /* CTA Typing Dots Indicator */
@@ -284,19 +285,19 @@ export function ConversationBubble({
               <span
                 className={cn(
                   "h-2 w-2 rounded-full transition-all duration-200",
-                  activeCtaDotIndex === 0 ? "bg-[#FFD177] scale-125" : "bg-[#FFD177]/40 scale-90"
+                  activeCtaDotIndex === 0 ? "bg-black scale-125" : "bg-black/40 scale-90"
                 )}
               />
               <span
                 className={cn(
                   "h-2 w-2 rounded-full transition-all duration-200",
-                  activeCtaDotIndex === 1 ? "bg-[#FFD177] scale-125" : "bg-[#FFD177]/40 scale-90"
+                  activeCtaDotIndex === 1 ? "bg-black scale-125" : "bg-black/40 scale-90"
                 )}
               />
               <span
                 className={cn(
                   "h-2 w-2 rounded-full transition-all duration-200",
-                  activeCtaDotIndex === 2 ? "bg-[#FFD177] scale-125" : "bg-[#FFD177]/40 scale-90"
+                  activeCtaDotIndex === 2 ? "bg-black scale-125" : "bg-black/40 scale-90"
                 )}
               />
             </div>
@@ -306,10 +307,10 @@ export function ConversationBubble({
               <span className="whitespace-nowrap leading-snug">
                 {displayedCtaText}
                 {displayedCtaText.length < ctaText.length && (
-                  <span className="inline-block w-0.5 h-4 ml-0.5 bg-[#FFD177] animate-pulse align-middle" />
+                  <span className="inline-block w-0.5 h-4 ml-0.5 bg-black animate-pulse align-middle" />
                 )}
               </span>
-              <ArrowUpRight className="h-4 w-4 text-[#FFD177] shrink-0 opacity-80" />
+              <ArrowUpRight className="h-4 w-4 text-black/70 shrink-0" />
             </div>
           ) : (
             /* Interactive Rolling Text when typing is complete */
@@ -320,13 +321,13 @@ export function ConversationBubble({
                   {ctaText}
                 </span>
                 {/* Secondary Rolling Text */}
-                <span className="absolute block transform translate-y-full transition-transform duration-300 ease-out group-hover:translate-y-0 text-[#FFEE00]">
+                <span className="absolute block transform translate-y-full transition-transform duration-300 ease-out group-hover:translate-y-0 text-black/60">
                   {ctaText}
                 </span>
               </div>
 
               {/* Sliding Arrow Icon */}
-              <ArrowUpRight className="h-4 w-4 text-[#FFD177] group-hover:text-[#FFEE00] transform transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:-translate-y-1" />
+              <ArrowUpRight className="h-4 w-4 text-black/70 group-hover:text-black transform transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:-translate-y-1" />
             </>
           )}
         </button>

@@ -24,23 +24,14 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
   return (
     <div
       id="contact"
-      className="relative w-full bg-[#FFD177] text-black pt-8 sm:pt-12 lg:pt-16 pb-16 lg:pb-24 overflow-hidden select-none"
+      className="relative w-full bg-background text-foreground pt-8 sm:pt-12 lg:pt-16 pb-16 lg:pb-24 overflow-hidden select-none"
     >
-      {/* Top Black SVG Wave Transition flowing from Dark Journey (#000000) into Gold Contact Stage (#FFD177) */}
-      <div className="absolute top-0 left-0 right-0 w-full overflow-hidden leading-none pointer-events-none select-none z-20">
-        <svg
-          className="relative block w-full h-7 sm:h-12 lg:h-16 text-[#000000]"
-          viewBox="0 0 1440 120"
-          preserveAspectRatio="none"
-          fill="currentColor"
-        >
-          <path d="M0,0 L1440,0 L1440,25 C1320,65 1200,85 1080,70 C960,55 840,25 720,40 C600,55 480,85 360,70 C240,55 120,25 0,40 Z" />
-        </svg>
-      </div>
+      {/* Editorial hairline separating journey from contact */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-border/40" />
 
-      {/* Ambient Lighting Overlays */}
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/25 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-black/5 rounded-full blur-3xl pointer-events-none" />
+      {/* Ambient accent glow */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-accent/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/3 rounded-full blur-3xl pointer-events-none" />
 
       <div className="mx-auto w-full max-w-6xl px-6 lg:px-12 relative z-10 pt-4 sm:pt-6">
         <AnimatePresence mode="wait">
@@ -72,9 +63,9 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
                 className="flex flex-col text-left font-sans font-extrabold tracking-tighter leading-[0.92] max-w-full"
               >
                 {[
-                  { text: "Transform Your", color: "text-black" },
-                  { text: "Digital Vision", color: "text-black" },
-                  { text: "Into Real Experience", color: "text-white drop-shadow-md" },
+                  { text: "Transform Your", color: "text-foreground" },
+                  { text: "Digital Vision", color: "text-foreground" },
+                  { text: "Into Real Experience", color: "text-accent" },
                 ].map((line, idx) => (
                   <div key={idx} className="overflow-hidden py-1.5 -my-1.5 max-w-full">
                     <motion.h2
@@ -103,7 +94,7 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
               </motion.div>
 
               {/* Portfolio Copywriting */}
-              <p className="text-base sm:text-xl text-black/85 leading-relaxed max-w-2xl font-normal pt-2">
+              <p className="text-base sm:text-xl text-secondary leading-relaxed max-w-2xl font-normal pt-2">
                 Every great digital product starts with an ambitious vision. As a full-stack
                 developer and designer, I turn complex ideas into high-performance web applications
                 and interactive digital experiences built to scale.
@@ -126,7 +117,7 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 30, scale: 0.96 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-2xl mx-auto bg-black text-white rounded-3xl p-8 sm:p-12 shadow-2xl border border-black/30 relative"
+              className="w-full max-w-2xl mx-auto bg-black text-white rounded-3xl p-5 sm:p-8 md:p-12 shadow-2xl border border-black/30 relative"
             >
               {/* Back to Overview Button */}
               <button
@@ -157,17 +148,6 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
         </AnimatePresence>
       </div>
 
-      {/* SVG Wave Transition to Footer (Zero Subpixel Gap) */}
-      <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none pointer-events-none select-none translate-y-px z-20">
-        <svg
-          className="relative block w-full h-10 sm:h-16 lg:h-20 text-[#000000]"
-          viewBox="0 0 1440 120"
-          preserveAspectRatio="none"
-          fill="currentColor"
-        >
-          <path d="M0,32L60,42.7C120,53,240,75,360,80C480,85,600,75,720,64C840,53,960,43,1080,48C1200,53,1320,75,1380,85.3L1440,96L1440,120L0,120Z" />
-        </svg>
-      </div>
     </div>
   );
 }

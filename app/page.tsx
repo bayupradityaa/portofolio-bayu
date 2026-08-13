@@ -10,6 +10,7 @@ import { Journey } from "@/components/sections/journey";
 import { Contact } from "@/components/sections/contact";
 import { getPublishedTechnologies } from "@/lib/actions/technologies";
 import { getPublishedProjects } from "@/lib/actions/projects";
+import { getProfileSettings } from "@/lib/actions/settings";
 
 // Marquee is client-heavy. Split into chunk.
 const TechStack = dynamic(
@@ -17,9 +18,10 @@ const TechStack = dynamic(
 );
 
 export default async function Home() {
-  const [technologies, publishedProjects] = await Promise.all([
+  const [technologies, publishedProjects, settings] = await Promise.all([
     getPublishedTechnologies(),
     getPublishedProjects(),
+    getProfileSettings(),
   ]);
 
   const techNames = technologies.map((t) => t.name);
@@ -43,12 +45,12 @@ export default async function Home() {
       <LoadingScreen />
       <Nav />
       <main id="main" className="flex-1">
-        <Hero />
+        <Hero settings={settings} />
         <div
           id="content-container"
           className="relative z-20 w-full bg-background"
         >
-          <About />
+          <About settings={settings} />
           <TechStack technologies={techNames} />
           <WorkSection items={workItems} />
           <div id="journey-section" className="relative z-10 w-full bg-[#000000] text-white">
@@ -57,7 +59,7 @@ export default async function Home() {
           <Contact />
         </div>
       </main>
-      <Footer />
+      <Footer settings={settings} />
     </>
   );
 }

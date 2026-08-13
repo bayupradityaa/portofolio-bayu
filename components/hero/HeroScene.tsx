@@ -67,6 +67,8 @@ export function HeroScene({ settings }: { settings: ProfileSettings | null }) {
   );
 
   useEffect(() => {
+    // Skip parallax entirely on touch devices — no cursor to track.
+    if ("ontouchstart" in window) return;
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [handleMouseMove]);
@@ -121,7 +123,7 @@ export function HeroScene({ settings }: { settings: ProfileSettings | null }) {
 
   return (
     <HeroProvider value={{ stage }}>
-      <section ref={sectionRef} id="hero" className="relative h-[220vh] md:h-[200vh]">
+      <section ref={sectionRef} id="hero" className="relative h-[180vh] md:h-[180vh]">
         <div
           ref={stickyRef}
           className="sticky top-0 h-[100dvh] overflow-hidden z-10 will-change-transform"
