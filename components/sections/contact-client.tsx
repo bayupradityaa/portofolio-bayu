@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import Image from "next/image";
 import { ArrowLeft, MessageSquare, ArrowUpRight, Sparkles, Mail } from "lucide-react";
 import { GithubIcon, LinkedinIcon, InstagramIcon } from "@/components/ui/brand-icons";
-import { ConversationBubble } from "@/components/ui/conversation-bubble";
 import { ContactForm } from "./contact-form";
 import { cn } from "@/lib/utils";
 import type { ProfileSettings } from "@/lib/types/database";
 import { motion, AnimatePresence } from "motion/react";
+
+const ConversationBubble = lazy(() =>
+  import("@/components/ui/conversation-bubble").then((m) => ({ default: m.ConversationBubble })),
+);
 
 interface ContactClientProps {
   settings: ProfileSettings | null;
@@ -101,13 +104,15 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
               </p>
 
               {/* Conversational Animated UI with GSAP 11-step sequence */}
-              <ConversationBubble
-                avatarSrc={avatarSrc}
-                name={name}
-                messageText="Have something in mind?"
-                ctaText="Let's Talk"
-                onCtaClick={() => setShowForm(true)}
-              />
+              <Suspense fallback={null}>
+                <ConversationBubble
+                  avatarSrc={avatarSrc}
+                  name={name}
+                  messageText="Have something in mind?"
+                  ctaText="Let's Talk"
+                  onCtaClick={() => setShowForm(true)}
+                />
+              </Suspense>
             </motion.div>
           ) : (
             /* ── FORM STATE (TOGGLED SMOOTHLY VIA LET'S TALK) ── */

@@ -157,7 +157,7 @@ export function useHeroSequence() {
     const sizeCanvas = () => {
       const rect = wrap.getBoundingClientRect();
       const desktopCheck = window.innerWidth >= 1024;
-      const dpr = desktopCheck ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+      const dpr = desktopCheck ? Math.min(window.devicePixelRatio || 1, 1.5) : 1;
       canvas.width = Math.round(rect.width * dpr);
       canvas.height = Math.round(rect.height * dpr);
       lastIndexRef.current = -1;

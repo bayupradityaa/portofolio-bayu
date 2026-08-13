@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const roles = [
   "Software Engineer",
@@ -14,8 +14,18 @@ export function TabTitleAnimator() {
   const [roleIndex, setRoleIndex] = useState(0);
   const [displayedText, setDisplayedText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const startedRef = useRef(false);
 
   useEffect(() => {
+    // Defer start by 3s so initial page render is not blocked
+    if (!startedRef.current) {
+      startedRef.current = true;
+      const delayTimer = setTimeout(() => {
+        setDisplayedText(roles[0].charAt(0));
+      }, 3000);
+      return () => clearTimeout(delayTimer);
+    }
+
     const currentFullText = roles[roleIndex];
     let timer: NodeJS.Timeout;
 

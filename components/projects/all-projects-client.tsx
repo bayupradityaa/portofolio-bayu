@@ -192,6 +192,7 @@ function ProjectCard({
                 e.stopPropagation();
                 onSelectProject(project);
               }}
+              aria-label={`View details for ${project.name}`}
               className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-accent hover:underline cursor-pointer"
             >
               <TextAnimate>View Details</TextAnimate>

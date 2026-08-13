@@ -80,6 +80,14 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* ── Preload LCP hero poster ─────────────────────────────── */}
+        <link rel="preload" href="/sequence-desktop/ezgif-frame-113.webp" as="image" type="image/webp" media="(min-width: 1024px)" fetchPriority="high" />
+        <link rel="preload" href="/sequence-mobile/ezgif-frame-001.webp" as="image" type="image/webp" media="(max-width: 1023px)" fetchPriority="high" />
+
+        {/* ── Preconnect to third-party origins ───────────────────── */}
+        <link rel="preconnect" href="https://trxsutzqybrkeporwmcx.supabase.co" />
+        <link rel="dns-prefetch" href="https://trxsutzqybrkeporwmcx.supabase.co" />
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

@@ -277,6 +277,7 @@ export function ConversationBubble({
         <button
           ref={ctaRef}
           onClick={onCtaClick}
+          aria-label="Let's Talk"
           className="group relative inline-flex items-center gap-2.5 overflow-hidden rounded-2xl bg-[#FFD177] px-7 py-3.5 text-sm sm:text-base font-extrabold text-black shadow-xl border border-[#FFD177] hover:bg-[#ffe099] hover:scale-105 hover:shadow-[0_0_30px_rgba(255,209,119,0.4)] active:scale-95 transition-all duration-300 cursor-pointer min-h-[48px]"
         >
           {showCtaDots ? (

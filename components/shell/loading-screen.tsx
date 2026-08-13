@@ -47,7 +47,7 @@ export function LoadingScreen() {
     });
 
     const startTime = performance.now();
-    const duration = 1400; // 1.4s smooth sweep
+    const duration = 700; // 0.7s smooth sweep — shorter for faster LCP
 
     let animFrame: number;
     const updateProgress = (now: number) => {
@@ -70,8 +70,8 @@ export function LoadingScreen() {
         setVisible(false);
         sessionStorage.setItem("intro-seen", "1");
         document.body.style.overflow = "";
-      }, 150);
-    }, 1700);
+      }, 100);
+    }, 1000);
 
     return () => {
       cancelAnimationFrame(animFrame);
@@ -84,10 +84,10 @@ export function LoadingScreen() {
     <AnimatePresence>
       {visible && (
         <motion.div
-          className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-background"
+          className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-background will-change-transform"
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 1.02 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         >
           {/* Editorial wordmark: outline + clipped fill, mono caps */}
           <motion.div
