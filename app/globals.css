@@ -674,7 +674,10 @@
   bottom: 0;
   width: 100%;
   max-width: 680px;
-  height: 100vh;
+  /* No height here on purpose: top:0 + bottom:0 already size this box against
+     the layout viewport. `100vh` is the LARGE viewport on iOS, so it made the
+     drawer taller than the visible area and pushed the social row and the
+     GET IN TOUCH button behind the toolbar (with overflow:hidden below). */
   z-index: 2;
   overflow: hidden;
 }
