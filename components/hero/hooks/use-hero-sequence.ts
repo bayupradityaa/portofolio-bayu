@@ -248,8 +248,32 @@ export function useHeroSequence() {
     images[0] = frame1;
     imagesRef.current = images;
 
+    // `sizeCanvas()` assigns canvas.width, which CLEARS the bitmap; with
+    // {alpha:false} a cleared bitmap is opaque black. A resize must therefore
+    // either repaint afterwards or leave the bitmap alone — never one without
+    // the other.
+    let lastW = Math.round(wrap.getBoundingClientRect().width);
+    let lastH = Math.round(wrap.getBoundingClientRect().height);
+    let resizeRaf: number | null = null;
+
     const onResize = () => {
-      sizeCanvas();
+      const rect = wrap.getBoundingClientRect();
+      const w = Math.round(rect.width);
+      const h = Math.round(rect.height);
+
+      // iOS Safari fires `resize` on every URL-bar collapse or expand: width is
+      // unchanged and height moves by roughly a toolbar. Stretching the existing
+      // bitmap over that is invisible; discarding and re-decoding it is not.
+      if (w === lastW && Math.abs(h - lastH) < 80) return;
+      lastW = w;
+      lastH = h;
+
+      if (resizeRaf !== null) cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(() => {
+        resizeRaf = null;
+        sizeCanvas();                                 // clears the bitmap…
+        renderFrame(currentFrameIndexRef.current);     // …so repaint is mandatory
+      });
     };
     window.addEventListener("resize", onResize);
 
@@ -274,6 +298,10 @@ export function useHeroSequence() {
       isCancelled = true;
       observer.disconnect();
       window.removeEventListener("resize", onResize);
+      if (resizeRaf !== null) {
+        cancelAnimationFrame(resizeRaf);
+        resizeRaf = null;
+      }
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;

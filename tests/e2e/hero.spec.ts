@@ -13,11 +13,13 @@ test.beforeEach(async ({ page }) => {
  *
  * The test dispatches a bare `resize` event as well as changing the viewport,
  * because those two are not equivalent here. A real dimension change makes
- * ScrollTrigger refresh and rewrite the pin spacer's inline styles, which trips
- * the MutationObserver at use-hero-sequence.ts:258-266 and repaints the canvas
- * as a side effect — masking the bug. A bare `resize` reaches the app's own
- * listener with nothing else moving, which is what a URL-bar collapse looks
- * like once GSAP has decided the layout did not change.
+ * ScrollTrigger auto-refresh: it recomputes start/end and re-fires `onUpdate`
+ * (use-hero-timeline.ts:127-132), which drives the timeline back through
+ * `renderFrame` and repaints the canvas as a side effect — masking the bug.
+ * (The MutationObserver at use-hero-sequence.ts:258-266 is NOT the agent: it
+ * watches documentElement's `class`, i.e. theme changes only.) A bare `resize`
+ * reaches the app's own listener with nothing else moving, which is what a
+ * URL-bar collapse looks like once GSAP has decided the layout did not change.
  *
  * Measured on this tree before the fix: baseline 9/9 non-black, then 0/9 after a
  * bare resize and still 0/9 a second later.
