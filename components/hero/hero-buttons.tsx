@@ -2,7 +2,6 @@
 
 import { useCallback, useRef } from "react";
 import { ArrowUpRight } from "lucide-react";
-import { GithubIcon } from "@/components/ui/brand-icons";
 import { TextAnimate } from "@/registry/magicui/text-animate";
 
 interface HeroButtonsProps {
@@ -35,20 +34,22 @@ const btnBase =
 const btnPrimary =
   "bg-accent text-accent-contrast hover:bg-accent-hover font-semibold";
 
-const btnSecondary =
-  "border border-border bg-card text-foreground hover:border-secondary/60 hover:bg-surface";
 
 /* ── Magnetic Link (input-layer only, zero GSAP) ────────────────── */
 
 function MagneticLink({
   children,
   className,
+  style,
   ...props
 }: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   const linkRef = useRef<HTMLAnchorElement>(null);
 
   const onMouseMove = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (typeof window !== "undefined" && !window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+        return;
+      }
       const el = linkRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
@@ -75,7 +76,7 @@ function MagneticLink({
       className={className}
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
-      style={{ willChange: "transform" }}
+      style={style}
       {...props}
     >
       {children}

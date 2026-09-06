@@ -123,7 +123,7 @@ export function HeroScene({ settings }: { settings: ProfileSettings | null }) {
 
   return (
     <HeroProvider value={{ stage }}>
-      <section ref={sectionRef} id="hero" className="relative h-[180vh] md:h-[180vh]">
+      <section ref={sectionRef} id="hero" className="relative h-[180svh] md:h-[180vh]">
         <div
           ref={stickyRef}
           className="sticky top-0 h-[100dvh] overflow-hidden z-10 will-change-transform"
@@ -144,7 +144,7 @@ export function HeroScene({ settings }: { settings: ProfileSettings | null }) {
           {/* UI Text layer with interactive parallax */}
           <div
             ref={parallaxLayerRef}
-            className="relative mx-auto flex h-full max-w-6xl flex-col justify-center px-6 pt-24"
+            className="relative mx-auto flex h-full max-w-6xl flex-col justify-center px-6 pt-16 md:pt-24 [@media(max-height:600px)]:pt-8 [@media(max-height:600px)]:justify-center"
           >
             <HeroTitle
               helloRef={titleHelloRef}

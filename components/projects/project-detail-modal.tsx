@@ -188,6 +188,10 @@ export function ProjectDetailModal({
                       src={img.url}
                       alt={img.alt}
                       fill
+                      // The thumb box is 80x56 CSS px. Without `sizes`, Next
+                      // defaults to 100vw and every thumbnail downloads a
+                      // viewport-wide image.
+                      sizes="80px"
                       className="object-cover"
                       onError={() =>
                         setFailedImages((prev) => ({ ...prev, [img.url]: true }))

@@ -176,14 +176,14 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
     <section
       id="journey"
       ref={sectionRef}
-      className="relative w-full bg-background text-foreground pt-4 pb-20 md:pt-8 md:pb-28 overflow-hidden select-none"
+      className="relative w-full bg-background text-foreground pt-4 pb-20 md:pt-8 md:pb-28 overflow-hidden"
       aria-label="About Me and My Journey Timeline"
     >
       <div className="mx-auto w-full max-w-6xl px-6">
         {/* Timeline Container */}
         <div className="relative w-full">
-          {/* SVG Bezier Curve with Thicker Line & High Visibility (Mobile & Desktop) */}
-          <div className="absolute inset-0 pointer-events-none z-0">
+          {/* SVG Bezier Curve with Thicker Line & High Visibility (Desktop only to prevent mobile distortion) */}
+          <div className="absolute inset-0 pointer-events-none z-0 hidden md:block">
             <svg
               className="w-full h-full"
               viewBox="0 0 1000 1400"
@@ -242,10 +242,10 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
                       <MapPin className="h-3.5 w-3.5" />
                     </div>
                     <div className="flex flex-col text-left">
-                      <span className="text-[11px] font-bold text-black tracking-tight leading-snug">
+                      <span className="text-xs font-bold text-black tracking-tight leading-snug">
                         See You in the Next Journey!
                       </span>
-                      <span className="text-[9.5px] text-black/70 font-normal leading-tight mt-0.5 whitespace-nowrap">
+                      <span className="text-xs text-black/70 font-normal leading-tight mt-0.5 whitespace-nowrap">
                         Ready to build the next milestone together.
                       </span>
                     </div>
@@ -309,17 +309,17 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
                     </h3>
 
                     {/* Organization / Company */}
-                    <div className="flex items-center gap-2 text-accent font-medium text-xs lg:text-sm mb-3">
+                    <div className="flex items-center gap-2 text-accent font-medium text-xs sm:text-sm mb-3">
                       <span>{entry.org}</span>
                       {entry.employment_type && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 border border-accent/20 text-accent font-mono">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-accent/10 border border-accent/20 text-accent font-mono">
                           {entry.employment_type}
                         </span>
                       )}
                     </div>
 
                     {/* Description */}
-                    <p className="text-muted text-xs lg:text-sm leading-relaxed mb-5 font-normal">
+                    <p className="text-muted text-sm sm:text-base leading-relaxed mb-5 font-normal">
                       {entry.description}
                     </p>
 
@@ -327,7 +327,7 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
                     {entry.tags && entry.tags.length > 0 && (
                       <div className="flex flex-wrap items-center gap-1.5 pt-3 border-t border-border/30">
                         {entry.tags.map((tag) => (
-                          <Badge key={tag} className="text-[11px] px-2.5 py-0.5 font-mono">
+                          <Badge key={tag} className="text-xs px-2.5 py-0.5 font-mono">
                             {tag}
                           </Badge>
                         ))}

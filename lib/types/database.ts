@@ -41,6 +41,10 @@ export type Project = {
   name: string;
   tagline: string;
   summary: string;
+  problem?: string | null;
+  process?: string | null;
+  outcome?: string | null;
+  metrics?: string | null;
   year: number;
   role: string;
   status: ProjectStatus;

@@ -5,7 +5,6 @@ import { Hero } from "@/components/hero/hero";
 import { About } from "@/components/sections/about";
 import dynamic from "next/dynamic";
 import { WorkSection, WorkItem } from "@/components/sections/work-section";
-import { workSectionData } from "@/components/sections/work-section-data";
 import { Journey } from "@/components/sections/journey";
 import { Contact } from "@/components/sections/contact";
 import { getPublishedTechnologies } from "@/lib/actions/technologies";
@@ -26,19 +25,16 @@ export default async function Home() {
 
   const techNames = technologies.map((t) => t.name);
 
-  // Map real database projects if available, otherwise use real portfolio entries
-  const workItems: WorkItem[] =
-    publishedProjects && publishedProjects.length > 0
-      ? publishedProjects.map((p, idx) => ({
-        index: String(idx + 1).padStart(2, "0"),
-        title: p.name,
-        category: p.category || "Full-Stack Project",
-        year: p.year ? p.year.toString() : "2025",
-        description: p.summary || p.tagline || "",
-        image: p.cover_image || "/works/pulse-studio.svg",
-        link: p.slug ? `/projects/${p.slug}` : `/projects`,
-      }))
-      : workSectionData;
+  // Map published projects from the database
+  const workItems: WorkItem[] = (publishedProjects || []).map((p, idx) => ({
+    index: String(idx + 1).padStart(2, "0"),
+    title: p.name,
+    category: p.category || "Full-Stack Project",
+    year: p.year ? p.year.toString() : "2025",
+    description: p.summary || p.tagline || "",
+    image: p.cover_image || "",
+    link: p.slug ? `/projects/${p.slug}` : `/projects`,
+  }));
 
   return (
     <>

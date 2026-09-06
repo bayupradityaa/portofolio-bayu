@@ -2,7 +2,9 @@ import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
 const controlBase =
-  "w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-foreground " +
+  // 16px on mobile: anything smaller makes iOS Safari zoom the viewport on focus
+  // and never zoom back out. 14px returns from sm upward, where no phone lives.
+  "w-full rounded-xl border border-border bg-surface px-4 py-3 text-base sm:text-sm text-foreground " +
   "placeholder:text-muted transition-colors duration-200 " +
   "focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent " +
   "aria-[invalid=true]:border-red-500/70";

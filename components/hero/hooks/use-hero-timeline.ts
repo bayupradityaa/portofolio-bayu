@@ -121,14 +121,13 @@ export function useHeroTimeline({
 
     const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
 
-    const lastDispatchedProgressRef = { current: -1 };
-
-    // Connect to ScrollTrigger with optimized scrub for mobile
+    // Connect to ScrollTrigger with optimized scrub for mobile and refresh invalidation
     const st = ScrollTrigger.create({
       trigger: section,
       start: "top top",
       end: "bottom bottom",
       scrub: 0.5, // Smooth 0.5s scrub momentum on both desktop and mobile touch
+      invalidateOnRefresh: true,
       onUpdate: (self) => {
         const p = self.progress;
 
@@ -167,27 +166,24 @@ export function useHeroTimeline({
           }
         }
 
-        // Dispatch scroll event for Nav only when progress changes meaningfully (>= 0.01 step)
-        if (
-          lastDispatchedProgressRef.current < 0 ||
-          Math.abs(p - lastDispatchedProgressRef.current) >= 0.01 ||
-          p === 0 ||
-          p === 1
-        ) {
-          lastDispatchedProgressRef.current = p;
-          window.dispatchEvent(
-            new CustomEvent("hero-scroll", {
-              detail: { progress: p },
-            })
-          );
-        }
 
         // Drive the timeline progress directly in GSAP without re-rendering React
         masterTl.progress(p);
       },
     });
 
+    const onVisualViewportResize = () => {
+      ScrollTrigger.refresh();
+    };
+
+    if (typeof window !== "undefined" && window.visualViewport) {
+      window.visualViewport.addEventListener("resize", onVisualViewportResize);
+    }
+
     return () => {
+      if (typeof window !== "undefined" && window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", onVisualViewportResize);
+      }
       st.kill();
       masterTl.kill();
       breatheTl.kill();

@@ -122,13 +122,25 @@ export const getPublicProjects = unstable_cache(
     const supabase = getSupabaseAdmin();
     if (!supabase) return [];
 
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from("projects")
       .select("*")
       .eq("published", true)
       .eq("show_on_public", true)
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false });
+
+    // Resilient fallback if column show_on_public does not exist yet in DB schema
+    if (error && error.message.includes("show_on_public")) {
+      const fallback = await supabase
+        .from("projects")
+        .select("*")
+        .eq("published", true)
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: false });
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (error) {
       console.error("[projects] public fetch error:", error.message);
@@ -150,12 +162,25 @@ export async function getProjectBySlug(slug: string): Promise<ProjectWithRelatio
   const supabase = getSupabaseAdmin();
   if (!supabase) return null;
 
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("projects")
     .select("*")
     .eq("slug", slug)
     .eq("published", true)
+    .eq("show_on_public", true)
     .single();
+
+  // Resilient fallback if column show_on_public does not exist yet in DB schema
+  if (error && error.message.includes("show_on_public")) {
+    const fallback = await supabase
+      .from("projects")
+      .select("*")
+      .eq("slug", slug)
+      .eq("published", true)
+      .single();
+    data = fallback.data;
+    error = fallback.error;
+  }
 
   if (error || !data) return null;
 
