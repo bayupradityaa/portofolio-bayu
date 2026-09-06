@@ -414,36 +414,60 @@ export function WorkSection({
             </article>
 
             {/* ── PROJECT SLIDES (PROPORTIONAL REFINED SIZING) ── */}
-            {items.map((item, idx) => {
-              const formattedIdx = getFormattedIndex(item, idx);
-              const category = getItemCategory(item);
+            {items.length === 0 ? (
+              <article
+                data-project-card
+                className="w-[82vw] sm:w-[480px] md:w-[540px] shrink-0 flex flex-col justify-center gap-4 p-8 rounded-[20px] md:rounded-[24px] border border-black/20 bg-black/5"
+              >
+                <span className="font-mono text-xs font-bold uppercase tracking-widest text-black/60">
+                  // Status Kurasi
+                </span>
+                <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-black">
+                  Studi Kasus Sedang Dipersiapkan
+                </h3>
+                <p className="text-sm md:text-base text-black/75 leading-relaxed">
+                  Proyek terbaru sedang dalam tahap dokumentasi dan kurasi untuk publikasi. Silakan kunjungi kembali segera.
+                </p>
+                <div className="pt-2">
+                  <Link
+                    href={viewAllHref}
+                    className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-black border-b border-black pb-1"
+                  >
+                    <span>{viewAllLabel} →</span>
+                  </Link>
+                </div>
+              </article>
+            ) : (
+              items.map((item, idx) => {
+                const formattedIdx = getFormattedIndex(item, idx);
+                const category = getItemCategory(item);
 
-              return (
-                <article
-                  key={item.link + idx}
-                  data-project-card
-                  className="w-[82vw] sm:w-[480px] md:w-[540px] lg:w-[590px] shrink-0 flex flex-col gap-4 group"
-                >
-                  {/* Desktop Image Frame with Max Height Constraint */}
-                  <div className="relative aspect-[16/10] max-h-[350px] lg:max-h-[380px] w-full rounded-[20px] md:rounded-[24px] overflow-hidden bg-black/10 border border-black/20 shadow-xl group transition-all duration-500 group-hover:border-black/40">
-                    <div
-                      data-card-image
-                      className="relative w-full h-full overflow-hidden"
-                    >
-                      <WorkCardImage
-                        src={item.image}
-                        title={item.title}
-                        category={category}
-                        status={item.status}
-                        priority={idx === 0}
-                      />
-                    </div>
+                return (
+                  <article
+                    key={item.link + idx}
+                    data-project-card
+                    className="w-[82vw] sm:w-[480px] md:w-[540px] lg:w-[590px] shrink-0 flex flex-col gap-4 group"
+                  >
+                    {/* Desktop Image Frame with Max Height Constraint */}
+                    <div className="relative aspect-[16/10] max-h-[350px] lg:max-h-[380px] w-full rounded-[20px] md:rounded-[24px] overflow-hidden bg-black/10 border border-black/20 shadow-xl group transition-all duration-500 group-hover:border-black/40">
+                      <div
+                        data-card-image
+                        className="relative w-full h-full overflow-hidden"
+                      >
+                        <WorkCardImage
+                          src={item.image}
+                          title={item.title}
+                          category={category}
+                          status={item.status}
+                          priority={idx === 0}
+                        />
+                      </div>
 
-                    {/* High Contrast Black Category Badge */}
-                    <div className="absolute top-3.5 left-3.5 font-mono text-[11px] font-bold px-3 py-1 rounded-full bg-black text-[#FFD177] shadow-md border border-black/30">
-                      {formattedIdx} // {category}
+                      {/* High Contrast Black Category Badge */}
+                      <div className="absolute top-3.5 left-3.5 font-mono text-[11px] font-bold px-3 py-1 rounded-full bg-black text-[#FFD177] shadow-md border border-black/30">
+                        {formattedIdx}{" // "}{category}
+                      </div>
                     </div>
-                  </div>
 
                   {/* Content Area Below Image */}
                   <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 pt-0.5">
@@ -473,7 +497,7 @@ export function WorkSection({
                   </div>
                 </article>
               );
-            })}
+            }))}
 
             {/* Final Summary CTA Slide */}
             <article
@@ -584,29 +608,50 @@ export function WorkSection({
 
         {/* Mobile Project Cards List */}
         <div className="space-y-14">
-          {items.map((item, idx) => {
-            const formattedIdx = getFormattedIndex(item, idx);
-            const category = getItemCategory(item);
+          {items.length === 0 ? (
+            <div className="p-6 rounded-2xl border border-black/20 bg-black/5 space-y-3">
+              <span className="font-mono text-xs font-bold uppercase tracking-widest text-black/60">
+                // Status Kurasi
+              </span>
+              <h3 className="text-xl font-bold tracking-tight text-black">
+                Studi Kasus Sedang Dipersiapkan
+              </h3>
+              <p className="text-sm text-black/75 leading-relaxed">
+                Proyek terbaru sedang dalam tahap dokumentasi dan kurasi untuk publikasi.
+              </p>
+              <div className="pt-1">
+                <Link
+                  href={viewAllHref}
+                  className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-black border-b border-black pb-1"
+                >
+                  <span>{viewAllLabel} →</span>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            items.map((item, idx) => {
+              const formattedIdx = getFormattedIndex(item, idx);
+              const category = getItemCategory(item);
 
-            return (
-              <article
-                key={"mobile-" + item.link + idx}
-                data-mobile-card
-                className="space-y-4 flex flex-col"
-              >
-                {/* Image Container */}
-                <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden border border-black/20 bg-black/10 shadow-lg">
-                  <WorkCardImage
-                    src={item.image}
-                    title={item.title}
-                    category={category}
-                    status={item.status}
-                    priority={idx === 0}
-                  />
-                  <div className="absolute top-3 left-3 font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-black text-[#FFD177]">
-                    {formattedIdx} // {category}
+              return (
+                <article
+                  key={"mobile-" + item.link + idx}
+                  data-mobile-card
+                  className="space-y-4 flex flex-col"
+                >
+                  {/* Image Container */}
+                  <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden border border-black/20 bg-black/10 shadow-lg">
+                    <WorkCardImage
+                      src={item.image}
+                      title={item.title}
+                      category={category}
+                      status={item.status}
+                      priority={idx === 0}
+                    />
+                    <div className="absolute top-3 left-3 font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-black text-[#FFD177]">
+                      {formattedIdx}{" // "}{category}
+                    </div>
                   </div>
-                </div>
 
                 {/* Details */}
                 <div className="space-y-2 pt-1">
@@ -632,7 +677,7 @@ export function WorkSection({
                 </div>
               </article>
             );
-          })}
+          }))}
         </div>
       </div>
     </section>
