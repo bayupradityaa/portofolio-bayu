@@ -180,7 +180,15 @@ export function Nav() {
       }
     }, containerRef);
 
-    return () => ctx.revert();
+    return () => {
+      // Unmount can land mid-close: the drawer's GET IN TOUCH is a Link, so the
+      // route changes ~0ms after closeMenu() while the ~500ms close timeline is
+      // still running. ctx.revert() kills that timeline, and with it the
+      // onComplete above that resets body.style.overflow — leaving the page
+      // permanently unscrollable. Release the lock before reverting, always.
+      document.body.style.overflow = "";
+      ctx.revert();
+    };
   }, [isMenuOpen]);
 
   // keydown Escape handling

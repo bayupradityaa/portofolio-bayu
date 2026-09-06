@@ -34,15 +34,32 @@ test.beforeEach(async ({ page }) => {
  */
 test("nav cleanup releases the scroll lock unconditionally", () => {
   const file = source("components/shell/nav.tsx");
-  const revertAt = file.indexOf("ctx.revert()");
-  expect(revertAt, "nav.tsx no longer calls ctx.revert() — reread the file").toBeGreaterThan(0);
-  // Window back from ctx.revert() so this works whether the cleanup is a single
-  // expression (pre-fix) or a block (post-fix).
-  const cleanup = file.slice(Math.max(0, revertAt - 300), revertAt + 20);
+
+  // Scope to the effect that OWNS the lock, i.e. the one that sets
+  // body.style.overflow = "hidden" and whose deps are [isMenuOpen]. Anchoring on
+  // the first `ctx.revert()` in the file finds the hover-setup effect instead,
+  // and anchoring anywhere inside the effect body would match the release that
+  // already lives in the close timeline's onComplete — neither is the cleanup.
+  const effectEnd = file.indexOf("}, [isMenuOpen]);");
+  expect(effectEnd, "nav.tsx no longer has an effect keyed on [isMenuOpen]").toBeGreaterThan(0);
+  const cleanupStart = file.lastIndexOf("return () =>", effectEnd);
+  expect(cleanupStart, "the [isMenuOpen] effect no longer returns a cleanup").toBeGreaterThan(0);
+  const cleanup = file.slice(cleanupStart, effectEnd);
+
   expect(
     cleanup,
-    "nav.tsx cleanup must reset body.style.overflow before ctx.revert() kills the close timeline",
+    "nav.tsx cleanup must reset body.style.overflow — ctx.revert() kills the close timeline that would otherwise do it",
   ).toMatch(/document\.body\.style\.overflow\s*=\s*""/);
+  // Comment-blind: the cleanup's own comment names ctx.revert(), so an ordering
+  // check against the raw text compares against prose instead of the call.
+  const code = cleanup
+    .split("\n")
+    .map((line) => line.split("//")[0])
+    .join("\n");
+  expect(
+    code.indexOf("document.body.style.overflow"),
+    "release the lock BEFORE ctx.revert(), not after",
+  ).toBeLessThan(code.indexOf("ctx.revert()"));
 });
 
 /**
