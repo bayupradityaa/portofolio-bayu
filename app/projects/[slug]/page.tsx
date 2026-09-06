@@ -74,7 +74,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         <div className="mb-8">
           <Link
             href="/projects"
-            className="inline-flex items-center gap-2 font-mono text-xs md:text-sm font-semibold uppercase tracking-wider text-foreground/60 hover:text-foreground transition-colors group"
+            className="inline-flex items-center gap-2 font-sans text-xs md:text-sm font-semibold uppercase tracking-wider text-foreground/60 hover:text-foreground transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
             <span>Back to All Projects</span>
@@ -84,11 +84,11 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         {/* Hero / Header */}
         <header className="space-y-6">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="font-mono text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full border border-border bg-card/60 text-accent">
+            <span className="font-sans text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full border border-border bg-card/60 text-accent">
               {project.category || "Case Study"}
             </span>
             {project.status && (
-              <span className="font-mono text-xs font-medium px-3 py-1 rounded-full bg-foreground/10 text-foreground/80">
+              <span className="font-sans text-xs font-medium px-3 py-1 rounded-full bg-foreground/10 text-foreground/80">
                 {project.status}
               </span>
             )}
@@ -99,13 +99,13 @@ export default async function ProjectDetailPage({ params }: PageProps) {
           </h1>
 
           {project.tagline && (
-            <p className="text-lg sm:text-xl md:text-2xl text-foreground/75 font-normal leading-relaxed max-w-3xl">
+            <p className="text-lg sm:text-xl md:text-2xl text-foreground/75 font-normal leading-relaxed max-w-3xl font-sans">
               {project.tagline}
             </p>
           )}
 
           {/* Metadata Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-y border-border/60 py-6 font-mono text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-y border-border/60 py-6 font-sans text-xs">
             {project.year && (
               <div className="space-y-1">
                 <span className="text-foreground/50 uppercase tracking-widest flex items-center gap-1.5">
@@ -187,7 +187,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             {/* Overview / Summary */}
             {project.summary && (
               <Reveal as="section" className="space-y-4">
-                <h2 className="font-mono text-xs md:text-sm uppercase tracking-widest text-accent font-semibold">
+                <h2 className="font-sans text-xs md:text-sm uppercase tracking-widest text-accent font-bold">
                   // Overview & Architecture
                 </h2>
                 <div className="text-base md:text-lg leading-relaxed text-foreground/85 font-normal whitespace-pre-line">
@@ -199,7 +199,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             {/* Highlights */}
             {project.highlights && project.highlights.length > 0 && (
               <Reveal as="section" className="space-y-4 pt-6 border-t border-border/50">
-                <h2 className="font-mono text-xs md:text-sm uppercase tracking-widest text-accent font-semibold">
+                <h2 className="font-sans text-xs md:text-sm uppercase tracking-widest text-accent font-bold">
                   // Key Highlights & Features
                 </h2>
                 <ul className="space-y-3">
@@ -216,7 +216,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             {/* The Challenge & Problem */}
             {project.problem && (
               <Reveal as="section" className="space-y-4 pt-6 border-t border-border/50">
-                <h2 className="font-mono text-xs md:text-sm uppercase tracking-widest text-accent font-semibold">
+                <h2 className="font-sans text-xs md:text-sm uppercase tracking-widest text-accent font-bold">
                   // The Challenge & Context
                 </h2>
                 <div className="text-base md:text-lg leading-relaxed text-foreground/85 font-normal whitespace-pre-line">
@@ -228,7 +228,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             {/* Process & Engineering Decisions */}
             {project.process && (
               <Reveal as="section" className="space-y-4 pt-6 border-t border-border/50">
-                <h2 className="font-mono text-xs md:text-sm uppercase tracking-widest text-accent font-semibold">
+                <h2 className="font-sans text-xs md:text-sm uppercase tracking-widest text-accent font-bold">
                   // Engineering Process & Architecture
                 </h2>
                 <div className="text-base md:text-lg leading-relaxed text-foreground/85 font-normal whitespace-pre-line">
@@ -240,7 +240,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             {/* Outcome & Impact */}
             {project.outcome && (
               <Reveal as="section" className="space-y-4 pt-6 border-t border-border/50">
-                <h2 className="font-mono text-xs md:text-sm uppercase tracking-widest text-accent font-semibold">
+                <h2 className="font-sans text-xs md:text-sm uppercase tracking-widest text-accent font-bold">
                   // Outcome & Real-World Impact
                 </h2>
                 <div className="text-base md:text-lg leading-relaxed text-foreground/85 font-normal whitespace-pre-line">
@@ -252,10 +252,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             {/* Key Metrics */}
             {project.metrics && (
               <Reveal as="section" className="space-y-4 pt-6 border-t border-border/50">
-                <h2 className="font-mono text-xs md:text-sm uppercase tracking-widest text-accent font-semibold">
+                <h2 className="font-sans text-xs md:text-sm uppercase tracking-widest text-accent font-bold">
                   // Key Metrics & Results
                 </h2>
-                <div className="text-base md:text-lg leading-relaxed text-foreground/85 font-normal whitespace-pre-line font-mono bg-card/40 p-5 rounded-xl border border-border/60">
+                <div className="text-base md:text-lg leading-relaxed text-foreground/85 font-normal whitespace-pre-line font-sans bg-card/40 p-5 rounded-xl border border-border/60">
                   {project.metrics}
                 </div>
               </Reveal>
@@ -264,7 +264,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             {/* Gallery Images */}
             {project.images && project.images.length > 0 && (
               <Reveal as="section" className="space-y-6 pt-6 border-t border-border/50">
-                <h2 className="font-mono text-xs md:text-sm uppercase tracking-widest text-accent font-semibold">
+                <h2 className="font-sans text-xs md:text-sm uppercase tracking-widest text-accent font-bold">
                   // Project Gallery
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -297,14 +297,14 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             {/* Tech Stack */}
             {project.technologies && project.technologies.length > 0 && (
               <Reveal as="div" className="p-6 rounded-2xl border border-border/60 bg-card/40 space-y-4">
-                <h3 className="font-mono text-xs md:text-sm uppercase tracking-widest text-accent font-semibold">
+                <h3 className="font-sans text-xs md:text-sm uppercase tracking-widest text-accent font-bold">
                   Technologies
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {project.technologies.map((t) => (
                     <span
                       key={t.id}
-                      className="font-mono text-xs px-3 py-1.5 rounded-lg border border-border/80 bg-background/80 text-foreground/90"
+                      className="font-sans text-xs px-3 py-1.5 rounded-lg border border-border/80 bg-background/80 text-foreground/90 font-medium"
                     >
                       {t.name}
                     </span>
@@ -316,7 +316,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             {/* Project Quick Links */}
             {(project.live_url || project.repo_url) && (
               <Reveal as="div" className="p-6 rounded-2xl border border-border/60 bg-card/40 space-y-4">
-                <h3 className="font-mono text-xs md:text-sm uppercase tracking-widest text-accent font-semibold">
+                <h3 className="font-sans text-xs md:text-sm uppercase tracking-widest text-accent font-bold">
                   Project Access
                 </h3>
                 <div className="space-y-2">
@@ -325,7 +325,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                       href={project.live_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full inline-flex items-center justify-between px-4 py-3 rounded-xl bg-accent text-accent-foreground font-mono text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity"
+                      className="w-full inline-flex items-center justify-between px-4 py-3 rounded-xl bg-accent text-accent-foreground font-sans text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity"
                     >
                       <span>{project.live_url_label || "Open Live Demo"}</span>
                       <ExternalLink className="w-4 h-4" />
@@ -336,7 +336,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                       href={project.repo_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full inline-flex items-center justify-between px-4 py-3 rounded-xl border border-border bg-background/80 text-foreground font-mono text-xs font-semibold uppercase tracking-wider hover:bg-card transition-colors"
+                      className="w-full inline-flex items-center justify-between px-4 py-3 rounded-xl border border-border bg-background/80 text-foreground font-sans text-xs font-semibold uppercase tracking-wider hover:bg-card transition-colors"
                     >
                       <span className="flex items-center gap-2">
                         <GithubIcon size={16} />
@@ -355,7 +355,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         <div className="pt-12 border-t border-border/60 flex items-center justify-between">
           <Link
             href="/projects"
-            className="inline-flex items-center gap-2 font-mono text-xs md:text-sm font-semibold uppercase tracking-wider text-foreground/70 hover:text-foreground transition-colors group"
+            className="inline-flex items-center gap-2 font-sans text-xs md:text-sm font-semibold uppercase tracking-wider text-foreground/70 hover:text-foreground transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
             <span>All Projects</span>
@@ -363,7 +363,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
           <Link
             href="/#contact"
-            className="inline-flex items-center gap-2 font-mono text-xs md:text-sm font-semibold uppercase tracking-wider text-accent hover:underline"
+            className="inline-flex items-center gap-2 font-sans text-xs md:text-sm font-semibold uppercase tracking-wider text-accent hover:underline"
           >
             <span>Discuss This Project →</span>
           </Link>

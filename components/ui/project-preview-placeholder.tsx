@@ -47,7 +47,7 @@ export function ProjectPreviewPlaceholder({
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
           <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
         </span>
-        <span className="tracking-wider uppercase text-[11px] font-mono font-bold">
+        <span className="tracking-wider uppercase text-[11px] font-sans font-bold">
           {isComingSoon ? "COMING SOON" : status}
         </span>
       </div>
@@ -61,7 +61,7 @@ export function ProjectPreviewPlaceholder({
 
         {/* Project Title Placeholder */}
         {title && (
-          <h4 className="mt-4 font-mono text-lg sm:text-xl font-bold tracking-tight text-white/90 max-w-[20ch] line-clamp-1">
+          <h4 className="mt-4 font-sans text-lg sm:text-xl font-bold tracking-tight text-white/90 max-w-[20ch] line-clamp-1">
             {title}
           </h4>
         )}
@@ -72,7 +72,7 @@ export function ProjectPreviewPlaceholder({
       </div>
 
       {/* Footer Meta Badge */}
-      <div className="relative z-10 mt-4 flex items-center gap-3 font-mono text-[10px] text-white/40 tracking-widest uppercase border-t border-white/10 pt-3 w-full max-w-[220px] justify-center">
+      <div className="relative z-10 mt-4 flex items-center gap-3 font-sans text-[10px] text-white/40 tracking-widest uppercase border-t border-white/10 pt-3 w-full max-w-[220px] justify-center">
         <span className="flex items-center gap-1">
           <Sparkles className="h-3 w-3 text-emerald-400/70" />
           {category || "IN DEVELOPMENT"}

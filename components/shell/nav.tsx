@@ -344,10 +344,10 @@ export function Nav() {
             <div className="menu-content-wrapper">
               {/* Header Label inside Drawer */}
               <div className="flex items-center justify-between border-b border-white/10 pb-2.5 mb-3">
-                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-[#FFD177]">
+                <span className="font-sans text-[11px] font-bold uppercase tracking-[0.25em] text-[#FFD177]">
                   EXPLORE PORTFOLIO
                 </span>
-                <span className="font-mono text-[11px] text-white/50">
+                <span className="font-sans text-[11px] text-white/50 font-medium">
                   BAYU PRADITYA
                 </span>
               </div>
@@ -416,7 +416,7 @@ export function Nav() {
 
                 <Link
                   href="/#contact"
-                  className="font-mono text-[11px] font-bold uppercase tracking-widest text-black bg-[#FFD177] px-4 py-2 rounded-full hover:bg-white transition-all shadow-md"
+                  className="font-sans text-[11px] font-bold uppercase tracking-widest text-black bg-[#FFD177] px-4 py-2 rounded-full hover:bg-white transition-all shadow-md"
                   onClick={closeMenu}
                 >
                   GET IN TOUCH ↗

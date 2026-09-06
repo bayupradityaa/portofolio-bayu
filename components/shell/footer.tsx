@@ -34,14 +34,14 @@ export async function Footer({ settings }: { settings: ProfileSettings | null })
             >
               <Logo />
             </a>
-            <p className="font-mono text-xs sm:text-sm uppercase tracking-wider text-muted">
+            <p className="font-sans text-xs sm:text-sm uppercase tracking-wider text-muted font-medium">
               {`${year} · ALL RIGHTS RESERVED`}
             </p>
           </div>
 
           {/* Right Column: Let's Connect! + Social Indices */}
           <div className="flex flex-col items-start md:items-end gap-1.5 sm:gap-2">
-            <span className="font-mono text-xs sm:text-sm font-bold uppercase tracking-[0.18em] text-[#FFD177]">
+            <span className="font-sans text-xs sm:text-sm font-bold uppercase tracking-[0.18em] text-[#FFD177]">
               Let&apos;s Connect!
             </span>
             <nav aria-label="Social" className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-2">
@@ -59,7 +59,7 @@ export async function Footer({ settings }: { settings: ProfileSettings | null })
                     target={s.href.startsWith("http") ? "_blank" : undefined}
                     rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
                     aria-label={s.label}
-                    className="group inline-flex items-center gap-1.5 min-h-11 font-mono text-xs sm:text-sm uppercase tracking-wider text-secondary transition-colors duration-200 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                    className="group inline-flex items-center gap-1.5 min-h-11 font-sans text-xs sm:text-sm uppercase tracking-wider text-secondary font-medium transition-colors duration-200 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                   >
                     <span className="text-muted transition-colors group-hover:text-accent">
                       {icon}

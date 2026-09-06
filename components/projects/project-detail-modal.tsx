@@ -224,8 +224,8 @@ export function ProjectDetailModal({
 
             {/* Quick Metadata */}
             {project.category && (
-              <div className="mt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-muted border-b border-border/50 pb-4">
-                <div className="rounded-md bg-card border border-border/60 px-2.5 py-1 text-xs text-secondary">
+              <div className="mt-2 flex flex-wrap items-center gap-4 text-xs font-sans text-muted border-b border-border/50 pb-4">
+                <div className="rounded-md bg-card border border-border/60 px-2.5 py-1 text-xs text-secondary font-medium">
                   {project.category}
                 </div>
               </div>
@@ -234,7 +234,7 @@ export function ProjectDetailModal({
 
           {/* Project Summary / Description */}
           <div className="mt-5">
-            <h3 className="text-xs font-mono font-semibold uppercase tracking-wider text-muted mb-2">
+            <h3 className="text-xs font-sans font-bold uppercase tracking-wider text-muted mb-2">
               About Project
             </h3>
             <p className="font-sans text-sm md:text-base leading-relaxed text-secondary whitespace-pre-line text-justify">
@@ -245,7 +245,7 @@ export function ProjectDetailModal({
           {/* Key Highlights */}
           {highlights.length > 0 && (
             <div className="mt-6 rounded-2xl border border-border/60 bg-surface/60 p-4 md:p-5">
-              <h3 className="text-xs font-mono font-semibold uppercase tracking-wider text-accent mb-3 flex items-center gap-1.5">
+              <h3 className="text-xs font-sans font-bold uppercase tracking-wider text-accent mb-3 flex items-center gap-1.5">
                 <CheckCircle2 size={14} /> Key Highlights & Deliverables
               </h3>
               <ul className="space-y-2.5">
@@ -265,14 +265,14 @@ export function ProjectDetailModal({
           {/* Tech Stack */}
           {stackNames.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-xs font-mono font-semibold uppercase tracking-wider text-muted mb-3">
+              <h3 className="text-xs font-sans font-bold uppercase tracking-wider text-muted mb-3">
                 Technologies Used
               </h3>
               <div className="flex flex-wrap gap-2">
                 {stackNames.map((tech) => (
                   <div
                     key={tech}
-                    className="inline-flex items-center gap-2 rounded-xl border border-border/70 bg-card/80 px-3 py-1.5 font-mono text-xs font-medium text-foreground shadow-sm"
+                    className="inline-flex items-center gap-2 rounded-xl border border-border/70 bg-card/80 px-3 py-1.5 font-sans text-xs font-medium text-foreground shadow-sm"
                   >
                     <TechIcon name={tech} className="h-4 w-4 text-accent shrink-0" />
                     <span>{tech}</span>

@@ -66,18 +66,15 @@
   --color-ch-github: var(--ch-github);
   --color-ch-contact: var(--ch-contact);
 
-  /* One grotesque for text AND display — Swiss doctrine. Scale and
-     weight carry the contrast; the mono is the only second voice. */
-  --font-sans: var(--font-archivo);
-  --font-display: var(--font-archivo);
-  --font-mono: var(--font-plex-mono);
-  /* Legacy aliases — some components still say `font-jakarta` /
-     `font-geist-mono`. They resolve into the new system, so no
-     component needs editing for the typeface change to land. */
-  --font-jakarta: var(--font-archivo);
-  --font-syne: var(--font-archivo);
-  --font-plus-jakarta: var(--font-archivo);
-  --font-geist-mono: var(--font-plex-mono);
+  /* Plus Jakarta Sans across text, display, and UI for maximum clarity and readability */
+  --font-sans: var(--font-plus-jakarta);
+  --font-display: var(--font-plus-jakarta);
+  --font-mono: var(--font-plus-jakarta);
+  --font-jakarta: var(--font-plus-jakarta);
+  --font-syne: var(--font-plus-jakarta);
+  --font-plus-jakarta: var(--font-plus-jakarta);
+  --font-archivo: var(--font-plus-jakarta);
+  --font-geist-mono: var(--font-plus-jakarta);
 
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 0.125rem);
@@ -99,7 +96,7 @@
   body {
     background: var(--background);
     color: var(--foreground);
-    font-family: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-plus-jakarta), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-feature-settings: "ss01", "cv01";
     overflow-x: hidden;
   }
@@ -116,13 +113,15 @@
     border-radius: 2px;
   }
 
-  /* Headings speak in the display face — tight, editorial, unapologetic. */
+  /* Headings speak in Plus Jakarta Sans — crisp, balanced, and readable. */
   h1,
   h2,
   h3,
-  h4 {
-    font-family: var(--font-syne), var(--font-plus-jakarta), sans-serif;
-    letter-spacing: -0.03em;
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-plus-jakarta), sans-serif;
+    letter-spacing: -0.025em;
     text-wrap: balance;
   }
 
@@ -137,7 +136,7 @@
 
   /* Section-level heading. */
   .text-display {
-    font-family: var(--font-syne), sans-serif;
+    font-family: var(--font-plus-jakarta), sans-serif;
     font-size: clamp(2.5rem, 6.5vw, 5.5rem);
     line-height: 0.95;
     letter-spacing: -0.035em;
@@ -145,18 +144,18 @@
 
   /* Page-level statement. Used sparingly — hero and the closing line. */
   .text-mega {
-    font-family: var(--font-syne), sans-serif;
+    font-family: var(--font-plus-jakarta), sans-serif;
     font-size: clamp(3.25rem, 13vw, 12rem);
     line-height: 0.84;
     letter-spacing: -0.045em;
     font-weight: 700;
   }
 
-  /* Small mono label that sits above a heading. */
+  /* Small label that sits above a heading. */
   .eyebrow {
-    font-family: var(--font-geist-mono), monospace;
+    font-family: var(--font-plus-jakarta), sans-serif;
     font-size: 0.6875rem;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.22em;
     color: var(--muted);

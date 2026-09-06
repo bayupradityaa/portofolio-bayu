@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, IBM_Plex_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, IBM_Plex_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -17,20 +17,17 @@ import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { getProfileSettings } from "@/lib/actions/settings";
 import { TabTitleAnimator } from "@/components/shell/tab-title-animator";
 
-
 /**
- * ONE grotesque, used from 11px to 18vw. That is the Swiss position:
- * contrast comes from scale and weight, not from a second family.
- * Archivo is a variable font (wght 100–900) so the whole ramp — body
- * copy at 400 through mega headlines at 900 — costs a single request.
+ * Plus Jakarta Sans — modern geometric grotesque optimized for high readability,
+ * clean editorial presentation, and crisp digital typography across all viewports.
  */
-const archivo = Archivo({
-  variable: "--font-archivo",
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
   subsets: ["latin"],
   display: "swap",
 });
 
-/** Meta voice: eyebrows, counters, timecodes, indices. */
+/** Meta voice: code tags and secondary indices */
 const plexMono = IBM_Plex_Mono({
   variable: "--font-plex-mono",
   subsets: ["latin"],
@@ -87,7 +84,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${plexMono.variable} h-full antialiased`}
+      className={`${plusJakartaSans.variable} ${plexMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
