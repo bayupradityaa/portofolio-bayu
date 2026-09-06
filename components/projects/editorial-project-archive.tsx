@@ -8,6 +8,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { GithubIcon } from "@/components/ui/brand-icons";
 import { ProjectPreviewPlaceholder } from "@/components/ui/project-preview-placeholder";
+import { ProjectSummaryView } from "@/components/projects/project-summary-view";
 import type { ProjectWithRelations } from "@/lib/types/database";
 import { cn } from "@/lib/utils";
 
@@ -24,15 +25,6 @@ export function EditorialProjectArchive({ projects }: EditorialProjectArchivePro
   const [activeIndex, setActiveIndex] = useState(0);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
-  // Curated story presets for flagship projects with fallback
-  const defaultStories: Record<string, { problem: string; build: string; result: string }> = {
-    "jkt48-sentiment-tracker": {
-      problem: "Live broadcasts generate thousands of chat messages, making audience sentiment difficult to understand in real time.",
-      build: "WebSocket-based ingestion connects to FastAPI services and a fine-tuned IndoBERT sentiment pipeline.",
-      result: "A continuously updated dashboard that transforms live audience messages into actionable sentiment insights.",
-    },
-  };
-
   // Build dynamic scenes from database projects
   const scenes = projects.map((p, idx) => {
     const number = String(idx + 1).padStart(2, "0");
@@ -41,12 +33,6 @@ export function EditorialProjectArchive({ projects }: EditorialProjectArchivePro
     const stack = p.technologies && p.technologies.length > 0
       ? p.technologies.map((t) => t.name)
       : ["Full Stack", "TypeScript", "Next.js"];
-
-    const story = defaultStories[p.slug] || (p.highlights && p.highlights.length >= 3 ? {
-      problem: p.highlights[0]?.text || "Complex engineering problem requiring optimized solutions.",
-      build: p.highlights[1]?.text || "Built with modern full-stack architecture and best practices.",
-      result: p.highlights[2]?.text || "Delivering high performance, reliable utility, and clean UX.",
-    } : undefined);
 
     const isFlagship = Boolean(idx === 0 || p.featured || p.slug === "jkt48-sentiment-tracker");
 
@@ -64,7 +50,6 @@ export function EditorialProjectArchive({ projects }: EditorialProjectArchivePro
       ctaType: "case-study",
       isFlagship,
       data: p,
-      story,
     };
   });
 
@@ -333,33 +318,13 @@ export function EditorialProjectArchive({ projects }: EditorialProjectArchivePro
                       )}
                     </div>
 
-                    {/* Integrated Story Breakdown for Flagship Project (Live Sentiment Tracker) */}
-                    {scene.story && (
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 pb-4 font-sans">
-                        <div className="space-y-1.5">
-                          <span className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-accent block">
-                            01 // THE PROBLEM
-                          </span>
-                          <p className="text-sm text-secondary leading-relaxed">
-                            {scene.story.problem}
-                          </p>
-                        </div>
-                        <div className="space-y-1.5">
-                          <span className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-accent block">
-                            02 // THE BUILD
-                          </span>
-                          <p className="text-sm text-secondary leading-relaxed">
-                            {scene.story.build}
-                          </p>
-                        </div>
-                        <div className="space-y-1.5">
-                          <span className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-accent block">
-                            03 // THE RESULT
-                          </span>
-                          <p className="text-sm text-secondary leading-relaxed">
-                            {scene.story.result}
-                          </p>
-                        </div>
+                    {/* Overview & Architecture Section */}
+                    {project.summary && (
+                      <div className="space-y-3 pt-2 pb-2 font-sans max-w-3xl">
+                        <span className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-accent block">
+                          // OVERVIEW & ARCHITECTURE
+                        </span>
+                        <ProjectSummaryView summary={project.summary} textSize="base" />
                       </div>
                     )}
 

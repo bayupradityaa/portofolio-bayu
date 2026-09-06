@@ -885,6 +885,7 @@ export function AzureIcon({ size = 20, className }: IconProps) {
 }
 
 const techStackIconMap: Record<string, string> = {
+  // Frontend
   react: "react",
   reactjs: "react",
   reactdom: "react",
@@ -896,155 +897,284 @@ const techStackIconMap: Record<string, string> = {
   js: "js",
   tailwind: "tailwindcss",
   tailwindcss: "tailwindcss",
-  python: "python",
+  vue: "vuejs",
+  vuejs: "vuejs",
+  nuxt: "nuxtjs",
+  nuxtjs: "nuxtjs",
+  astro: "astro",
+  angular: "angular",
+  svelte: "sveltejs",
+  sveltejs: "sveltejs",
+  sveltekit: "sveltejs",
+  remix: "remix",
+  html: "html5",
+  html5: "html5",
+  css: "css3",
+  css3: "css3",
+  sass: "sass",
+  scss: "sass",
+  vite: "vitejs",
+  vitejs: "vitejs",
+  vite2: "vitejs",
+  webpack: "webpack",
+  turborepo: "turborepo",
+  redux: "redux",
+  zustand: "zustand",
+  shadcn: "shadcnui",
+  shadcnui: "shadcnui",
+  radix: "radixui",
+  radixui: "radixui",
+  materialui: "materialui",
+  mui: "materialui",
+  tanstack: "tanstack",
+  tanstackquery: "tanstack",
+  reactquery: "tanstack",
+  zod: "zod",
+
+  // Backend & Runtime
   node: "nodejs",
   nodejs: "nodejs",
   express: "expressjs",
   expressjs: "expressjs",
   go: "go",
   golang: "go",
-  docker: "docker",
-  git: "git",
-  github: "github",
+  python: "python",
+  django: "django",
+  flask: "flask",
+  nestjs: "nestjs",
+  nest: "nestjs",
+  laravel: "laravel",
+  bun: "bunjs",
+  bunjs: "bunjs",
+  deno: "deno",
+  graphql: "graphql",
+  socketio: "socketio",
+  spring: "spring",
+  springboot: "spring",
+  rails: "rails",
+  rubyonrails: "rails",
+  ruby: "ruby",
+  php: "php",
+  rust: "rust",
+  csharp: "csharp",
+  cplusplus: "cplusplus",
+  cpp: "cplusplus",
+  c: "c",
+  java: "java",
+
+  // AI & ML
+  pytorch: "pytorch",
+  tensorflow: "tensorflow",
+  tf: "tensorflow",
+  openai: "openai",
+  openaiapi: "openai",
+  chatgpt: "openai",
+  anthropic: "anthropic",
+  claude: "claude",
+  gemini: "gemini",
+  googlegemini: "gemini",
+  deepseek: "deepseek",
+  ollama: "ollama",
+  langchain: "langchain",
+  llamaindex: "llamaindex",
+  huggingface: "huggingface",
+  hf: "huggingface",
+  opencv: "opencv",
+  pandas: "pandas",
+  numpy: "numpy",
+  scikitlearn: "scikitlearn",
+  jupyter: "jupyternotebook",
+  jupyternotebook: "jupyternotebook",
+  streamlit: "streamlit",
+
+  // Data, Cloud & DevOps
   postgresql: "postgresql",
   postgres: "postgresql",
   mysql: "mysql",
+  mongodb: "mongodb",
+  mongo: "mongodb",
+  mariadb: "mariadb",
+  sqlite: "sqlite",
+  sqlite3: "sqlite",
+  redis: "redis",
   firebase: "firebase",
   supabase: "supabase",
+  neon: "neon",
+  prisma: "prisma",
+  drizzle: "drizzle",
+  drizzleorm: "drizzle",
+  typeorm: "typeorm",
+  docker: "docker",
+  kubernetes: "kubernetes",
+  k8s: "kubernetes",
+  aws: "aws",
+  amazonwebservices: "aws",
   googlecloud: "gcloud",
   gcp: "gcloud",
   gcloud: "gcloud",
+  azure: "azure",
+  microsoftazure: "azure",
   cloudflare: "cloudflare",
+  vercel: "vercel",
+  netlify: "netlify",
+  railway: "railway",
+  render: "render",
+  digitalocean: "digitalocean",
+  nginx: "nginx",
+  linux: "linux",
+
+  // Mobile
+  reactnative: "reactnative",
+  flutter: "flutter",
+  dart: "dart",
+  kotlin: "kotlin",
+  swift: "swift",
+  expo: "expo",
+
+  // Testing & Quality
+  jest: "jest",
+  vitest: "vitest",
+  cypress: "cypress",
+  playwright: "playwright",
+
+  // Workflow & Tools
+  git: "git",
+  github: "github",
+  gitlab: "gitlab",
+  bitbucket: "bitbucket",
   postman: "postman",
   vscode: "vscode",
   visualstudiocode: "vscode",
-  flask: "flask",
-  vite: "vitejs",
-  vitejs: "vitejs",
-  graphql: "graphql",
-  redis: "redis",
-  aws: "aws",
-  html: "html5",
-  css: "css3",
+  figma: "figma",
+  canva: "canva",
+  photoshop: "photoshop",
+  jira: "jira",
+  threejs: "threejs",
+  three: "threejs",
+  gsap: "gsap",
 };
 
 export function TechIcon({ name, className, size = 14 }: { name: string; className?: string; size?: number }) {
-  const normalized = name.toLowerCase().trim().replace(/[\.\s-]/g, "");
+  const normalized = name.toLowerCase().trim().replace(/[\.\s-_]/g, "");
   const mappedIcon = techStackIconMap[normalized] || techStackIconMap[name.toLowerCase().trim()];
 
   if (mappedIcon) {
     return (
       <div style={{ width: size, height: size }} className={cn("inline-flex items-center justify-center shrink-0 leading-none", className)}>
-        <TechStackIcon name={mappedIcon} className="w-full h-full object-contain fill-current text-current" />
+        <TechStackIcon name={mappedIcon as any} className="w-full h-full object-contain fill-current text-current" />
       </div>
     );
   }
 
   switch (normalized) {
-    case "nextjs":
-      return <NextdotjsIcon size={size} className={className} />;
-    case "react":
-    case "reactdom":
-      return <ReactIcon size={size} className={className} />;
-    case "typescript":
-      return <TypescriptIcon size={size} className={className} />;
-    case "tailwind":
-    case "tailwindcss":
-      return <TailwindcssIcon size={size} className={className} />;
-    case "fastapi":
-      return (
-        <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} className={className} aria-hidden="true">
-          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-        </svg>
-      );
-    case "python":
-      return <PythonIcon size={size} className={className} />;
-    case "firebase":
-      return <FirebaseIcon size={size} className={className} />;
-    case "appscript":
-    case "appsscript":
-    case "googleappsscript":
-    case "googleappscript":
-      return <GoogleappsscriptIcon size={size} className={className} />;
-    case "spreadsheet":
-    case "spreadsheets":
-    case "googlesheets":
-    case "googlesheet":
-    case "excel":
-      return <GooglesheetsIcon size={size} className={className} />;
-    case "googlecloud":
-    case "googlecloudplatform":
-    case "gcp":
-      return <GooglecloudIcon size={size} className={className} />;
-    case "supabase":
-      return <SupabaseIcon size={size} className={className} />;
-    case "postgresql":
-    case "postgres":
-      return <PostgresqlIcon size={size} className={className} />;
-    case "mongodb":
-    case "mongo":
-      return <MongodbIcon size={size} className={className} />;
-    case "laravel":
-      return <LaravelIcon size={size} className={className} />;
-    case "astro":
-      return <AstroIcon size={size} className={className} />;
-    case "streamlit":
-      return <StreamlitIcon size={size} className={className} />;
-    case "threejs":
-    case "three":
-      return <ThreejsIcon size={size} className={className} />;
-    case "django":
-      return <DjangoIcon size={size} className={className} />;
-    case "tensorflow":
-    case "tf":
-      return <TensorflowIcon size={size} className={className} />;
-    case "vue":
-    case "vuejs":
-      return <VuejsIcon size={size} className={className} />;
-    case "cypress":
-      return <CypressIcon size={size} className={className} />;
-    case "fastify":
-      return <FastifyIcon size={size} className={className} />;
-    case "jupyter":
-    case "jupyternotebook":
-      return <JupyternotebookIcon size={size} className={className} />;
-    case "nuxt":
-    case "nuxtjs":
-      return <NuxtjsIcon size={size} className={className} />;
-    case "sqlite":
-    case "sqllite":
-    case "sqlite3":
-      return <SqliteIcon size={size} className={className} />;
-    case "nginx":
-      return <NginxIcon size={size} className={className} />;
-    case "nestjs":
-    case "nest":
-      return <NestjsIcon size={size} className={className} />;
-    case "numpy":
-      return <NumpyIcon size={size} className={className} />;
-    case "azure":
-    case "msazure":
-    case "microsoftazure":
-      return <AzureIcon size={size} className={className} />;
+    case "framermotion":
+      return <FramermotionIcon size={size} className={className} />;
     case "githubactions":
     case "githubaction":
       return <GithubactionsIcon size={size} className={className} />;
-    case "framermotion":
-      return <FramermotionIcon size={size} className={className} />;
-    case "gsap":
-      return <GsapIcon size={size} className={className} />;
-    case "figma":
-      return <FigmaIcon size={size} className={className} />;
-    case "vite":
+    case "fastapi":
       return (
-        <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} className={className} aria-hidden="true">
-          <path d="M18.8 2.4l-7.2 13.8h4.8L12 22.8l9.6-13.8h-6l3.2-6.6z" />
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className} aria-hidden="true">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
         </svg>
       );
-    case "vercel":
+    case "trpc":
       return (
-        <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} className={className} aria-hidden="true">
-          <path d="M24 22.525H0L12 1.475l12 21.05z" />
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className} aria-hidden="true">
+          <path d="M11.667 0 4 13.333h6.667L9.333 24 20 10.667h-6.667z" />
+        </svg>
+      );
+    case "apollo":
+    case "apollographql":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className} aria-hidden="true">
+          <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm1.758 17.514a6.002 6.002 0 0 1-3.516-1.134l1.328-1.57a3.998 3.998 0 0 0 2.188.704c1.17 0 2.12-.95 2.12-2.12 0-.48-.16-.922-.43-1.28l1.637-1.25a5.98 5.98 0 0 1 .903 2.53c0 3.314-2.686 6-6 6zm-7.516-5.514c0-3.314 2.686-6 6-6a5.98 5.98 0 0 1 3.516 1.134l-1.328 1.57a3.998 3.998 0 0 0-2.188-.704c-1.17 0-2.12.95-2.12 2.12 0 .48.16.922.43 1.28l-1.637 1.25a5.98 5.98 0 0 1-.903-2.53z" />
+        </svg>
+      );
+    case "pinecone":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className} aria-hidden="true">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16.93V15h-2v3.93C7.05 18.44 4 15.58 4 12c0-.53.07-1.04.18-1.54L7 13.27V11h2v3.09l2-2V9h2v2.09l2 2V11h2v2.27l2.82-2.81c.11.5.18 1.01.18 1.54 0 3.58-3.05 6.44-7 6.93z" />
+        </svg>
+      );
+    case "websocket":
+    case "websockets":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+          <path d="M7 17l9.2-9.2M17 17V7H7" />
+          <path d="M17 7l-9.2 9.2M7 7v10h10" />
+        </svg>
+      );
+    case "webgl":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+          <line x1="12" y1="22.08" x2="12" y2="12" />
+        </svg>
+      );
+    case "sentimentanalysis":
+    case "sentiment":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+          <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" />
+          <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+          <line x1="9" y1="9" x2="9.01" y2="9" />
+          <line x1="15" y1="9" x2="15.01" y2="9" />
+        </svg>
+      );
+    case "aspnetcore":
+    case "aspnet":
+    case "dotnet":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className} aria-hidden="true">
+          <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
+          <text x="12" y="15.5" fill="currentColor" fontSize="7.5" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">.NET</text>
+        </svg>
+      );
+    case "dynamodb":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.75" className={className} aria-hidden="true">
+          <ellipse cx="12" cy="5" rx="9" ry="3" />
+          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+        </svg>
+      );
+    case "grpc":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className} aria-hidden="true">
+          <circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <text x="12" y="15" fill="currentColor" fontSize="7" fontWeight="bold" fontFamily="monospace" textAnchor="middle">gRPC</text>
+        </svg>
+      );
+    case "reacthookform":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+          <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+          <path d="m9 14 2 2 4-4" />
+        </svg>
+      );
+    case "transformers":
+      return (
+        <div style={{ width: size, height: size }} className={cn("inline-flex items-center justify-center shrink-0 leading-none", className)}>
+          <TechStackIcon name={"huggingface" as any} className="w-full h-full object-contain fill-current text-current" />
+        </div>
+      );
+    case "restapi":
+    case "api":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+          <rect x="2" y="2" width="6" height="6" rx="1" />
+          <rect x="16" y="2" width="6" height="6" rx="1" />
+          <rect x="9" y="16" width="6" height="6" rx="1" />
+          <path d="M5 8v4a2 2 0 0 0 2 2h2m0 0V9m0 5h7a2 2 0 0 0 2-2V8" />
+        </svg>
+      );
+    case "lenis":
+      return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+          <path d="M2 12c3-4 6-4 9 0s6 4 9 0s3-4 4-2" />
         </svg>
       );
     case "recharts":
@@ -1064,60 +1194,11 @@ export function TechIcon({ name, className, size = 14 }: { name: string; classNa
           <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
         </svg>
       );
-    case "canva":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">CV</text>
-        </svg>
-      );
-    case "photoshop":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">PS</text>
-        </svg>
-      );
     case "metabusinesssuite":
       return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">MB</text>
-        </svg>
-      );
-    case "pytorch":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">PT</text>
-        </svg>
-      );
-    case "transformers":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">HF</text>
-        </svg>
-      );
-    case "zod":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">ZD</text>
-        </svg>
-      );
-    case "reacthookform":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">HF</text>
-        </svg>
-      );
-    case "lenis":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" width={size} height={size} className={className} aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <text x="12" y="15.5" fill="currentColor" stroke="none" fontSize="9" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">LN</text>
         </svg>
       );
     default:

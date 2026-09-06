@@ -9,6 +9,7 @@ import { Footer } from "@/components/shell/footer";
 import { Reveal } from "@/components/motion/reveal";
 import { getProjectBySlug, getPublicProjects } from "@/lib/actions/projects";
 import { getProfileSettings } from "@/lib/actions/settings";
+import { ProjectSummaryView } from "@/components/projects/project-summary-view";
 import { cn } from "@/lib/utils";
 
 export const revalidate = 3600;
@@ -199,9 +200,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                 <h2 className="font-sans text-xs md:text-sm uppercase tracking-widest text-accent font-bold">
                   // Overview & Architecture
                 </h2>
-                <div className="text-base md:text-lg leading-relaxed text-foreground/85 font-normal whitespace-pre-line">
-                  {project.summary}
-                </div>
+                <ProjectSummaryView summary={project.summary} textSize="lg" />
               </Reveal>
             )}
 

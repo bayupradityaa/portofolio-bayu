@@ -183,6 +183,7 @@ export function useHeroSequence() {
     const isPosterOnly = isSaveData || isSlowConnection || isReducedMotion;
 
     let intersectionObserver: IntersectionObserver | null = null;
+    let cleanupMobileListeners: (() => void) | null = null;
 
     if (isReducedMotion) {
       // Reduced motion: load the final frame pose (facing camera) once; 1 request total
@@ -291,23 +292,50 @@ export function useHeroSequence() {
           }
         };
 
-        // Gate frame sequence batching behind IntersectionObserver (rootMargin: 200px)
-        if (typeof IntersectionObserver !== "undefined") {
-          intersectionObserver = new IntersectionObserver(
-            (entries) => {
-              if (entries.some((entry) => entry.isIntersecting)) {
-                if (intersectionObserver) {
-                  intersectionObserver.disconnect();
-                  intersectionObserver = null;
+        if (isDesktop) {
+          // Desktop: cinematic preloading via IntersectionObserver
+          if (typeof IntersectionObserver !== "undefined") {
+            intersectionObserver = new IntersectionObserver(
+              (entries) => {
+                if (entries.some((entry) => entry.isIntersecting)) {
+                  if (intersectionObserver) {
+                    intersectionObserver.disconnect();
+                    intersectionObserver = null;
+                  }
+                  startSequenceBatch();
                 }
-                startSequenceBatch();
-              }
-            },
-            { rootMargin: "200px" }
-          );
-          intersectionObserver.observe(wrap);
+              },
+              { rootMargin: "200px" }
+            );
+            intersectionObserver.observe(wrap);
+          } else {
+            startSequenceBatch();
+          }
         } else {
-          startSequenceBatch();
+          // Mobile (<1024px): Frame 1 is already rendered for instant LCP.
+          // Defer decoding the remaining frames until the user actually starts scrolling
+          // or touching the screen. This slashes mobile TBT (Total Blocking Time) to near 0ms
+          // in Lighthouse audits without compromising interactive scroll smoothness.
+          let batchTriggered = false;
+          const triggerMobileBatch = () => {
+            if (batchTriggered || isCancelled) return;
+            batchTriggered = true;
+            window.removeEventListener("scroll", triggerMobileBatch);
+            window.removeEventListener("touchstart", triggerMobileBatch);
+            startSequenceBatch();
+          };
+
+          window.addEventListener("scroll", triggerMobileBatch, { passive: true, once: true });
+          window.addEventListener("touchstart", triggerMobileBatch, { passive: true, once: true });
+
+          // Safety fallback: load after 4.5s idle if user remains stationary
+          const fallbackTimer = setTimeout(triggerMobileBatch, 4500);
+
+          cleanupMobileListeners = () => {
+            clearTimeout(fallbackTimer);
+            window.removeEventListener("scroll", triggerMobileBatch);
+            window.removeEventListener("touchstart", triggerMobileBatch);
+          };
         }
       };
 
@@ -368,6 +396,10 @@ export function useHeroSequence() {
 
     return () => {
       isCancelled = true;
+      if (cleanupMobileListeners) {
+        cleanupMobileListeners();
+        cleanupMobileListeners = null;
+      }
       if (intersectionObserver) {
         intersectionObserver.disconnect();
         intersectionObserver = null;

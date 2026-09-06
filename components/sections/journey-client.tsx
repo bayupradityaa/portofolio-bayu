@@ -234,7 +234,7 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
     <section
       id="journey"
       ref={sectionRef}
-      className="relative w-full bg-background text-foreground pt-4 pb-20 md:pt-8 md:pb-28 overflow-hidden"
+      className="relative w-full bg-background text-foreground pt-14 pb-20 sm:pt-16 md:pt-8 md:pb-28 overflow-hidden"
       aria-label="About Me and My Journey Timeline"
     >
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
@@ -466,7 +466,7 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
           </div>
 
           {/* ── EXPERIENCE CARDS CONTAINER ───────────────────────────────── */}
-          <div className="relative z-10 space-y-12 md:space-y-24 pl-12 sm:pl-16 md:pl-0">
+          <div className="relative z-10 space-y-16 sm:space-y-20 md:space-y-24 pl-14 sm:pl-16 md:pl-0">
             {timeline.map((entry, idx) => {
               const isRight = idx % 2 !== 0;
               const isActive = activeNodes[idx];
@@ -511,7 +511,7 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-foreground mb-1 group-hover:text-accent transition-colors font-sans pt-1">
+                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-foreground mb-1 group-hover:text-accent transition-colors font-sans pt-2">
                       {entry.title}
                     </h3>
 
@@ -549,7 +549,7 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
           {/* ── MOBILE TOUCHDOWN MESSAGE (appears when landed) ──────────── */}
           <div
             className={cn(
-              "md:hidden mt-8 ml-2 flex items-center gap-3 p-3.5 rounded-2xl border border-accent/30 bg-card/95 backdrop-blur-xl shadow-xl transition-all duration-500",
+              "md:hidden mt-12 ml-2 flex items-center gap-3 p-3.5 rounded-2xl border border-accent/30 bg-card/95 backdrop-blur-xl shadow-xl transition-all duration-500",
               isLanded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
             )}
           >
