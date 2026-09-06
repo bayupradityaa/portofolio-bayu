@@ -123,12 +123,13 @@ export function useHeroTimeline({
 
     const lastDispatchedProgressRef = { current: -1 };
 
-    // Connect to ScrollTrigger with optimized scrub for mobile
+    // Connect to ScrollTrigger with optimized scrub for mobile and refresh invalidation
     const st = ScrollTrigger.create({
       trigger: section,
       start: "top top",
       end: "bottom bottom",
       scrub: 0.5, // Smooth 0.5s scrub momentum on both desktop and mobile touch
+      invalidateOnRefresh: true,
       onUpdate: (self) => {
         const p = self.progress;
 
@@ -187,7 +188,18 @@ export function useHeroTimeline({
       },
     });
 
+    const onVisualViewportResize = () => {
+      ScrollTrigger.refresh();
+    };
+
+    if (typeof window !== "undefined" && window.visualViewport) {
+      window.visualViewport.addEventListener("resize", onVisualViewportResize);
+    }
+
     return () => {
+      if (typeof window !== "undefined" && window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", onVisualViewportResize);
+      }
       st.kill();
       masterTl.kill();
       breatheTl.kill();
