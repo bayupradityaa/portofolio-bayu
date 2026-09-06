@@ -176,77 +176,149 @@ export function useHeroSequence() {
       };
     };
 
-    // Phase 1: Load Frame 1 FIRST for instant sub-second LCP paint
-    const frame1 = new Image();
-    frame1.onload = () => {
-      if (isCancelled) return;
+    const connection = typeof navigator !== "undefined" ? (navigator as unknown as { connection?: { saveData?: boolean; effectiveType?: string } }).connection : null;
+    const isSaveData = connection?.saveData === true;
+    const isSlowConnection = connection?.effectiveType === "2g" || connection?.effectiveType === "slow-2g";
+    const isReducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isPosterOnly = isSaveData || isSlowConnection || isReducedMotion;
+
+    let intersectionObserver: IntersectionObserver | null = null;
+
+    if (isReducedMotion) {
+      // Reduced motion: load the final frame pose (facing camera) once; 1 request total
+      const finalImg = new Image();
+      finalImg.onload = () => {
+        if (isCancelled) return;
+        images[frameCount - 1] = finalImg;
+        imagesRef.current = images;
+        if ("decode" in finalImg) {
+          finalImg.decode().catch(() => {});
+        }
+        sizeCanvas();
+        renderFrame(frameCount - 1);
+        setStatus("ready");
+      };
+      finalImg.onerror = () => {
+        if (!isCancelled) setStatus("unavailable");
+      };
+      finalImg.src = path(frameCount);
+      images[frameCount - 1] = finalImg;
+      imagesRef.current = images;
+    } else if (isPosterOnly) {
+      // Save-Data / 2G: load only frame 1 for an instant static paint; 1 request total
+      const frame1 = new Image();
+      frame1.onload = () => {
+        if (isCancelled) return;
+        images[0] = frame1;
+        imagesRef.current = images;
+        if ("decode" in frame1) {
+          frame1.decode().catch(() => {});
+        }
+        sizeCanvas();
+        renderFrame(0);
+        setStatus("ready");
+      };
+      frame1.onerror = () => {
+        if (!isCancelled) setStatus("unavailable");
+      };
+      frame1.src = path(1);
       images[0] = frame1;
       imagesRef.current = images;
-      if ("decode" in frame1) {
-        frame1.decode().catch(() => {});
-      }
-      sizeCanvas();
-      renderFrame(0);
-      setStatus("ready");
-
-      // Build the list of 1-based frame numbers this device actually decodes.
-      // Desktop (step 1) → every frame (unchanged). Mobile (step 3) → every 3rd
-      // frame; the drawFrame nearest-loaded-frame fallback paints the gaps, so
-      // the scrub stays continuous while decode work drops ~65%.
-      const framesToLoad: number[] = [];
-      for (let f = 1 + step; f <= frameCount; f += step) {
-        framesToLoad.push(f);
-      }
-      // Always include the true last frame so the end-of-scroll pose is exact.
-      if (framesToLoad[framesToLoad.length - 1] !== frameCount) {
-        framesToLoad.push(frameCount);
-      }
-
-      // Phase 2: Fast-track keyframes across the range for instant scroll coverage.
-      const strideEvery = Math.max(1, Math.round(framesToLoad.length / 12));
-      framesToLoad
-        .filter((_, i) => i % strideEvery === 0)
-        .forEach((fNum) => {
-          loadAndDecodeFrame(fNum, fNum - 1);
-        });
-
-      // Phase 3: Fill the rest in non-blocking idle batches (no TBT spike).
-      let cursor = 0;
-
-      const loadBatch = () => {
-        if (isCancelled || cursor >= framesToLoad.length) return;
-        const batchSize = 8;
-        const end = Math.min(framesToLoad.length, cursor + batchSize);
-
-        for (let i = cursor; i < end; i++) {
-          const fNum = framesToLoad[i];
-          loadAndDecodeFrame(fNum, fNum - 1);
+    } else {
+      // Phase 1: Load Frame 1 FIRST for instant sub-second LCP paint
+      const frame1 = new Image();
+      frame1.onload = () => {
+        if (isCancelled) return;
+        images[0] = frame1;
+        imagesRef.current = images;
+        if ("decode" in frame1) {
+          frame1.decode().catch(() => {});
         }
+        sizeCanvas();
+        renderFrame(0);
+        setStatus("ready");
 
-        cursor = end;
-        if (cursor < framesToLoad.length && !isCancelled) {
-          if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-            window.requestIdleCallback(loadBatch, { timeout: 600 });
-          } else {
-            setTimeout(loadBatch, 20);
+        const startSequenceBatch = () => {
+          if (isCancelled) return;
+          // Build the list of 1-based frame numbers this device actually decodes.
+          // Desktop (step 1) → every frame (unchanged). Mobile (step 3) → every 3rd
+          // frame; the drawFrame nearest-loaded-frame fallback paints the gaps, so
+          // the scrub stays continuous while decode work drops ~65%.
+          const framesToLoad: number[] = [];
+          for (let f = 1 + step; f <= frameCount; f += step) {
+            framesToLoad.push(f);
           }
+          // Always include the true last frame so the end-of-scroll pose is exact.
+          if (framesToLoad[framesToLoad.length - 1] !== frameCount) {
+            framesToLoad.push(frameCount);
+          }
+
+          // Phase 2: Fast-track keyframes across the range for instant scroll coverage.
+          const strideEvery = Math.max(1, Math.round(framesToLoad.length / 12));
+          framesToLoad
+            .filter((_, i) => i % strideEvery === 0)
+            .forEach((fNum) => {
+              loadAndDecodeFrame(fNum, fNum - 1);
+            });
+
+          // Phase 3: Fill the rest in non-blocking idle batches (no TBT spike).
+          let cursor = 0;
+
+          const loadBatch = () => {
+            if (isCancelled || cursor >= framesToLoad.length) return;
+            const batchSize = 8;
+            const end = Math.min(framesToLoad.length, cursor + batchSize);
+
+            for (let i = cursor; i < end; i++) {
+              const fNum = framesToLoad[i];
+              loadAndDecodeFrame(fNum, fNum - 1);
+            }
+
+            cursor = end;
+            if (cursor < framesToLoad.length && !isCancelled) {
+              if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+                window.requestIdleCallback(loadBatch, { timeout: 600 });
+              } else {
+                setTimeout(loadBatch, 20);
+              }
+            }
+          };
+
+          if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+            window.requestIdleCallback(loadBatch, { timeout: 300 });
+          } else {
+            setTimeout(loadBatch, 30);
+          }
+        };
+
+        // Gate frame sequence batching behind IntersectionObserver (rootMargin: 200px)
+        if (typeof IntersectionObserver !== "undefined") {
+          intersectionObserver = new IntersectionObserver(
+            (entries) => {
+              if (entries.some((entry) => entry.isIntersecting)) {
+                if (intersectionObserver) {
+                  intersectionObserver.disconnect();
+                  intersectionObserver = null;
+                }
+                startSequenceBatch();
+              }
+            },
+            { rootMargin: "200px" }
+          );
+          intersectionObserver.observe(wrap);
+        } else {
+          startSequenceBatch();
         }
       };
 
-      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-        window.requestIdleCallback(loadBatch, { timeout: 300 });
-      } else {
-        setTimeout(loadBatch, 30);
-      }
-    };
+      frame1.onerror = () => {
+        if (!isCancelled) setStatus("unavailable");
+      };
 
-    frame1.onerror = () => {
-      if (!isCancelled) setStatus("unavailable");
-    };
-
-    frame1.src = path(1);
-    images[0] = frame1;
-    imagesRef.current = images;
+      frame1.src = path(1);
+      images[0] = frame1;
+      imagesRef.current = images;
+    }
 
     // `sizeCanvas()` assigns canvas.width, which CLEARS the bitmap; with
     // {alpha:false} a cleared bitmap is opaque black. A resize must therefore
@@ -296,6 +368,10 @@ export function useHeroSequence() {
 
     return () => {
       isCancelled = true;
+      if (intersectionObserver) {
+        intersectionObserver.disconnect();
+        intersectionObserver = null;
+      }
       observer.disconnect();
       window.removeEventListener("resize", onResize);
       if (resizeRaf !== null) {
