@@ -22,7 +22,7 @@ const Word: React.FC<WordProps> = ({ children, progress, range, activeColorClass
   const opacity = useTransform(progress, range, [0, 1]);
 
   return (
-    <span className="relative inline-block select-none">
+    <span className="relative inline-block">
       {/* Background low-contrast layer */}
       <span className={cn("absolute opacity-20", activeColorClassName)}>{children}</span>
       {/* Active fading layer */}

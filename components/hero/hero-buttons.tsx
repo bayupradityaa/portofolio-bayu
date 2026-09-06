@@ -43,12 +43,16 @@ const btnSecondary =
 function MagneticLink({
   children,
   className,
+  style,
   ...props
 }: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   const linkRef = useRef<HTMLAnchorElement>(null);
 
   const onMouseMove = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (typeof window !== "undefined" && !window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+        return;
+      }
       const el = linkRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
@@ -75,7 +79,7 @@ function MagneticLink({
       className={className}
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
-      style={{ willChange: "transform" }}
+      style={style}
       {...props}
     >
       {children}

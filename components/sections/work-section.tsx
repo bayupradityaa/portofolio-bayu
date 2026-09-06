@@ -285,7 +285,7 @@ export function WorkSection({
     <section
       id="work"
       ref={sectionRef}
-      className={cn("relative w-full bg-[#000000] text-white select-none", className)}
+      className={cn("relative w-full bg-[#000000] text-white", className)}
       aria-label="Selected Work Portfolio Showcase"
     >
       {/* ────────────────────────────────────────────────────────────────────── */}

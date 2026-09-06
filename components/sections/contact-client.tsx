@@ -27,7 +27,7 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
   return (
     <div
       id="contact"
-      className="relative w-full bg-background text-foreground pt-8 sm:pt-12 lg:pt-16 pb-16 lg:pb-24 overflow-hidden select-none"
+      className="relative w-full bg-background text-foreground pt-8 sm:pt-12 lg:pt-16 pb-16 lg:pb-24 overflow-hidden"
     >
       {/* Editorial hairline separating journey from contact */}
       <div className="absolute top-0 left-0 right-0 h-px bg-border/40" />
@@ -127,7 +127,7 @@ export function ContactClient({ settings, socials }: ContactClientProps) {
               {/* Back to Overview Button */}
               <button
                 onClick={() => setShowForm(false)}
-                className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#FFD177] hover:text-white transition-colors mb-6 cursor-pointer"
+                className="inline-flex items-center gap-2 min-h-11 text-xs font-mono font-bold uppercase tracking-widest text-[#FFD177] hover:text-white active:opacity-70 transition-colors mb-6 cursor-pointer"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Back to Overview</span>

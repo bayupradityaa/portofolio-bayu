@@ -27,7 +27,8 @@ function saveManual(name: string, projectName: string, buffer: Buffer) {
   writeFileSync(join(manualDir, `${name}-${LABEL}-${projectName}.png`), buffer);
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-1440", "desktop-visual is the invariant proof specifically for desktop @1440×900");
   await skipPreloader(page);
   await page.goto("/");
   await waitForSequenceReady(page);

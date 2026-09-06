@@ -20,7 +20,7 @@ export async function About({ settings }: { settings: ProfileSettings | null }) 
   return (
     <section
       id="about"
-      className="relative w-full bg-background text-foreground pt-16 pb-24 md:pt-24 md:pb-32 overflow-hidden select-none"
+      className="relative w-full bg-background text-foreground pt-16 pb-24 md:pt-24 md:pb-32 overflow-hidden"
     >
       {/* Editorial hairline separating hero from about */}
       <div className="absolute top-0 left-0 right-0 h-px bg-border/40" />
@@ -40,7 +40,7 @@ export async function About({ settings }: { settings: ProfileSettings | null }) 
           </div>
         </div>
 
-        <dl className="relative z-10 mt-16 grid grid-cols-2 gap-x-6 gap-y-10 border-t border-border pt-12 md:mt-24 md:grid-cols-4">
+        <dl className="relative z-10 mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10 border-t border-border pt-12 md:mt-24">
           {defaultStats.map((s, i) => (
             <Reveal key={s.label} delay={i * 0.06} as="div" className="text-center">
               <dt className="text-xs font-mono font-semibold uppercase tracking-wider text-muted">{s.label}</dt>

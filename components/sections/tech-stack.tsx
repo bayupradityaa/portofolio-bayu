@@ -267,7 +267,7 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
   const row2 = uniqueTechs.slice(midPoint);
 
   return (
-    <section id="stack" className="relative w-full bg-[#000000] text-foreground pt-28 pb-32 md:pt-40 md:pb-44 overflow-hidden">
+    <section id="stack" className="relative w-full bg-[#000000] text-foreground pt-16 pb-20 md:pt-40 md:pb-44 overflow-hidden">
       {/* Technical engineering grid texture */}
       <div className="grid-faint opacity-30 pointer-events-none absolute inset-0" aria-hidden="true" />
 
@@ -283,7 +283,7 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
           scrollEnd="center center-=10%"
           stagger={0.04}
           containerClassName="mt-4 max-w-[700px]"
-          textClassName="text-5xl md:text-7xl lg:text-[72px] font-semibold tracking-tight text-foreground leading-[1.1]"
+          textClassName="text-3xl sm:text-5xl md:text-7xl lg:text-[72px] font-semibold tracking-tight text-foreground leading-[1.1]"
         >
           Technology Ecosystem
         </ScrollFloat>
@@ -296,8 +296,8 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
       {/* Technology Marquee Area */}
       <div className="relative z-10 w-full overflow-hidden">
         {/* Edge Fade Masks for Smooth Transitions */}
-        <div className="pointer-events-none absolute left-0 top-0 z-20 h-full w-20 bg-linear-to-r from-[#000000] to-transparent md:w-36 lg:w-48" />
-        <div className="pointer-events-none absolute right-0 top-0 z-20 h-full w-20 bg-linear-to-l from-[#000000] to-transparent md:w-36 lg:w-48" />
+        <div className="pointer-events-none absolute left-0 top-0 z-20 h-full w-8 bg-linear-to-r from-[#000000] to-transparent md:w-36 lg:w-48" />
+        <div className="pointer-events-none absolute right-0 top-0 z-20 h-full w-8 bg-linear-to-l from-[#000000] to-transparent md:w-36 lg:w-48" />
 
         <div className="flex flex-col gap-3 md:gap-4">
           {/* Row 1: moves left */}
@@ -318,6 +318,24 @@ export function TechStack({ technologies = [] }: { technologies?: string[] }) {
             onTechClick={handleTechClick}
           />
         </div>
+      </div>
+
+      {/* Active Tech Description Panel (Mobile & Tablet Unclipped Info Panel) */}
+      <div className="relative z-10 mx-auto max-w-xl px-6 mt-8 min-h-[3.5rem] flex items-center justify-center">
+        {activeTech ? (
+          <div className="flex flex-col items-center text-center animate-fadeIn py-2.5 px-5 rounded-xl border border-accent/20 bg-card/60 backdrop-blur-sm">
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-accent">
+              {activeTech}
+            </span>
+            <p className="font-sans text-xs sm:text-sm text-muted mt-1 leading-relaxed">
+              {logoTooltips[activeTech] || `${activeTech} Technology`}
+            </p>
+          </div>
+        ) : (
+          <p className="font-mono text-[11px] uppercase tracking-widest text-muted/60 text-center">
+            Tap or hover any technology to inspect role in stack
+          </p>
+        )}
       </div>
 
     </section>
@@ -408,10 +426,10 @@ function LogoPill({
         {name}
       </span>
 
-      {/* Floating Tooltip */}
+      {/* Floating Tooltip (Desktop hover only; mobile uses unclipped detail panel below marquee) */}
       <div
         className={cn(
-          "pointer-events-none absolute bottom-full left-1/2 mb-3 w-48 -translate-x-1/2 rounded-xl border border-border bg-card/95 p-3 text-center shadow-[0_10px_30px_rgba(0,0,0,0.2)] backdrop-blur-md transition-all duration-300 z-50 transform",
+          "pointer-events-none absolute bottom-full left-1/2 mb-3 w-48 -translate-x-1/2 rounded-xl border border-border bg-card/95 p-3 text-center shadow-[0_10px_30px_rgba(0,0,0,0.2)] backdrop-blur-md transition-all duration-300 z-50 transform hidden md:block",
           isActive
             ? "opacity-100 translate-y-0 border-accent/40"
             : "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0"

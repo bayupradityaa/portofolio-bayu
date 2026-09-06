@@ -109,7 +109,7 @@ export function ProjectGalleryLightbox({
             type="button"
             onClick={close}
             aria-label="Close gallery"
-            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+            className="absolute top-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 top-[max(1rem,env(safe-area-inset-top))] right-[max(1rem,env(safe-area-inset-right))]"
           >
             <X size={20} />
           </button>
@@ -143,7 +143,7 @@ export function ProjectGalleryLightbox({
                     className="max-h-[75vh] w-auto rounded-lg object-contain"
                   />
                 ) : (
-                  <div className="flex h-64 w-96 flex-col items-center justify-center rounded-lg bg-surface text-secondary">
+                  <div className="flex h-64 w-full max-w-sm flex-col items-center justify-center rounded-lg bg-surface text-secondary">
                     <ImageOff size={36} className="mb-2" />
                     <p className="text-sm">Failed to load image</p>
                   </div>
@@ -169,18 +169,25 @@ export function ProjectGalleryLightbox({
           </div>
 
           {slides.length > 1 && (
-            <div className="absolute bottom-6 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="absolute bottom-6 flex items-center gap-1 bottom-[max(1.5rem,env(safe-area-inset-bottom))]"
+              onClick={(e) => e.stopPropagation()}
+            >
               {slides.map((s, i) => (
                 <button
                   key={s.url}
                   type="button"
                   onClick={() => setOpenAt(i)}
                   aria-label={`Go to image ${i + 1}`}
-                  className={cn(
-                    "h-2 w-2 rounded-full transition-colors",
-                    i === openAt ? "bg-white" : "bg-white/40 hover:bg-white/60",
-                  )}
-                />
+                  className="flex h-11 w-11 items-center justify-center cursor-pointer"
+                >
+                  <span
+                    className={cn(
+                      "h-2 w-2 rounded-full transition-colors",
+                      i === openAt ? "bg-white" : "bg-white/40 hover:bg-white/60",
+                    )}
+                  />
+                </button>
               ))}
             </div>
           )}

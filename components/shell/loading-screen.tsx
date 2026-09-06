@@ -7,7 +7,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
  * List of critical homepage assets to prefetch & warm in browser cache
  * during the preloader phase so the site opens smoothly without layout shifts.
  */
-const CRITICAL_ASSETS = ["/og-image.png", "/favicon.ico"];
+const CRITICAL_ASSETS = ["/fotobulat.webp"];
 
 /**
  * First-paint screen. The wordmark is masked by a real progress bar rather
@@ -84,7 +84,7 @@ export function LoadingScreen() {
     <AnimatePresence>
       {visible && (
         <motion.div
-          className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-background will-change-transform"
+          className="fixed inset-0 z-[130] flex flex-col items-center justify-center bg-background will-change-transform"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
