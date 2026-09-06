@@ -39,8 +39,7 @@ function WorkCardImage({
 }) {
   const [hasError, setHasError] = useState(false);
 
-  const isComingSoon = status?.toLowerCase().includes("coming") || status?.toLowerCase().includes("dev");
-  const isValidSrc = src && src !== "/works/pulse-studio.svg" && !hasError && !isComingSoon;
+  const isValidSrc = Boolean(src && src !== "/works/pulse-studio.svg" && !hasError);
 
   if (!isValidSrc) {
     return (
@@ -54,7 +53,7 @@ function WorkCardImage({
 
   return (
     <Image
-      src={src}
+      src={src!}
       alt={title}
       fill
       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 35vw"
@@ -112,7 +111,7 @@ function ProjectDividerDesktop({
         {/* Center Tag Pill */}
         <div className="bg-[#FFD177] py-2 px-1 flex flex-col items-center gap-1.5 my-auto z-10 border border-black/30 rounded-xs shadow-xs">
           <span className="font-mono text-[9px] font-extrabold uppercase tracking-[0.25em] text-black/85 [writing-mode:vertical-lr] rotate-180">
-            {label || (index ? `PRJ // ${index}` : "DIV // 00")}
+            {label || (index ? `Project / ${index}` : "DIV // 00")}
           </span>
           <span className="w-1.5 h-1.5 rounded-full bg-black/85" />
         </div>
@@ -151,7 +150,7 @@ function ProjectDividerMobile({
         <div className="absolute -top-[3px] left-1/4 w-px h-[7px] bg-black/45" />
       </div>
       <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/10 border border-black/25 font-mono text-[10px] font-extrabold uppercase tracking-widest text-black/85 shrink-0">
-        <span>{label || `PRJ // ${index}`}</span>
+        <span>{label || `Project / ${index}`}</span>
         <span className="w-1.5 h-1.5 rounded-full bg-black/85" />
       </div>
       <div className="relative flex-1 h-px bg-black/30 flex items-center justify-center">
@@ -427,13 +426,9 @@ export function WorkSection({
           >
             <div className="flex items-center gap-3 font-mono text-[10px] font-bold tracking-[0.25em] text-black/70 uppercase">
               <span className="text-black font-black">+</span>
-              <span>SELECTED WORKS ARCHIVE</span>
-              <span className="text-black/30">//</span>
-              <span className="text-black/60">COLLECTION 2024–2026</span>
+              <span>SELECTED WORKS</span>
             </div>
             <div className="hidden sm:flex items-center gap-3 font-mono text-[10px] font-bold tracking-[0.25em] text-black/70 uppercase">
-              <span>INDEX 01—{String(items.length).padStart(2, "0")}</span>
-              <span className="text-black/30">//</span>
               <span>HORIZONTAL SCROLL GALLERY →</span>
               <span className="text-black font-black">+</span>
             </div>
@@ -447,7 +442,6 @@ export function WorkSection({
             <div className="flex items-center gap-2 font-mono text-[10px] font-bold tracking-[0.2em] text-black/60 uppercase">
               <span>LAT. 6.2088° S / LONG. 106.8456° E</span>
               <span className="text-black/30">•</span>
-              <span>GRID SYSTEM: ACTIVE</span>
             </div>
             <div className="flex items-center gap-3 font-mono text-[10px] font-bold tracking-[0.2em] text-black/60 uppercase">
               <span>EXPLORATION STAGE</span>
@@ -615,6 +609,14 @@ export function WorkSection({
                         <div className="absolute top-3.5 left-3.5 font-mono text-[11px] font-bold px-3 py-1 rounded-full bg-black text-[#FFD177] shadow-md border border-black/30">
                           {formattedIdx}{" // "}{category}
                         </div>
+
+                        {/* Coming Soon Status Badge */}
+                        {item.status && item.status.toLowerCase().includes("coming") && (
+                          <div className="absolute top-3.5 right-3.5 z-20 inline-flex items-center gap-1.5 font-mono text-[10px] font-bold px-2.5 py-1 rounded-full bg-black/85 text-amber-300 border border-amber-500/30 backdrop-blur-md shadow-md">
+                            <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
+                            <span>COMING SOON</span>
+                          </div>
+                        )}
                       </div>
 
                       {/* Content Area Below Image */}
@@ -652,7 +654,7 @@ export function WorkSection({
             {/* Closing Divider before Final Summary CTA */}
             {items.length > 0 && (
               <ProjectDividerDesktop
-                label="ARCHIVE // END"
+                label="ARCHIVE / END"
                 index="99"
               />
             )}
@@ -844,6 +846,14 @@ export function WorkSection({
                       <div className="absolute top-3 left-3 font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-black text-[#FFD177]">
                         {formattedIdx}{" // "}{category}
                       </div>
+
+                      {/* Coming Soon Status Badge */}
+                      {item.status && item.status.toLowerCase().includes("coming") && (
+                        <div className="absolute top-3 right-3 z-20 inline-flex items-center gap-1.5 font-mono text-[10px] font-bold px-2.5 py-1 rounded-full bg-black/85 text-amber-300 border border-amber-500/30 backdrop-blur-md shadow-md">
+                          <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
+                          <span>COMING SOON</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Details */}

@@ -145,6 +145,17 @@ export function ProjectDetailModal({
               <ProjectPreviewPlaceholder title={project.name} category={project.category} status={project.status} />
             )}
 
+            {/* Coming Soon Badge */}
+            {project.status === "Coming Soon" && (
+              <div className="absolute top-4 right-4 z-20 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-black/80 px-3 py-1 text-xs font-semibold text-amber-300 backdrop-blur-md shadow-xl font-mono">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
+                </span>
+                <span>COMING SOON</span>
+              </div>
+            )}
+
             {/* Gallery Navigation Arrows */}
             {imagesList.length > 1 && (
               <>
@@ -223,13 +234,25 @@ export function ProjectDetailModal({
             </p>
 
             {/* Quick Metadata */}
-            {project.category && (
-              <div className="mt-2 flex flex-wrap items-center gap-4 text-xs font-sans text-muted border-b border-border/50 pb-4">
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-xs font-sans text-muted border-b border-border/50 pb-4">
+              {project.category && (
                 <div className="rounded-md bg-card border border-border/60 px-2.5 py-1 text-xs text-secondary font-medium">
                   {project.category}
                 </div>
-              </div>
-            )}
+              )}
+              {project.status && (
+                <div
+                  className={cn(
+                    "rounded-md border px-2.5 py-1 text-xs font-medium font-mono",
+                    project.status === "Coming Soon"
+                      ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
+                      : "border-border/60 bg-card text-secondary"
+                  )}
+                >
+                  {project.status}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Project Summary / Description */}

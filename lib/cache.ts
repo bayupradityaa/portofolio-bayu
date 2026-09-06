@@ -15,67 +15,65 @@ export const CACHE_TAGS = {
 /** Revalidation helpers — call after admin mutations */
 export function revalidateProjects() {
   try {
-    revalidateTag(CACHE_TAGS.PROJECTS, "max");
+    revalidateTag(CACHE_TAGS.PROJECTS, { expire: 0 });
   } catch {}
   try {
-    revalidatePath("/", "page");
-    revalidatePath("/projects", "page");
-    revalidatePath("/projects/[slug]", "page");
-    revalidatePath("/dev/projects", "page");
+    revalidatePath("/", "layout");
+    revalidatePath("/projects", "layout");
+    revalidatePath("/dev/projects", "layout");
     revalidatePath("/sitemap.xml");
   } catch {}
 }
 
 export function revalidateTechnologies() {
   try {
-    revalidateTag(CACHE_TAGS.TECHNOLOGIES, "max");
+    revalidateTag(CACHE_TAGS.TECHNOLOGIES, { expire: 0 });
   } catch {}
   try {
-    revalidatePath("/", "page");
-    revalidatePath("/projects", "page");
-    revalidatePath("/dev/technologies", "page");
+    revalidatePath("/", "layout");
+    revalidatePath("/projects", "layout");
+    revalidatePath("/dev/technologies", "layout");
   } catch {}
 }
 
 export function revalidateExperience() {
   try {
-    revalidateTag(CACHE_TAGS.EXPERIENCE, "max");
+    revalidateTag(CACHE_TAGS.EXPERIENCE, { expire: 0 });
   } catch {}
   try {
-    revalidatePath("/", "page");
-    revalidatePath("/dev/experience", "page");
+    revalidatePath("/", "layout");
+    revalidatePath("/dev/experience", "layout");
   } catch {}
 }
 
 export function revalidateEducation() {
   try {
-    revalidateTag(CACHE_TAGS.EDUCATION, "max");
+    revalidateTag(CACHE_TAGS.EDUCATION, { expire: 0 });
   } catch {}
   try {
-    revalidatePath("/", "page");
-    revalidatePath("/dev/education", "page");
+    revalidatePath("/", "layout");
+    revalidatePath("/dev/education", "layout");
   } catch {}
 }
 
 export function revalidateCertificates() {
   try {
-    revalidateTag(CACHE_TAGS.CERTIFICATES, "max");
+    revalidateTag(CACHE_TAGS.CERTIFICATES, { expire: 0 });
   } catch {}
   try {
-    revalidatePath("/", "page");
-    revalidatePath("/dev/certificates", "page");
+    revalidatePath("/", "layout");
+    revalidatePath("/dev/certificates", "layout");
   } catch {}
 }
 
 export function revalidateSettings() {
   try {
-    revalidateTag(CACHE_TAGS.SETTINGS, "max");
+    revalidateTag(CACHE_TAGS.SETTINGS, { expire: 0 });
   } catch {}
   try {
     revalidatePath("/", "layout");
-    revalidatePath("/", "page");
-    revalidatePath("/projects", "page");
-    revalidatePath("/dev/settings", "page");
+    revalidatePath("/projects", "layout");
+    revalidatePath("/dev/settings", "layout");
     revalidatePath("/sitemap.xml");
     revalidatePath("/robots.txt");
   } catch {}
@@ -83,10 +81,10 @@ export function revalidateSettings() {
 
 export function revalidateMessages() {
   try {
-    revalidateTag(CACHE_TAGS.MESSAGES, "max");
+    revalidateTag(CACHE_TAGS.MESSAGES, { expire: 0 });
   } catch {}
   try {
-    revalidatePath("/dev", "page");
-    revalidatePath("/dev/messages", "page");
+    revalidatePath("/dev", "layout");
+    revalidatePath("/dev/messages", "layout");
   } catch {}
 }

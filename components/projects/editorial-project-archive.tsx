@@ -260,7 +260,7 @@ export function EditorialProjectArchive({ projects }: EditorialProjectArchivePro
                 const project = scene.data!;
                 const coverUrl = project.cover_image || project.images[0]?.image_url || "";
                 const isComingSoon = project.status === "Coming Soon";
-                const showPlaceholder = !coverUrl || imageErrors[project.id] || isComingSoon;
+                const showPlaceholder = !coverUrl || imageErrors[project.id];
 
               return (
                 <article
@@ -270,9 +270,16 @@ export function EditorialProjectArchive({ projects }: EditorialProjectArchivePro
                 >
                   <div className="scene-content space-y-6">
                     {/* Editorial Number & Category Label */}
-                    <span className="font-sans text-xs sm:text-sm font-bold tracking-[0.25em] uppercase text-accent block">
-                      {scene.categoryLabel}
-                    </span>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="font-sans text-xs sm:text-sm font-bold tracking-[0.25em] uppercase text-accent block">
+                        {scene.categoryLabel}
+                      </span>
+                      {isComingSoon && (
+                        <span className="font-mono text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-300">
+                          Coming Soon
+                        </span>
+                      )}
+                    </div>
 
                     {/* Project Title (Live Sentiment largest, others proportionally scaled) */}
                     <h2
@@ -312,6 +319,17 @@ export function EditorialProjectArchive({ projects }: EditorialProjectArchivePro
                           category={scene.type}
                           status={project.status}
                         />
+                      )}
+
+                      {/* Floating Coming Soon Status Badge */}
+                      {isComingSoon && (
+                        <div className="absolute top-4 right-4 z-20 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-black/80 px-3.5 py-1.5 text-xs font-semibold text-amber-300 backdrop-blur-md shadow-xl font-mono">
+                          <span className="relative flex h-2 w-2">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
+                          </span>
+                          <span>COMING SOON</span>
+                        </div>
                       )}
                     </div>
 

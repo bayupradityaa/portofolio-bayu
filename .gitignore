@@ -50,6 +50,3 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
-
-# desktop-visual writes these on every run; the committed *-before-*.png are the baseline
-/tests/e2e/__baseline__/manual/*-current-*.png

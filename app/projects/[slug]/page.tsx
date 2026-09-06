@@ -9,6 +9,7 @@ import { Footer } from "@/components/shell/footer";
 import { Reveal } from "@/components/motion/reveal";
 import { getProjectBySlug, getPublicProjects } from "@/lib/actions/projects";
 import { getProfileSettings } from "@/lib/actions/settings";
+import { cn } from "@/lib/utils";
 
 export const revalidate = 3600;
 
@@ -88,7 +89,14 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               {project.category || "Case Study"}
             </span>
             {project.status && (
-              <span className="font-sans text-xs font-medium px-3 py-1 rounded-full bg-foreground/10 text-foreground/80">
+              <span
+                className={cn(
+                  "font-sans text-xs font-medium px-3 py-1 rounded-full",
+                  project.status === "Coming Soon"
+                    ? "border border-amber-500/30 bg-amber-500/10 text-amber-300 font-mono font-semibold"
+                    : "bg-foreground/10 text-foreground/80"
+                )}
+              >
                 {project.status}
               </span>
             )}
@@ -169,6 +177,15 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               sizes="(max-width: 768px) 100vw, 1200px"
               className="object-cover object-top"
             />
+            {project.status === "Coming Soon" && (
+              <div className="absolute top-4 right-4 md:top-6 md:right-6 z-20 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-black/80 px-4 py-1.5 text-xs font-semibold text-amber-300 backdrop-blur-md shadow-xl font-mono">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
+                </span>
+                <span>COMING SOON</span>
+              </div>
+            )}
           </div>
         )}
 
@@ -317,10 +334,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                       href={project.live_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full inline-flex items-center justify-between px-4 py-3 rounded-xl bg-accent text-accent-foreground font-sans text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity"
+                      className="w-full inline-flex items-center justify-between px-4 py-3 rounded-xl bg-accent text-black font-sans text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity shadow-sm"
                     >
-                      <span>{project.live_url_label || "Open Live Demo"}</span>
-                      <ExternalLink className="w-4 h-4" />
+                      <span className="text-black">{project.live_url_label || "Visit Website"}</span>
+                      <ExternalLink className="w-4 h-4 text-black shrink-0" />
                     </a>
                   )}
                   {project.repo_url && (
