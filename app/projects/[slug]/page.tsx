@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink, Calendar, User, Tag, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, User, Tag, CheckCircle2 } from "lucide-react";
 import { GithubIcon } from "@/components/ui/brand-icons";
 import { Nav } from "@/components/shell/nav";
 import { Footer } from "@/components/shell/footer";
@@ -68,7 +68,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   return (
     <>
-      <Nav />
+      <Nav settings={settings} />
       <main id="main" className="flex-1 w-full min-h-screen pt-28 pb-24 px-6 md:px-12 max-w-6xl mx-auto">
         {/* Back Link */}
         <div className="mb-8">
@@ -105,15 +105,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
           )}
 
           {/* Metadata Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-y border-border/60 py-6 font-sans text-xs">
-            {project.year && (
-              <div className="space-y-1">
-                <span className="text-foreground/50 uppercase tracking-widest flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5" /> Year
-                </span>
-                <p className="text-foreground font-semibold">{project.year}</p>
-              </div>
-            )}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 border-y border-border/60 py-6 font-sans text-xs">
 
             {project.role && (
               <div className="space-y-1">

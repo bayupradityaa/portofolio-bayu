@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { contactSchema } from "@/lib/schemas/contact";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { revalidateMessages } from "@/lib/cache";
 
 export const runtime = "nodejs";
 
@@ -81,6 +82,8 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
+
+  revalidateMessages();
 
   return NextResponse.json({ ok: true, stored: true });
 }

@@ -1,11 +1,15 @@
 import type { MetadataRoute } from "next";
+import { getProfileSettings } from "@/lib/actions/settings";
 
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const settings = await getProfileSettings();
+
   return {
-    name: "Bayu Praditya — Creative Engineer & Full-Stack Developer",
-    short_name: "Bayu Praditya",
+    name: settings?.seo_title || `${settings?.name || "Bayu Praditya"} — Web Developer`,
+    short_name: settings?.name || "Bayu Praditya",
     description:
-      "Portfolio of Bayu Praditya — Creative engineer working across modern frontend, backend systems, and interactive digital experiences.",
+      settings?.seo_description ||
+      "Portfolio of Bayu Praditya — Web developer working across modern frontend, backend systems, and interactive digital experiences.",
     start_url: "/",
     display: "standalone",
     background_color: "#000000",

@@ -10,6 +10,8 @@ import { GithubIcon, LinkedinIcon, InstagramIcon } from "@/components/ui/brand-i
 import { Mail, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import type { ProfileSettings } from "@/lib/types/database";
+
 // Register GSAP Plugins safely for SSR
 if (typeof window !== "undefined") {
   gsap.registerPlugin(CustomEase);
@@ -23,12 +25,18 @@ const navItems = [
   { id: "contact", number: "05", label: "Contact", href: "/contact", shape: "5" },
 ];
 
-export function Nav() {
+export function Nav({ settings }: { settings?: ProfileSettings | null } = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const hasOpenedRef = useRef(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === "/";
+
+  const emailHref = settings?.email ? `mailto:${settings.email}` : "mailto:bayuupraditya@gmail.com";
+  const githubHref = settings?.github || "https://github.com/bayupradityaa";
+  const linkedinHref = settings?.linkedin || "https://www.linkedin.com/in/bayupradityaa/";
+  const instagramHref = settings?.instagram || "https://www.instagram.com/bayuupradityaa";
+  const nameDisplay = settings?.name?.toUpperCase() || "BAYU PRADITYA";
 
   // Initial Setup & Hover Effects
   useEffect(() => {
@@ -348,7 +356,7 @@ export function Nav() {
                   EXPLORE PORTFOLIO
                 </span>
                 <span className="font-sans text-[11px] text-white/50 font-medium">
-                  BAYU PRADITYA
+                  {nameDisplay}
                 </span>
               </div>
 
@@ -378,15 +386,15 @@ export function Nav() {
               <div className="pt-4 mt-3 border-t border-white/10 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-5 text-white/80">
                   <a
-                    href="mailto:bayuupraditya@gmail.com"
+                    href={emailHref}
                     className="hover:text-[#FFD177] transition-colors"
-                    aria-label="Email Bayu Praditya"
-                    title="Email me (bayuupraditya@gmail.com)"
+                    aria-label="Email"
+                    title="Send Email"
                   >
                     <Mail size={18} />
                   </a>
                   <a
-                    href="https://github.com/bayupradityaa"
+                    href={githubHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-[#FFD177] transition-colors"
@@ -395,7 +403,7 @@ export function Nav() {
                     <GithubIcon size={18} />
                   </a>
                   <a
-                    href="https://linkedin.com"
+                    href={linkedinHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-[#FFD177] transition-colors"
@@ -404,7 +412,7 @@ export function Nav() {
                     <LinkedinIcon size={18} />
                   </a>
                   <a
-                    href="https://instagram.com"
+                    href={instagramHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-[#FFD177] transition-colors"

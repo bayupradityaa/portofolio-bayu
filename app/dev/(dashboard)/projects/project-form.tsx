@@ -37,8 +37,7 @@ export function ProjectForm({ project, technologies }: ProjectFormProps) {
           name: project.name,
           tagline: project.tagline,
           summary: project.summary,
-          year: project.year,
-          role: project.role,
+          role: project.role ?? "",
           status: project.status,
           category: project.category,
           live_url: project.live_url ?? "",
@@ -48,6 +47,7 @@ export function ProjectForm({ project, technologies }: ProjectFormProps) {
           cover_alt: project.cover_alt,
           featured: project.featured,
           published: project.published,
+          show_on_public: (project as Record<string, unknown>).show_on_public as boolean ?? true,
           is_open_source: project.is_open_source,
           is_personal: project.is_personal,
           sort_order: project.sort_order,
@@ -65,8 +65,8 @@ export function ProjectForm({ project, technologies }: ProjectFormProps) {
           live_url_label: "",
           cover_image: "",
           cover_alt: "",
-          year: new Date().getFullYear(),
           published: true,
+          show_on_public: true,
           featured: false,
           is_open_source: false,
           is_personal: true,
@@ -232,6 +232,16 @@ export function ProjectForm({ project, technologies }: ProjectFormProps) {
                   />
                 </div>
               </div>
+
+              <div>
+                <label htmlFor="pf-role" className="mb-1.5 block text-sm font-medium text-[#fafafa]">Role</label>
+                <input
+                  id="pf-role"
+                  {...register("role")}
+                  className="w-full rounded-lg border border-[#27272a] bg-[#0a0a0c] px-3 py-2.5 text-sm text-[#fafafa] placeholder:text-[#71717a] focus:border-[#22c55e] focus:outline-none"
+                  placeholder="Full Stack Engineer, Lead Developer, etc."
+                />
+              </div>
             </div>
           </div>
 
@@ -286,25 +296,62 @@ export function ProjectForm({ project, technologies }: ProjectFormProps) {
         <div className="space-y-6">
           {/* Flags */}
           <div className="rounded-xl border border-[#27272a] bg-[#111113] p-6">
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#71717a]">Visibility</h2>
-            <div className="space-y-3">
-              {(
-                [
-                  ["published", "Published"],
-                  ["featured", "Featured"],
-                  ["is_open_source", "Open Source"],
-                  ["is_personal", "Personal Project"],
-                ] as const
-              ).map(([key, label]) => (
-                <label key={key} className="flex items-center gap-3">
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#71717a]">Visibility &amp; Placement</h2>
+            <div className="space-y-4">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  {...register("featured")}
+                  className="mt-0.5 h-4 w-4 rounded border-[#27272a] bg-[#0a0a0c] text-[#22c55e] focus:ring-[#22c55e]"
+                />
+                <div>
+                  <span className="text-sm font-medium text-[#fafafa]">Tampilkan di Beranda (Section Work)</span>
+                  <p className="text-xs text-[#71717a]">Muncul di section Project / Selected Works pada halaman Beranda (/).</p>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  {...register("show_on_public")}
+                  className="mt-0.5 h-4 w-4 rounded border-[#27272a] bg-[#0a0a0c] text-[#22c55e] focus:ring-[#22c55e]"
+                />
+                <div>
+                  <span className="text-sm font-medium text-[#fafafa]">Tampilkan di Halaman Arsip (/projects)</span>
+                  <p className="text-xs text-[#71717a]">Muncul di daftar arsip lengkap pada halaman /projects.</p>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  {...register("published")}
+                  className="mt-0.5 h-4 w-4 rounded border-[#27272a] bg-[#0a0a0c] text-[#22c55e] focus:ring-[#22c55e]"
+                />
+                <div>
+                  <span className="text-sm font-medium text-[#fafafa]">Published (Status Aktif)</span>
+                  <p className="text-xs text-[#71717a]">Jika tidak aktif (Draft), project disembunyikan total.</p>
+                </div>
+              </label>
+
+              <div className="pt-2 border-t border-[#27272a] space-y-3">
+                <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
-                    {...register(key)}
+                    {...register("is_open_source")}
                     className="h-4 w-4 rounded border-[#27272a] bg-[#0a0a0c] text-[#22c55e] focus:ring-[#22c55e]"
                   />
-                  <span className="text-sm text-[#a1a1aa]">{label}</span>
+                  <span className="text-sm text-[#a1a1aa]">Open Source</span>
                 </label>
-              ))}
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    {...register("is_personal")}
+                    className="h-4 w-4 rounded border-[#27272a] bg-[#0a0a0c] text-[#22c55e] focus:ring-[#22c55e]"
+                  />
+                  <span className="text-sm text-[#a1a1aa]">Personal Project</span>
+                </label>
+              </div>
             </div>
           </div>
 

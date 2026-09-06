@@ -21,7 +21,7 @@ export default async function ProjectsPage() {
   return (
     <>
       <LoadingScreen />
-      <Nav />
+      <Nav settings={settings} />
       <main id="main" className="flex-1">
         <AllProjectsClient projects={projects} />
       </main>

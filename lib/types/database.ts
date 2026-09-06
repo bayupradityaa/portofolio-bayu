@@ -45,7 +45,7 @@ export type Project = {
   process?: string | null;
   outcome?: string | null;
   metrics?: string | null;
-  year: number;
+  year?: number;
   role: string;
   status: ProjectStatus;
   category: string | null;

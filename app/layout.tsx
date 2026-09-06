@@ -76,11 +76,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getProfileSettings();
+  const sameAsSocials = [
+    settings?.github,
+    settings?.linkedin,
+    settings?.instagram,
+  ].filter(Boolean) as string[];
+
   return (
     <html
       lang="en"
@@ -102,10 +109,10 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Person",
-              name: "Bayu Praditya",
-              url: "https://bayupraditya.dev",
-              jobTitle: "Web Developer & AI Engineer",
-              sameAs: [
+              name: settings?.name || "Bayu Praditya",
+              url: settings?.site_url || "https://bayupraditya.dev",
+              jobTitle: settings?.headline || "Web Developer & AI Engineer",
+              sameAs: sameAsSocials.length > 0 ? sameAsSocials : [
                 "https://github.com/bayupradityaa",
                 "https://linkedin.com/in/bayupraditya",
                 "https://instagram.com/bayupraditya",

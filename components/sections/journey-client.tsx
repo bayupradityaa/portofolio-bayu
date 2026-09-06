@@ -5,7 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { MapPin, Navigation } from "lucide-react";
+import { MapPin } from "lucide-react";
 import type { Experience } from "@/lib/types/database";
 
 if (typeof window !== "undefined") {
@@ -357,15 +357,15 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
               {/* Desktop Touchdown Landing Pop-Up */}
               <g ref={desktopPopupGroupRef}>
                 <foreignObject
-                  x="-125"
+                  x="-230"
                   y="-85"
-                  width="250"
-                  height="75"
+                  width="350"
+                  height="78"
                   className="overflow-visible pointer-events-none"
                 >
                   <div
                     className={cn(
-                      "relative flex items-center gap-2.5 rounded-xl border border-accent/30 bg-card/95 backdrop-blur-xl px-3.5 py-2.5 text-foreground shadow-[0_10px_35px_rgba(0,0,0,0.5)] transition-all duration-500 transform origin-bottom font-sans",
+                      "relative flex items-center gap-3 rounded-xl border border-accent/30 bg-card/95 backdrop-blur-xl px-4 py-2.5 text-foreground shadow-[0_10px_35px_rgba(0,0,0,0.5)] transition-all duration-500 transform origin-bottom font-sans",
                       isLanded
                         ? "opacity-100 scale-100 translate-y-0"
                         : "opacity-0 scale-75 translate-y-3 pointer-events-none"
@@ -374,7 +374,7 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-contrast shadow-md">
                       <MapPin className="h-4 w-4" />
                     </div>
-                    <div className="flex flex-col text-left">
+                    <div className="flex flex-col text-left whitespace-nowrap">
                       <span className="text-xs font-bold text-foreground tracking-tight leading-snug">
                         Touchdown: Destination Reached!
                       </span>
@@ -382,7 +382,10 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
                         Ready to build the next milestone together.
                       </span>
                     </div>
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-card" />
+                    <div
+                      className="absolute -bottom-2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-card"
+                      style={{ left: "230px", transform: "translateX(-50%)" }}
+                    />
                   </div>
                 </foreignObject>
               </g>
@@ -465,10 +468,8 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
           {/* ── EXPERIENCE CARDS CONTAINER ───────────────────────────────── */}
           <div className="relative z-10 space-y-12 md:space-y-24 pl-12 sm:pl-16 md:pl-0">
             {timeline.map((entry, idx) => {
-              const shortYear = getShortYear(entry.period, idx);
               const isRight = idx % 2 !== 0;
               const isActive = activeNodes[idx];
-              const waypointNumber = String(idx + 1).padStart(2, "0");
 
               return (
                 <div
@@ -509,17 +510,8 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
                       <span>{entry.period}</span>
                     </div>
 
-                    {/* Checkpoint Header Info */}
-                    <div className="flex items-center justify-between text-xs font-mono text-accent/80 uppercase tracking-widest pt-1 mb-2">
-                      <span className="flex items-center gap-1.5 font-bold">
-                        <Navigation className="w-3 h-3 text-accent rotate-45" />
-                        Waypoint {waypointNumber}
-                      </span>
-                      <span className="text-muted-foreground/70 font-semibold">{shortYear}</span>
-                    </div>
-
                     {/* Title */}
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-foreground mb-1 group-hover:text-accent transition-colors font-sans">
+                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-foreground mb-1 group-hover:text-accent transition-colors font-sans pt-1">
                       {entry.title}
                     </h3>
 

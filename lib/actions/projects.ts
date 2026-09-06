@@ -162,25 +162,12 @@ export async function getProjectBySlug(slug: string): Promise<ProjectWithRelatio
   const supabase = getSupabaseAdmin();
   if (!supabase) return null;
 
-  let { data, error } = await supabase
+  const { data, error } = await supabase
     .from("projects")
     .select("*")
     .eq("slug", slug)
     .eq("published", true)
-    .eq("show_on_public", true)
     .single();
-
-  // Resilient fallback if column show_on_public does not exist yet in DB schema
-  if (error && error.message.includes("show_on_public")) {
-    const fallback = await supabase
-      .from("projects")
-      .select("*")
-      .eq("slug", slug)
-      .eq("published", true)
-      .single();
-    data = fallback.data;
-    error = fallback.error;
-  }
 
   if (error || !data) return null;
 
@@ -289,25 +276,49 @@ export async function createProject(values: unknown) {
   const supabase = getSupabaseAdmin();
   if (!supabase) return { error: "Supabase not configured" };
 
-  const parsed = projectSchema.safeParse(values);
+  const rawValues =
+    typeof values === "object" && values !== null
+      ? { show_on_public: true, ...values }
+      : values;
+
+  const parsed = projectSchema.safeParse(rawValues);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
   }
 
-  // Clean up empty URL strings to null
+  // Clean up empty URL strings to null and ensure year fallback
   const data = {
     ...parsed.data,
+    year: new Date().getFullYear(),
     live_url: parsed.data.live_url || null,
     repo_url: parsed.data.repo_url || null,
   };
 
-  const { data: project, error } = await supabase
+  let { data: project, error } = await supabase
     .from("projects")
     .insert(data)
     .select("id")
     .single();
 
-  if (error) return { error: error.message };
+  // Resilient fallback if schema in Supabase does not have extended columns (e.g. show_on_public, problem, etc.)
+  if (error && (error.message.includes("show_on_public") || error.message.includes("schema cache") || error.message.includes("column"))) {
+    const baseData = { ...data };
+    delete (baseData as Record<string, unknown>).show_on_public;
+    delete (baseData as Record<string, unknown>).problem;
+    delete (baseData as Record<string, unknown>).process;
+    delete (baseData as Record<string, unknown>).outcome;
+    delete (baseData as Record<string, unknown>).metrics;
+
+    const retry = await supabase
+      .from("projects")
+      .insert(baseData)
+      .select("id")
+      .single();
+    project = retry.data;
+    error = retry.error;
+  }
+
+  if (error || !project) return { error: error?.message ?? "Failed to create project" };
 
   revalidateProjects();
   return { success: true, id: project.id };
@@ -328,7 +339,20 @@ export async function updateProject(id: string, values: unknown) {
     ...(parsed.data.repo_url !== undefined && { repo_url: parsed.data.repo_url || null }),
   };
 
-  const { error } = await supabase.from("projects").update(data).eq("id", id);
+  let { error } = await supabase.from("projects").update(data).eq("id", id);
+
+  // Resilient fallback if schema in Supabase does not have extended columns (e.g. show_on_public, problem, etc.)
+  if (error && (error.message.includes("show_on_public") || error.message.includes("schema cache") || error.message.includes("column"))) {
+    const baseData = { ...data };
+    delete (baseData as Record<string, unknown>).show_on_public;
+    delete (baseData as Record<string, unknown>).problem;
+    delete (baseData as Record<string, unknown>).process;
+    delete (baseData as Record<string, unknown>).outcome;
+    delete (baseData as Record<string, unknown>).metrics;
+
+    const retry = await supabase.from("projects").update(baseData).eq("id", id);
+    error = retry.error;
+  }
 
   if (error) return { error: error.message };
 
@@ -388,18 +412,27 @@ export async function toggleShowOnPublic(id: string) {
   const supabase = getSupabaseAdmin();
   if (!supabase) return { error: "Supabase not configured" };
 
-  const { data: project } = await supabase.from("projects").select("show_on_public").eq("id", id).single();
-  if (!project) return { error: "Project not found" };
+  const { data: project, error: fetchError } = await supabase.from("projects").select("*").eq("id", id).single();
+  if (fetchError || !project) return { error: "Project not found" };
+
+  const currentVal = ((project as Record<string, unknown>).show_on_public as boolean) ?? true;
+  const nextVal = !currentVal;
 
   const { error } = await supabase
     .from("projects")
-    .update({ show_on_public: !project.show_on_public })
+    .update({ show_on_public: nextVal })
     .eq("id", id);
+
+  if (error && error.message.includes("show_on_public")) {
+    return {
+      error: "Kolom 'show_on_public' belum ada di database Supabase. Jalankan: ALTER TABLE projects ADD COLUMN show_on_public BOOLEAN DEFAULT true;",
+    };
+  }
 
   if (error) return { error: error.message };
 
   revalidateProjects();
-  return { success: true, show_on_public: !project.show_on_public };
+  return { success: true, show_on_public: nextVal };
 }
 
 export async function duplicateProject(id: string) {

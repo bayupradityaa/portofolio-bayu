@@ -93,50 +93,53 @@ export function ProjectsClient({ projects }: { projects: ProjectWithRelations[] 
     },
     {
       key: "featured",
-      label: "Featured",
-      className: "w-20",
+      label: "Home (Work)",
+      className: "w-28 text-center",
       render: (p: ProjectWithRelations) => (
         <button
           onClick={(e) => { e.stopPropagation(); handleToggleFeatured(p.id); }}
-          title={p.featured ? "Featured — click to unfeature" : "Click to feature"}
-          aria-label={p.featured ? "Featured, click to unfeature" : "Not featured, click to feature"}
-          className="transition-colors hover:scale-110"
+          title={p.featured ? "Tampil di Section Work Beranda — Klik untuk sembunyikan" : "Sembunyi dari Beranda — Klik untuk tampilkan di Beranda"}
+          aria-label={p.featured ? "Tampil di Beranda" : "Sembunyi dari Beranda"}
+          className="transition-colors hover:scale-110 p-1"
         >
           <Star size={16} className={p.featured ? "fill-amber-400 text-amber-400" : "text-[#71717a]"} />
         </button>
       ),
     },
     {
+      key: "show_on_public",
+      label: "Archive (/projects)",
+      className: "w-32 text-center",
+      render: (p: ProjectWithRelations) => {
+        const isVisible = ((p as Record<string, unknown>).show_on_public as boolean) ?? true;
+        return (
+          <button
+            onClick={(e) => { e.stopPropagation(); handleToggleShowOnPublic(p.id); }}
+            title={isVisible ? "Tampil di Halaman /projects — Klik untuk sembunyikan" : "Sembunyi dari /projects — Klik untuk tampilkan"}
+            aria-label="Toggle /projects visibility"
+            className="transition-colors hover:scale-110 p-1"
+          >
+            <Globe size={16} className={isVisible ? "text-[#38bdf8]" : "text-[#52525b]"} />
+          </button>
+        );
+      },
+    },
+    {
       key: "published",
-      label: "Published",
-      className: "w-24",
+      label: "Status",
+      className: "w-20 text-center",
       render: (p: ProjectWithRelations) => (
         <button
           onClick={(e) => { e.stopPropagation(); handleTogglePublished(p.id); }}
-          title={p.published ? "Published — click to unpublish" : "Draft — click to publish"}
-          aria-label={p.published ? "Published, click to unpublish" : "Draft, click to publish"}
-          className="transition-colors"
+          title={p.published ? "Published (Aktif) — Klik untuk jadikan Draft" : "Draft (Nonaktif) — Klik untuk Publish"}
+          aria-label={p.published ? "Published" : "Draft"}
+          className="transition-colors p-1"
         >
           {p.published ? (
             <Eye size={16} className="text-emerald-400" />
           ) : (
             <EyeOff size={16} className="text-[#71717a]" />
           )}
-        </button>
-      ),
-    },
-    {
-      key: "show_on_public",
-      label: "Public",
-      className: "w-16",
-      render: (p: ProjectWithRelations) => (
-        <button
-          onClick={(e) => { e.stopPropagation(); handleToggleShowOnPublic(p.id); }}
-          title={p.show_on_public ? "Visible on /projects page — click to hide" : "Hidden from /projects page — click to show"}
-          aria-label={p.show_on_public ? "Visible on public page" : "Hidden from public page"}
-          className="transition-colors hover:scale-110"
-        >
-          <Globe size={16} className={p.show_on_public ? "text-[#FFD177]" : "text-[#52525b]"} />
         </button>
       ),
     },

@@ -24,122 +24,49 @@ export function EditorialProjectArchive({ projects }: EditorialProjectArchivePro
   const [activeIndex, setActiveIndex] = useState(0);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
-  // 1. Identify each project by slug or order
-  const featured =
-    projects.find((p) => p.slug === "jkt48-sentiment-tracker") ||
-    projects.find((p) => p.featured) ||
-    projects[0];
+  // Curated story presets for flagship projects with fallback
+  const defaultStories: Record<string, { problem: string; build: string; result: string }> = {
+    "jkt48-sentiment-tracker": {
+      problem: "Live broadcasts generate thousands of chat messages, making audience sentiment difficult to understand in real time.",
+      build: "WebSocket-based ingestion connects to FastAPI services and a fine-tuned IndoBERT sentiment pipeline.",
+      result: "A continuously updated dashboard that transforms live audience messages into actionable sentiment insights.",
+    },
+  };
 
-  const receh48 =
-    projects.find((p) => p.slug === "receh48") ||
-    projects.find((p) => p.id !== featured?.id);
+  // Build dynamic scenes from database projects
+  const scenes = projects.map((p, idx) => {
+    const number = String(idx + 1).padStart(2, "0");
+    const category = p.category || "Selected Work";
+    const categoryLabel = `${number} / ${category.toUpperCase()}`;
+    const stack = p.technologies && p.technologies.length > 0
+      ? p.technologies.map((t) => t.name)
+      : ["Full Stack", "TypeScript", "Next.js"];
 
-  const cltStore =
-    projects.find((p) => p.slug === "clt-store") ||
-    projects.find((p) => p.id !== featured?.id && p.id !== receh48?.id);
+    const story = defaultStories[p.slug] || (p.highlights && p.highlights.length >= 3 ? {
+      problem: p.highlights[0]?.text || "Complex engineering problem requiring optimized solutions.",
+      build: p.highlights[1]?.text || "Built with modern full-stack architecture and best practices.",
+      result: p.highlights[2]?.text || "Delivering high performance, reliable utility, and clean UX.",
+    } : undefined);
 
-  const fruitvision =
-    projects.find((p) => p.slug === "fruitvision") ||
-    projects.find((p) => p.id !== featured?.id && p.id !== receh48?.id && p.id !== cltStore?.id);
+    const isFlagship = Boolean(idx === 0 || p.featured || p.slug === "jkt48-sentiment-tracker");
 
-  const irisOfficial =
-    projects.find((p) => p.slug === "iris-official") ||
-    projects.find(
-      (p) =>
-        p.id !== featured?.id &&
-        p.id !== receh48?.id &&
-        p.id !== cltStore?.id &&
-        p.id !== fruitvision?.id
-    );
-
-  // 2. Build normalized list of 5 scenes with explicit editorial data
-  const scenes = [
-    {
-      index: 0,
-      id: "scene-01",
-      number: "01",
-      categoryLabel: "01 / AI · REAL-TIME",
-      displayName: "LIVE SENTIMENT TRACKER",
-      tagline: "Real-time AI sentiment analytics powered by IndoBERT.",
-      role: "Full Stack Engineer",
-      year: "2026",
-      type: "AI / REAL-TIME",
-      stack: ["Next.js", "TypeScript", "FastAPI", "Python", "WebSocket", "IndoBERT", "PostgreSQL", "Supabase"],
+    return {
+      index: idx,
+      id: `scene-${number}`,
+      number,
+      categoryLabel,
+      displayName: p.name.toUpperCase(),
+      tagline: p.tagline || p.summary || "A thoughtful digital experience and software engineering case study.",
+      role: p.role || "Full Stack Engineer",
+      type: category.toUpperCase(),
+      stack,
       ctaLabel: "VIEW CASE STUDY",
       ctaType: "case-study",
-      isFlagship: true,
-      data: featured,
-      story: {
-        problem: "Live broadcasts generate thousands of chat messages, making audience sentiment difficult to understand in real time.",
-        build: "WebSocket-based ingestion connects to FastAPI services and a fine-tuned IndoBERT sentiment pipeline.",
-        result: "A continuously updated dashboard that transforms live audience messages into actionable sentiment insights.",
-      },
-    },
-    {
-      index: 1,
-      id: "scene-02",
-      number: "02",
-      categoryLabel: "02 / WEB PLATFORM",
-      displayName: "RECEH48",
-      tagline: "A modern ticket booking platform built for the JKT48 community.",
-      role: "Full Stack Engineer",
-      year: "2025",
-      type: "WEB PLATFORM",
-      stack: ["Next.js", "React", "TypeScript", "Supabase"],
-      ctaLabel: "VIEW CASE STUDY",
-      ctaType: "case-study",
-      isFlagship: false,
-      data: receh48,
-    },
-    {
-      index: 2,
-      id: "scene-03",
-      number: "03",
-      categoryLabel: "03 / DIGITAL COMMERCE",
-      displayName: "CLT.STORE",
-      tagline: "Digital gaming services and top-up business.",
-      role: "Founder",
-      year: "2024",
-      type: "DIGITAL COMMERCE",
-      stack: ["Next.js", "TypeScript", "Supabase", "PostgreSQL"],
-      ctaLabel: "VIEW CASE STUDY",
-      ctaType: "case-study",
-      isFlagship: false,
-      data: cltStore,
-    },
-    {
-      index: 3,
-      id: "scene-04",
-      number: "04",
-      categoryLabel: "04 / COMPUTER VISION",
-      displayName: "FRUITVISION",
-      tagline: "A computer vision experiment for fruit detection.",
-      role: "ML & Frontend Engineer",
-      year: "2024",
-      type: "COMPUTER VISION",
-      stack: ["Next.js", "TypeScript", "REST API", "NumPy"],
-      ctaLabel: "VIEW PROJECT",
-      ctaType: "project",
-      isFlagship: false,
-      data: fruitvision,
-    },
-    {
-      index: 4,
-      id: "scene-05",
-      number: "05",
-      categoryLabel: "05 / COMMUNITY PLATFORM",
-      displayName: "IRIS OFFICIAL",
-      tagline: "An interactive community platform combining information, gamification, commerce, and AI assistance.",
-      role: "Lead Developer",
-      year: "2024",
-      type: "COMMUNITY PLATFORM",
-      stack: ["Next.js", "React", "TypeScript", "Supabase"],
-      ctaLabel: "VIEW PROJECT",
-      ctaType: "project",
-      isFlagship: false,
-      data: irisOfficial,
-    },
-  ].filter((s) => Boolean(s.data));
+      isFlagship,
+      data: p,
+      story,
+    };
+  });
 
   // 3. GSAP ScrollTrigger setup
   useEffect(() => {
@@ -316,11 +243,24 @@ export function EditorialProjectArchive({ projects }: EditorialProjectArchivePro
           {/* RIGHT 70%: SCROLL-DRIVEN PROJECT SCENES                     */}
           {/* ──────────────────────────────────────────────────────────── */}
           <main className="w-full md:w-[72%] lg:w-[72%] border-l-0 md:border-l md:border-white/10 md:pl-10 lg:pl-16">
-            {scenes.map((scene) => {
-              const project = scene.data!;
-              const coverUrl = project.cover_image || project.images[0]?.image_url || "";
-              const isComingSoon = project.status === "Coming Soon";
-              const showPlaceholder = !coverUrl || imageErrors[project.id] || isComingSoon;
+            {scenes.length === 0 ? (
+              <div className="py-28 text-center space-y-4">
+                <span className="font-sans text-xs font-bold uppercase tracking-[0.25em] text-accent block">
+                  // ARCHIVE STATUS
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                  No Published Projects Yet
+                </h2>
+                <p className="text-secondary text-sm max-w-md mx-auto">
+                  Projects published in the admin panel will automatically appear in this archive.
+                </p>
+              </div>
+            ) : (
+              scenes.map((scene) => {
+                const project = scene.data!;
+                const coverUrl = project.cover_image || project.images[0]?.image_url || "";
+                const isComingSoon = project.status === "Coming Soon";
+                const showPlaceholder = !coverUrl || imageErrors[project.id] || isComingSoon;
 
               return (
                 <article
@@ -405,23 +345,14 @@ export function EditorialProjectArchive({ projects }: EditorialProjectArchivePro
                       </div>
                     )}
 
-                    {/* ROLE · YEAR · TYPE */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2 font-sans">
+                    {/* ROLE · TYPE */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2 font-sans">
                       <div className="space-y-1">
                         <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted block">
                           ROLE
                         </span>
                         <p className="text-foreground font-semibold text-sm sm:text-base">
                           {scene.role}
-                        </p>
-                      </div>
-
-                      <div className="space-y-1">
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted block">
-                          YEAR
-                        </span>
-                        <p className="text-foreground font-semibold text-sm sm:text-base">
-                          {scene.year}
                         </p>
                       </div>
 
@@ -481,7 +412,7 @@ export function EditorialProjectArchive({ projects }: EditorialProjectArchivePro
                   </div>
                 </article>
               );
-            })}
+            }))}
           </main>
         </div>
       </div>

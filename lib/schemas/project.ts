@@ -14,7 +14,6 @@ export const projectSchema = z.object({
   process: z.string().trim().max(5000).optional().nullable(),
   outcome: z.string().trim().max(5000).optional().nullable(),
   metrics: z.string().trim().max(2000).optional().nullable(),
-  year: z.number().int().optional().nullable(),
   role: z.string().trim().optional().nullable(),
   status: z.enum(["Live", "Local Development", "Coming Soon"]),
   category: z.string().trim().max(100).nullable(),

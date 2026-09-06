@@ -25,21 +25,25 @@ export default async function Home() {
 
   const techNames = technologies.map((t) => t.name);
 
-  // Map published projects from the database
-  const workItems: WorkItem[] = (publishedProjects || []).map((p, idx) => ({
+  // Filter projects chosen for Home (featured === true)
+  // Fallback to all published projects if no projects are marked featured yet
+  const featuredProjects = (publishedProjects || []).filter((p) => p.featured);
+  const homeProjects = featuredProjects.length > 0 ? featuredProjects : (publishedProjects || []);
+
+  const workItems: WorkItem[] = homeProjects.map((p, idx) => ({
     index: String(idx + 1).padStart(2, "0"),
     title: p.name,
     category: p.category || "Full-Stack Project",
-    year: p.year ? p.year.toString() : "2025",
     description: p.summary || p.tagline || "",
     image: p.cover_image || "",
+    status: p.status,
     link: p.slug ? `/projects/${p.slug}` : `/projects`,
   }));
 
   return (
     <>
       <LoadingScreen />
-      <Nav />
+      <Nav settings={settings} />
       <main id="main" className="flex-1">
         <Hero settings={settings} />
         <div
