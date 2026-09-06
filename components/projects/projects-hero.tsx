@@ -97,7 +97,7 @@ export function ProjectsHero({ totalCount }: ProjectsHeroProps) {
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
             </span>
             <span>
-              ARCHIVE // {String(totalCount).padStart(2, "0")} SHIPPED WORKS
+              MY PROJECTS
             </span>
           </div>
         </div>

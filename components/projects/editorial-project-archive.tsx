@@ -257,9 +257,6 @@ export function EditorialProjectArchive({ projects }: EditorialProjectArchivePro
                 <span className="font-sans text-xs font-bold uppercase tracking-[0.25em] text-accent block">
                   SELECTED WORKS
                 </span>
-                <span className="font-sans text-[11px] uppercase tracking-wider text-muted block">
-                  ARCHIVE // 01 — 05
-                </span>
               </div>
 
               {/* Minimalist Editorial Number Index */}
