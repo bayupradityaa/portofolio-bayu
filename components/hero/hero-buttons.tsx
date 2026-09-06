@@ -2,7 +2,6 @@
 
 import { useCallback, useRef } from "react";
 import { ArrowUpRight } from "lucide-react";
-import { GithubIcon } from "@/components/ui/brand-icons";
 import { TextAnimate } from "@/registry/magicui/text-animate";
 
 interface HeroButtonsProps {
@@ -35,8 +34,6 @@ const btnBase =
 const btnPrimary =
   "bg-accent text-accent-contrast hover:bg-accent-hover font-semibold";
 
-const btnSecondary =
-  "border border-border bg-card text-foreground hover:border-secondary/60 hover:bg-surface";
 
 /* ── Magnetic Link (input-layer only, zero GSAP) ────────────────── */
 

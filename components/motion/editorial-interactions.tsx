@@ -175,13 +175,4 @@ export function Magnetic({
   );
 }
 
-/* ──────────────────────────────────────────────────────────────────────────
- *  CUSTOM CURSOR
- *  A pair of concentric circles that lag the pointer. The outer ring
- *  lerps slowly for the editorial "weight", the inner dot snaps 1:1.
- *  Auto-hides when the pointer leaves the viewport or on touch.
- * ──────────────────────────────────────────────────────────────────────── */
 
-export function EditorialCursor() {
-  return null;
-}
