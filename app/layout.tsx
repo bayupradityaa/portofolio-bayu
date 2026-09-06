@@ -16,7 +16,7 @@ import "lenis/dist/lenis.css";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { getProfileSettings } from "@/lib/actions/settings";
 import { TabTitleAnimator } from "@/components/shell/tab-title-animator";
-import { EditorialCursor } from "@/components/motion/editorial-interactions";
+
 
 /**
  * ONE grotesque, used from 11px to 18vw. That is the Swiss position:
@@ -43,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = settings?.seo_title || "Bayu Praditya — Web Developer";
   const description = settings?.seo_description || "Portfolio of Bayu Praditya, a web developer working across modern frontend, backend engineering, and digital products.";
   const url = settings?.site_url || "https://bayupraditya.dev";
-  const ogImage = settings?.og_image || "/og-image.jpg";
+  const ogImage = settings?.og_image || "/og-image.png";
   const keywords = settings?.seo_keywords && settings.seo_keywords.length > 0 ? settings.seo_keywords : ["Bayu Praditya", "software engineer", "web developer", "AI engineer", "portfolio"];
 
   return {

@@ -213,6 +213,54 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               </Reveal>
             )}
 
+            {/* The Challenge & Problem */}
+            {project.problem && (
+              <Reveal as="section" className="space-y-4 pt-6 border-t border-border/50">
+                <h2 className="font-mono text-xs md:text-sm uppercase tracking-widest text-accent font-semibold">
+                  // The Challenge & Context
+                </h2>
+                <div className="text-base md:text-lg leading-relaxed text-foreground/85 font-normal whitespace-pre-line">
+                  {project.problem}
+                </div>
+              </Reveal>
+            )}
+
+            {/* Process & Engineering Decisions */}
+            {project.process && (
+              <Reveal as="section" className="space-y-4 pt-6 border-t border-border/50">
+                <h2 className="font-mono text-xs md:text-sm uppercase tracking-widest text-accent font-semibold">
+                  // Engineering Process & Architecture
+                </h2>
+                <div className="text-base md:text-lg leading-relaxed text-foreground/85 font-normal whitespace-pre-line">
+                  {project.process}
+                </div>
+              </Reveal>
+            )}
+
+            {/* Outcome & Impact */}
+            {project.outcome && (
+              <Reveal as="section" className="space-y-4 pt-6 border-t border-border/50">
+                <h2 className="font-mono text-xs md:text-sm uppercase tracking-widest text-accent font-semibold">
+                  // Outcome & Real-World Impact
+                </h2>
+                <div className="text-base md:text-lg leading-relaxed text-foreground/85 font-normal whitespace-pre-line">
+                  {project.outcome}
+                </div>
+              </Reveal>
+            )}
+
+            {/* Key Metrics */}
+            {project.metrics && (
+              <Reveal as="section" className="space-y-4 pt-6 border-t border-border/50">
+                <h2 className="font-mono text-xs md:text-sm uppercase tracking-widest text-accent font-semibold">
+                  // Key Metrics & Results
+                </h2>
+                <div className="text-base md:text-lg leading-relaxed text-foreground/85 font-normal whitespace-pre-line font-mono bg-card/40 p-5 rounded-xl border border-border/60">
+                  {project.metrics}
+                </div>
+              </Reveal>
+            )}
+
             {/* Gallery Images */}
             {project.images && project.images.length > 0 && (
               <Reveal as="section" className="space-y-6 pt-6 border-t border-border/50">
