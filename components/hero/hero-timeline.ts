@@ -47,6 +47,13 @@ export function setHeroInitialStates(refs: HeroRefs): void {
   gsap.set(refs.glow, { opacity: 0, scale: 0.6 });
 }
 
+function getActiveFrameCount(): number {
+  if (typeof window === "undefined") return sequenceConfig.desktop.frameCount;
+  return window.innerWidth >= 1024
+    ? sequenceConfig.desktop.frameCount
+    : sequenceConfig.mobile.frameCount;
+}
+
 /**
  * Show all hero elements immediately — used for prefers-reduced-motion.
  */
@@ -62,8 +69,9 @@ export function setHeroFinalStates(refs: HeroRefs): void {
   }
   gsap.set(refs.buttonWraps, { opacity: 1, y: 0, scale: 1 });
   gsap.set(refs.glow, { opacity: 0.4, scale: 1 });
-  // Render the final frame (portrait facing camera)
-  refs.renderFrame(sequenceConfig.frameCount - 1);
+  // Render the final frame (portrait facing camera) using device-accurate frame count
+  const frameCount = getActiveFrameCount();
+  refs.renderFrame(frameCount - 1);
 }
 
 /* ── Master timeline ────────────────────────────────────────────── */
@@ -87,7 +95,7 @@ export function setHeroFinalStates(refs: HeroRefs): void {
  */
 export function createHeroTimeline(refs: HeroRefs): gsap.core.Timeline {
   const tl = gsap.timeline({ paused: true });
-  const frameCount = sequenceConfig.frameCount;
+  const frameCount = getActiveFrameCount();
 
   // ── Frame scrub: 0%–100% (continuous across entire scroll) ────
   const frameProxy = { value: 0 };
