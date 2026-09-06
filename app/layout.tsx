@@ -1,7 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Archivo, IBM_Plex_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  viewportFit: "cover",
+  width: "device-width",
+  initialScale: 1,
+};
 // Ships `.lenis-stopped { overflow: clip }` and `overscroll-behavior: contain`
 // for [data-lenis-prevent]. Without it lenis.stop() does not actually stop
 // native scrolling, and modals scroll-chain into the page behind them.

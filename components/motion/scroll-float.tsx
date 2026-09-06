@@ -48,12 +48,27 @@ export function ScrollFloat({
     const el = containerRef.current;
     if (!el) return;
 
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const charElements = el.querySelectorAll(".char");
+
+    if (prefersReducedMotion) {
+      gsap.set(charElements, {
+        opacity: 1,
+        yPercent: 0,
+        scaleY: 1,
+        scaleX: 1,
+        clearProps: "willChange",
+      });
+      return;
+    }
+
     const scroller =
       scrollContainerRef && scrollContainerRef.current
         ? scrollContainerRef.current
         : window;
-
-    const charElements = el.querySelectorAll(".char");
 
     const ctx = gsap.context(() => {
       gsap.fromTo(

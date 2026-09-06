@@ -144,7 +144,7 @@ export function HeroScene({ settings }: { settings: ProfileSettings | null }) {
           {/* UI Text layer with interactive parallax */}
           <div
             ref={parallaxLayerRef}
-            className="relative mx-auto flex h-full max-w-6xl flex-col justify-center px-6 pt-24"
+            className="relative mx-auto flex h-full max-w-6xl flex-col justify-center px-6 pt-16 md:pt-24 [@media(max-height:600px)]:pt-8 [@media(max-height:600px)]:justify-center"
           >
             <HeroTitle
               helloRef={titleHelloRef}

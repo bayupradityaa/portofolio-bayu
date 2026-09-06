@@ -111,7 +111,10 @@ export function Magnetic({
     reduceRef.current = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    if (reduceRef.current) return;
+    const isFinePointer = window.matchMedia(
+      "(hover: hover) and (pointer: fine)",
+    ).matches;
+    if (reduceRef.current || !isFinePointer) return;
     const el = ref.current;
     if (!el) return;
 

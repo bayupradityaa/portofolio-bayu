@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, createContext, useContext } from "react";
+import { useEffect, useState, createContext, useContext } from "react";
 import { usePathname } from "next/navigation";
 import { useReducedMotion } from "motion/react";
 import { useSmoothScroll, expoOut } from "@/lib/hooks/use-smooth-scroll";
@@ -24,12 +24,19 @@ export function useLenis() {
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const reduce = useReducedMotion();
   const pathname = usePathname();
+  const [lenisInstance, setLenisInstance] = useState<Lenis | null>(null);
 
   // Skip Lenis on /dev (the playground page has its own scroll handling) and
   // when the user prefers reduced motion.
   const lenisRef = useSmoothScroll({
     disabled: reduce || !!pathname?.startsWith("/dev"),
   });
+
+  useEffect(() => {
+    if (lenisRef.current) {
+      setLenisInstance(lenisRef.current);
+    }
+  }, [lenisRef]);
 
   useEffect(() => {
     const lenis = lenisRef.current;
@@ -88,7 +95,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
   }, [lenisRef, pathname]);
 
   return (
-    <LenisContext.Provider value={lenisRef.current}>
+    <LenisContext.Provider value={lenisInstance || lenisRef.current}>
       {children}
     </LenisContext.Provider>
   );
