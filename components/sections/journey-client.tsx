@@ -5,7 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { MapPin, Navigation, Sparkles, CheckCircle2 } from "lucide-react";
+import { MapPin, Navigation } from "lucide-react";
 import type { Experience } from "@/lib/types/database";
 
 if (typeof window !== "undefined") {
@@ -49,6 +49,23 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
     setMounted(true);
   }, []);
 
+  // Desktop coordinates placed EXACTLY on the original flight path curve
+  // Curve: M 460 120 C 620 140, 740 240, 740 360 C 740 520, 260 560, 260 720 C 260 880, 740 920, 740 1080 C 740 1220, 460 1320, 260 1340
+  const desktopWaypoints = [
+    { x: 460, y: 120, label: "01", shortYear: getShortYear(timeline[0]?.period || "", 0), isRight: false },
+    { x: 740, y: 360, label: "02", shortYear: getShortYear(timeline[1]?.period || "", 1), isRight: true },
+    { x: 260, y: 720, label: "03", shortYear: getShortYear(timeline[2]?.period || "", 2), isRight: false },
+    { x: 740, y: 1080, label: "04", shortYear: getShortYear(timeline[3]?.period || "", 3), isRight: true },
+  ];
+
+  // Mobile coordinates placed EXACTLY on the mobile vertical flight path line (x = 24)
+  const mobileWaypoints = [
+    { x: 24, y: 70, label: "01", shortYear: getShortYear(timeline[0]?.period || "", 0) },
+    { x: 24, y: 390, label: "02", shortYear: getShortYear(timeline[1]?.period || "", 1) },
+    { x: 24, y: 730, label: "03", shortYear: getShortYear(timeline[2]?.period || "", 2) },
+    { x: 24, y: 1070, label: "04", shortYear: getShortYear(timeline[3]?.period || "", 3) },
+  ];
+
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
     if (!timeline || timeline.length === 0) return;
@@ -83,7 +100,7 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
       });
 
       if (popup) {
-        gsap.set(popup, { x: startPt.x, y: startPt.y });
+        gsap.set(popup, { x: 260, y: 1340 });
       }
 
       ScrollTrigger.create({
@@ -106,10 +123,6 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
             rotation: angle + 90,
             transformOrigin: "center center",
           });
-
-          if (popup) {
-            gsap.set(popup, { x: pt.x, y: pt.y });
-          }
 
           setIsLanded(self.progress >= 0.92);
 
@@ -235,23 +248,97 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
               fill="none"
               preserveAspectRatio="none"
             >
-              {/* Background Guideline Path */}
+              {/* Background Guideline Path (ORIGINAL CURVE) */}
               <path
                 d="M 460 120 C 620 140, 740 240, 740 360 C 740 520, 260 560, 260 720 C 260 880, 740 920, 740 1080 C 740 1220, 460 1320, 260 1340"
                 stroke="rgba(255, 255, 255, 0.22)"
-                strokeWidth="3"
-                strokeDasharray="8 8"
+                strokeWidth="3.5"
+                strokeDasharray="10 10"
               />
 
-              {/* Glowing Accent Animated Progress Flight Path */}
+              {/* Glowing Accent Animated Progress Flight Path (ORIGINAL CURVE) */}
               <path
                 ref={desktopPathRef}
                 d="M 460 120 C 620 140, 740 240, 740 360 C 740 520, 260 560, 260 720 C 260 880, 740 920, 740 1080 C 740 1220, 460 1320, 260 1340"
                 stroke="var(--color-accent, #FFD177)"
-                strokeWidth="5"
+                strokeWidth="6"
                 strokeLinecap="round"
-                className="filter drop-shadow-[0_0_12px_rgba(255,209,119,0.7)]"
+                className="filter drop-shadow-[0_0_14px_rgba(255,209,119,0.75)]"
               />
+
+              {/* ── DESKTOP WAYPOINTS RIGHT ON THE LINE ──────────────── */}
+              {desktopWaypoints.map((wp, idx) => {
+                const isActive = activeNodes[idx];
+                return (
+                  <g key={`wp-${idx}`} transform={`translate(${wp.x}, ${wp.y})`}>
+                    {/* Ping ripple when active */}
+                    {isActive && (
+                      <circle
+                        r="26"
+                        fill="none"
+                        stroke="var(--color-accent, #FFD177)"
+                        strokeWidth="2"
+                        opacity="0.55"
+                        className="animate-ping"
+                      />
+                    )}
+                    {/* Outer border disk directly on the line */}
+                    <circle
+                      r="18"
+                      fill="#0b0b0d"
+                      stroke={isActive ? "var(--color-accent, #FFD177)" : "rgba(255, 255, 255, 0.35)"}
+                      strokeWidth={isActive ? "2.5" : "1.5"}
+                      className="filter drop-shadow-[0_0_15px_rgba(255,209,119,0.4)] transition-all duration-500"
+                    />
+                    {/* Core indicator */}
+                    <circle
+                      r={isActive ? "7" : "4"}
+                      fill={isActive ? "var(--color-accent, #FFD177)" : "rgba(255, 255, 255, 0.5)"}
+                      className="transition-all duration-500"
+                    />
+                    {/* Waypoint Number Pill Badge */}
+                    <g transform={`translate(${wp.isRight ? 34 : -34}, 0)`}>
+                      <rect
+                        x="-16"
+                        y="-10"
+                        width="32"
+                        height="20"
+                        rx="10"
+                        fill={isActive ? "var(--color-accent, #FFD177)" : "rgba(255,255,255,0.08)"}
+                        stroke={isActive ? "var(--color-accent, #FFD177)" : "rgba(255,255,255,0.2)"}
+                        strokeWidth="1"
+                        className="transition-all duration-500"
+                      />
+                      <text
+                        x="0"
+                        y="4"
+                        textAnchor="middle"
+                        fill={isActive ? "#000000" : "#a1a1aa"}
+                        fontSize="10"
+                        fontFamily="monospace"
+                        fontWeight="800"
+                      >
+                        {wp.label}
+                      </text>
+                    </g>
+                  </g>
+                );
+              })}
+
+              {/* Destination Landing Pad Marker at (260, 1340) */}
+              <g transform="translate(260, 1340)">
+                <circle
+                  r={isLanded ? "20" : "14"}
+                  fill="#0b0b0d"
+                  stroke={isLanded ? "var(--color-accent, #FFD177)" : "rgba(255,255,255,0.25)"}
+                  strokeWidth="2"
+                  className="transition-all duration-500"
+                />
+                <circle
+                  r={isLanded ? "8" : "4"}
+                  fill={isLanded ? "var(--color-accent, #FFD177)" : "rgba(255,255,255,0.4)"}
+                />
+              </g>
 
               {/* Desktop Airplane Icon Group */}
               <g
@@ -289,10 +376,10 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
                     </div>
                     <div className="flex flex-col text-left">
                       <span className="text-xs font-bold text-foreground tracking-tight leading-snug">
-                        Touchdown: Ready to Build!
+                        Touchdown: Destination Reached!
                       </span>
                       <span className="text-[11px] text-foreground/70 font-normal leading-tight mt-0.5">
-                        Let's start the next milestone together.
+                        Ready to build the next milestone together.
                       </span>
                     </div>
                     <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-card" />
@@ -303,16 +390,16 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
           </div>
 
           {/* ── MOBILE FLIGHT TRACK SVG (< md) ──────────────────────────── */}
-          <div className="absolute left-2.5 sm:left-4 top-0 bottom-0 w-10 pointer-events-none z-0 md:hidden">
+          <div className="absolute left-2 sm:left-4 top-0 bottom-0 w-12 pointer-events-none z-0 md:hidden">
             <svg
               className="w-full h-full"
-              viewBox="0 0 40 1400"
+              viewBox="0 0 48 1400"
               fill="none"
               preserveAspectRatio="none"
             >
               {/* Mobile Dashed Guideline Path */}
               <path
-                d="M 20 50 C 30 150, 10 250, 20 370 C 30 490, 10 590, 20 710 C 30 830, 10 930, 20 1050 C 30 1170, 10 1260, 20 1360"
+                d="M 24 70 L 24 1350"
                 stroke="rgba(255, 255, 255, 0.22)"
                 strokeWidth="2.5"
                 strokeDasharray="6 6"
@@ -321,12 +408,43 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
               {/* Mobile Glowing Progress Path */}
               <path
                 ref={mobilePathRef}
-                d="M 20 50 C 30 150, 10 250, 20 370 C 30 490, 10 590, 20 710 C 30 830, 10 930, 20 1050 C 30 1170, 10 1260, 20 1360"
+                d="M 24 70 L 24 1350"
                 stroke="var(--color-accent, #FFD177)"
                 strokeWidth="4"
                 strokeLinecap="round"
                 className="filter drop-shadow-[0_0_8px_rgba(255,209,119,0.8)]"
               />
+
+              {/* ── MOBILE WAYPOINTS RIGHT ON THE LINE ───────────────── */}
+              {mobileWaypoints.map((wp, idx) => {
+                const isActive = activeNodes[idx];
+                return (
+                  <g key={`m-wp-${idx}`} transform={`translate(${wp.x}, ${wp.y})`}>
+                    {isActive && (
+                      <circle
+                        r="16"
+                        fill="none"
+                        stroke="var(--color-accent, #FFD177)"
+                        strokeWidth="1.5"
+                        opacity="0.6"
+                        className="animate-ping"
+                      />
+                    )}
+                    <circle
+                      r="12"
+                      fill="#0b0b0d"
+                      stroke={isActive ? "var(--color-accent, #FFD177)" : "rgba(255, 255, 255, 0.35)"}
+                      strokeWidth={isActive ? "2" : "1"}
+                      className="transition-all duration-500 filter drop-shadow-[0_0_10px_rgba(255,209,119,0.4)]"
+                    />
+                    <circle
+                      r={isActive ? "5" : "3"}
+                      fill={isActive ? "var(--color-accent, #FFD177)" : "rgba(255, 255, 255, 0.45)"}
+                      className="transition-all duration-500"
+                    />
+                  </g>
+                );
+              })}
 
               {/* Mobile Airplane Icon Group */}
               <g
@@ -344,8 +462,8 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
             </svg>
           </div>
 
-          {/* ── EXPERIENCE CARDS WITH MILESTONE WAYPOINTS ───────────────── */}
-          <div className="relative z-10 space-y-12 md:space-y-24 pl-10 sm:pl-14 md:pl-0">
+          {/* ── EXPERIENCE CARDS CONTAINER ───────────────────────────────── */}
+          <div className="relative z-10 space-y-12 md:space-y-24 pl-12 sm:pl-16 md:pl-0">
             {timeline.map((entry, idx) => {
               const shortYear = getShortYear(entry.period, idx);
               const isRight = idx % 2 !== 0;
@@ -360,63 +478,7 @@ export function JourneyClient({ timeline }: { timeline: Experience[] }) {
                     isRight ? "md:flex-row-reverse" : ""
                   )}
                 >
-                  {/* ── MOBILE WAYPOINT NODE (< md) ────────────────────── */}
-                  <div className="absolute -left-10 sm:-left-14 top-4 flex md:hidden items-center">
-                    <div
-                      className={cn(
-                        "relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border transition-all duration-500 font-mono text-xs font-bold",
-                        isActive
-                          ? "border-accent bg-accent text-accent-contrast shadow-[0_0_18px_rgba(255,209,119,0.65)] scale-110"
-                          : "border-border/70 bg-card text-muted-foreground/70 scale-95"
-                      )}
-                    >
-                      {isActive && (
-                        <span className="absolute inset-0 rounded-full bg-accent/40 animate-ping opacity-75" />
-                      )}
-                      <span>{waypointNumber}</span>
-                    </div>
-                  </div>
-
-                  {/* ── DESKTOP WAYPOINT NODE & CONNECTOR (>= md) ───────── */}
-                  <div
-                    className={cn(
-                      "hidden md:flex absolute top-1/2 -translate-y-1/2 items-center z-20 pointer-events-none transition-all duration-500",
-                      isRight
-                        ? "right-1/2 mr-[-24px] flex-row-reverse"
-                        : "left-1/2 ml-[-24px] flex-row"
-                    )}
-                  >
-                    {/* Anchor Line */}
-                    <div
-                      className={cn(
-                        "h-[2px] transition-all duration-500",
-                        isRight ? "w-12 lg:w-16" : "w-12 lg:w-16",
-                        isActive
-                          ? "bg-accent shadow-[0_0_8px_rgba(255,209,119,0.8)]"
-                          : "bg-border/60"
-                      )}
-                    />
-
-                    {/* Central Radar Waypoint Node */}
-                    <div
-                      className={cn(
-                        "relative flex h-11 w-11 lg:h-12 lg:w-12 items-center justify-center rounded-full border-2 transition-all duration-500 font-mono shadow-xl backdrop-blur-md",
-                        isActive
-                          ? "border-accent bg-card text-accent shadow-[0_0_24px_rgba(255,209,119,0.65)] scale-110"
-                          : "border-border/80 bg-card/90 text-muted-foreground scale-95"
-                      )}
-                    >
-                      {isActive && (
-                        <span className="absolute inset-0 rounded-full bg-accent/30 animate-ping opacity-75" />
-                      )}
-                      <div className="flex flex-col items-center justify-center leading-none">
-                        <span className="text-[11px] font-extrabold">{waypointNumber}</span>
-                        <span className="text-[9px] font-medium text-accent/90 mt-0.5">{shortYear}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* ── CARD BODY CONTAINER ─────────────────────────────── */}
+                  {/* Card Body */}
                   <div
                     ref={(el) => {
                       cardsRef.current[idx] = el;

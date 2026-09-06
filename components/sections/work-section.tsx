@@ -85,6 +85,86 @@ function getItemCategory(item: WorkItem): string {
   return item.category || "Selected Work";
 }
 
+function ProjectDividerDesktop({
+  label,
+  index,
+}: {
+  label?: string;
+  index?: string;
+}) {
+  return (
+    <div
+      aria-hidden="true"
+      className="h-[430px] lg:h-[470px] w-12 md:w-16 lg:w-20 shrink-0 flex flex-col items-center justify-between py-2 select-none pointer-events-none relative z-10"
+    >
+      {/* Top Crosshair */}
+      <span className="font-mono text-sm font-bold text-black/70 leading-none">
+        +
+      </span>
+
+      {/* Vertical Hairline with Architectural Accents */}
+      <div className="relative w-px flex-1 bg-black/35 my-3 flex flex-col items-center justify-center">
+        {/* Upper Ruler Tick */}
+        <div className="absolute top-[22%] w-3.5 h-px bg-black/50 -left-[6.5px]" />
+
+        {/* Mid-Upper Mini Dot */}
+        <div className="absolute top-[38%] w-1.5 h-1.5 rounded-full bg-black/40 -left-[2.5px]" />
+
+        {/* Center Tag Pill */}
+        <div className="bg-[#FFD177] py-2 px-1 flex flex-col items-center gap-1.5 my-auto z-10 border border-black/30 rounded-xs shadow-xs">
+          <span className="font-mono text-[9px] font-extrabold uppercase tracking-[0.25em] text-black/85 [writing-mode:vertical-lr] rotate-180">
+            {label || (index ? `PRJ // ${index}` : "DIV // 00")}
+          </span>
+          <span className="w-1.5 h-1.5 rounded-full bg-black/85" />
+        </div>
+
+        {/* Mid-Lower Mini Dot */}
+        <div className="absolute bottom-[38%] w-1.5 h-1.5 rounded-full bg-black/40 -left-[2.5px]" />
+
+        {/* Lower Ruler Tick */}
+        <div className="absolute bottom-[22%] w-3.5 h-px bg-black/50 -left-[6.5px]" />
+      </div>
+
+      {/* Bottom Crosshair */}
+      <span className="font-mono text-sm font-bold text-black/70 leading-none">
+        +
+      </span>
+    </div>
+  );
+}
+
+function ProjectDividerMobile({
+  index,
+  label,
+}: {
+  index?: string;
+  label?: string;
+}) {
+  return (
+    <div
+      aria-hidden="true"
+      className="w-full flex items-center gap-3 py-5 select-none relative z-10"
+    >
+      <span className="font-mono text-xs font-bold text-black/60 leading-none">
+        +
+      </span>
+      <div className="relative flex-1 h-px bg-black/30 flex items-center justify-center">
+        <div className="absolute -top-[3px] left-1/4 w-px h-[7px] bg-black/45" />
+      </div>
+      <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/10 border border-black/25 font-mono text-[10px] font-extrabold uppercase tracking-widest text-black/85 shrink-0">
+        <span>{label || `PRJ // ${index}`}</span>
+        <span className="w-1.5 h-1.5 rounded-full bg-black/85" />
+      </div>
+      <div className="relative flex-1 h-px bg-black/30 flex items-center justify-center">
+        <div className="absolute -top-[3px] right-1/4 w-px h-[7px] bg-black/45" />
+      </div>
+      <span className="font-mono text-xs font-bold text-black/60 leading-none">
+        +
+      </span>
+    </div>
+  );
+}
+
 export function WorkSection({
   items,
   className,
@@ -312,7 +392,6 @@ export function WorkSection({
             <p className="text-base md:text-lg text-white/70 leading-relaxed font-normal max-w-2xl pt-1">
               A timeline of my education, career milestones, and technical experiences that built who I am today.
             </p>
-
           </header>
         </div>
 
@@ -321,9 +400,65 @@ export function WorkSection({
           ref={trackContainerRef}
           className="relative z-20 w-full h-full overflow-hidden flex items-center pt-24 pb-12 bg-[#FFD177] text-black"
         >
+          {/* ── ARCHITECTURAL GRID & TEXTURE (PREVENTS BACKGROUND EMPTINESS) ── */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none select-none z-0 opacity-20"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, rgba(0,0,0,0.14) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.14) 1px, transparent 1px)
+              `,
+              backgroundSize: "48px 48px",
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none select-none z-0 opacity-15"
+            style={{
+              backgroundImage: "radial-gradient(rgba(0,0,0,0.25) 1px, transparent 1px)",
+              backgroundSize: "24px 24px",
+            }}
+          />
+
+          {/* Top Architectural Guide Rail */}
+          <div
+            aria-hidden="true"
+            className="absolute top-7 left-0 right-0 z-10 pl-8 lg:pl-16 pr-32 lg:pr-44 flex items-center justify-between border-b border-black/20 pb-2 pointer-events-none select-none"
+          >
+            <div className="flex items-center gap-3 font-mono text-[10px] font-bold tracking-[0.25em] text-black/70 uppercase">
+              <span className="text-black font-black">+</span>
+              <span>SELECTED WORKS ARCHIVE</span>
+              <span className="text-black/30">//</span>
+              <span className="text-black/60">COLLECTION 2024–2026</span>
+            </div>
+            <div className="hidden sm:flex items-center gap-3 font-mono text-[10px] font-bold tracking-[0.25em] text-black/70 uppercase">
+              <span>INDEX 01—{String(items.length).padStart(2, "0")}</span>
+              <span className="text-black/30">//</span>
+              <span>HORIZONTAL SCROLL GALLERY →</span>
+              <span className="text-black font-black">+</span>
+            </div>
+          </div>
+
+          {/* Bottom Architectural Guide Rail */}
+          <div
+            aria-hidden="true"
+            className="absolute bottom-6 left-0 right-0 z-10 px-8 lg:px-16 flex items-center justify-between border-t border-black/20 pt-2 pointer-events-none select-none"
+          >
+            <div className="flex items-center gap-2 font-mono text-[10px] font-bold tracking-[0.2em] text-black/60 uppercase">
+              <span>LAT. 6.2088° S / LONG. 106.8456° E</span>
+              <span className="text-black/30">•</span>
+              <span>GRID SYSTEM: ACTIVE</span>
+            </div>
+            <div className="flex items-center gap-3 font-mono text-[10px] font-bold tracking-[0.2em] text-black/60 uppercase">
+              <span>EXPLORATION STAGE</span>
+              <span className="text-black font-black">+</span>
+            </div>
+          </div>
+
           <div
             ref={trackRef}
-            className="flex items-center gap-10 lg:gap-16 w-max pr-16 lg:pr-32 pl-0"
+            className="relative z-10 flex items-center gap-8 lg:gap-12 w-max pr-16 lg:pr-32 pl-0"
           >
             {/* ── SLIDE 0: CENTERED TITLE & INTRO CTA (#FFD177 STAGE) ── */}
             <article
@@ -413,7 +548,7 @@ export function WorkSection({
               </div>
             </article>
 
-            {/* ── PROJECT SLIDES (PROPORTIONAL REFINED SIZING) ── */}
+            {/* ── PROJECT SLIDES WITH BLACK ARCHITECTURAL DIVIDERS ── */}
             {items.length === 0 ? (
               <article
                 data-project-card
@@ -443,66 +578,90 @@ export function WorkSection({
                 const category = getItemCategory(item);
 
                 return (
-                  <article
-                    key={item.link + idx}
-                    data-project-card
-                    className="w-[82vw] sm:w-[480px] md:w-[540px] lg:w-[590px] shrink-0 flex flex-col gap-4 group"
-                  >
-                    {/* Desktop Image Frame with Max Height Constraint */}
-                    <div className="relative aspect-[16/10] max-h-[350px] lg:max-h-[380px] w-full rounded-[20px] md:rounded-[24px] overflow-hidden bg-black/10 border border-black/20 shadow-xl group transition-all duration-500 group-hover:border-black/40">
-                      <div
-                        data-card-image
-                        className="relative w-full h-full overflow-hidden"
+                  <React.Fragment key={item.link + idx}>
+                    {/* Vertical Black Divider Line between projects */}
+                    <ProjectDividerDesktop
+                      label={idx === 0 ? "ENTRY // 01" : undefined}
+                      index={formattedIdx}
+                    />
+
+                    <article
+                      data-project-card
+                      className="w-[82vw] sm:w-[480px] md:w-[540px] lg:w-[590px] shrink-0 flex flex-col gap-4 group relative"
+                    >
+                      {/* Subtle Giant Architectural Watermark Index */}
+                      <span
+                        aria-hidden="true"
+                        className="absolute -top-10 right-4 font-mono font-black text-7xl md:text-8xl text-black/[0.08] select-none pointer-events-none tracking-tighter leading-none z-0"
                       >
-                        <WorkCardImage
-                          src={item.image}
-                          title={item.title}
-                          category={category}
-                          status={item.status}
-                          priority={idx === 0}
-                        />
+                        {formattedIdx}
+                      </span>
+
+                      {/* Desktop Image Frame with Max Height Constraint */}
+                      <div className="relative z-10 aspect-[16/10] max-h-[350px] lg:max-h-[380px] w-full rounded-[20px] md:rounded-[24px] overflow-hidden bg-black/10 border border-black/20 shadow-xl group transition-all duration-500 group-hover:border-black/40">
+                        <div
+                          data-card-image
+                          className="relative w-full h-full overflow-hidden"
+                        >
+                          <WorkCardImage
+                            src={item.image}
+                            title={item.title}
+                            category={category}
+                            status={item.status}
+                            priority={idx === 0}
+                          />
+                        </div>
+
+                        {/* High Contrast Black Category Badge */}
+                        <div className="absolute top-3.5 left-3.5 font-mono text-[11px] font-bold px-3 py-1 rounded-full bg-black text-[#FFD177] shadow-md border border-black/30">
+                          {formattedIdx}{" // "}{category}
+                        </div>
                       </div>
 
-                      {/* High Contrast Black Category Badge */}
-                      <div className="absolute top-3.5 left-3.5 font-mono text-[11px] font-bold px-3 py-1 rounded-full bg-black text-[#FFD177] shadow-md border border-black/30">
-                        {formattedIdx}{" // "}{category}
+                      {/* Content Area Below Image */}
+                      <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-3 pt-0.5">
+                        <div className="space-y-1.5 max-w-md">
+                          <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-black font-sans group-hover:text-black/70 transition-colors duration-300">
+                            {item.title}
+                          </h3>
+
+                          {item.description && (
+                            <p className="text-xs md:text-sm text-black/80 font-normal leading-relaxed line-clamp-2">
+                              {item.description}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="shrink-0 pt-1 md:pt-0">
+                          <Link
+                            href={item.link}
+                            className="group/link inline-flex items-center gap-2.5 font-mono text-xs font-semibold uppercase tracking-widest text-black/80 hover:text-black transition-all duration-300 border-b border-black/30 hover:border-black pb-0.5 whitespace-nowrap"
+                          >
+                            <TextAnimate>EXPLORE PROJECT</TextAnimate>
+                            <span className="transition-transform duration-300 group-hover/link:translate-x-1.5">
+                              →
+                            </span>
+                          </Link>
+                        </div>
                       </div>
-                    </div>
+                    </article>
+                  </React.Fragment>
+                );
+              })
+            )}
 
-                  {/* Content Area Below Image */}
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 pt-0.5">
-                    <div className="space-y-1.5 max-w-md">
-                      <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-black font-sans group-hover:text-black/70 transition-colors duration-300">
-                        {item.title}
-                      </h3>
-
-                      {item.description && (
-                        <p className="text-xs md:text-sm text-black/80 font-normal leading-relaxed line-clamp-2">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="shrink-0 pt-1 md:pt-0">
-                      <Link
-                        href={item.link}
-                        className="group/link inline-flex items-center gap-2.5 font-mono text-xs font-semibold uppercase tracking-widest text-black/80 hover:text-black transition-all duration-300 border-b border-black/30 hover:border-black pb-0.5 whitespace-nowrap"
-                      >
-                        <TextAnimate>EXPLORE PROJECT</TextAnimate>
-                        <span className="transition-transform duration-300 group-hover/link:translate-x-1.5">
-                          →
-                        </span>
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              );
-            }))}
+            {/* Closing Divider before Final Summary CTA */}
+            {items.length > 0 && (
+              <ProjectDividerDesktop
+                label="ARCHIVE // END"
+                index="99"
+              />
+            )}
 
             {/* Final Summary CTA Slide */}
             <article
               data-project-card
-              className="w-[78vw] sm:w-[380px] md:w-[420px] shrink-0 flex flex-col justify-center gap-6 p-7 lg:p-10 rounded-2xl md:rounded-3xl bg-black text-white border border-black/20 shadow-2xl"
+              className="w-[78vw] sm:w-[380px] md:w-[420px] shrink-0 flex flex-col justify-center gap-6 p-7 lg:p-10 rounded-2xl md:rounded-3xl bg-black text-white border border-black/20 shadow-2xl relative z-10"
             >
               <h3 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-white leading-snug">
                 Discover our complete collection of digital experiences, brands, and platforms.
@@ -525,9 +684,22 @@ export function WorkSection({
       {/* ────────────────────────────────────────────────────────────────────── */}
       {/* MOBILE STACKED VIEW (< 768px)                                         */}
       {/* ────────────────────────────────────────────────────────────────────── */}
-      <div className="block md:hidden relative px-6 pt-8 pb-16 space-y-12 bg-[#FFD177] text-black overflow-hidden">
+      <div className="block md:hidden relative px-6 pt-8 pb-16 space-y-10 bg-[#FFD177] text-black overflow-hidden">
+        {/* Mobile Architectural Grid Overlay */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none select-none z-0 opacity-20"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(0,0,0,0.14) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(0,0,0,0.14) 1px, transparent 1px)
+            `,
+            backgroundSize: "40px 40px",
+          }}
+        />
+
         {/* Mobile Header */}
-        <header className="text-center space-y-6 pb-8 border-b border-black/20">
+        <header className="relative z-10 text-center space-y-6 pb-6 border-b border-black/20">
           {/* Mobile Giant Awwwards Headline with Outline Text */}
           <motion.div
             initial="hidden"
@@ -606,8 +778,17 @@ export function WorkSection({
           </div>
         </header>
 
+        {/* Mobile Subheader Indicator */}
+        <div
+          aria-hidden="true"
+          className="w-full flex items-center justify-between font-mono text-[10px] font-bold uppercase tracking-widest text-black/60 pt-1 pb-2 border-b border-black/20 relative z-10"
+        >
+          <span>// CURATED WORKS</span>
+          <span>TOTAL [{String(items.length).padStart(2, "0")}]</span>
+        </div>
+
         {/* Mobile Project Cards List */}
-        <div className="space-y-14">
+        <div className="space-y-10 relative z-10">
           {items.length === 0 ? (
             <div className="p-6 rounded-2xl border border-black/20 bg-black/5 space-y-3">
               <span className="font-mono text-xs font-bold uppercase tracking-widest text-black/60">
@@ -634,50 +815,72 @@ export function WorkSection({
               const category = getItemCategory(item);
 
               return (
-                <article
-                  key={"mobile-" + item.link + idx}
-                  data-mobile-card
-                  className="space-y-4 flex flex-col"
-                >
-                  {/* Image Container */}
-                  <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden border border-black/20 bg-black/10 shadow-lg">
-                    <WorkCardImage
-                      src={item.image}
-                      title={item.title}
-                      category={category}
-                      status={item.status}
-                      priority={idx === 0}
+                <React.Fragment key={"mobile-" + item.link + idx}>
+                  {idx > 0 && (
+                    <ProjectDividerMobile
+                      index={formattedIdx}
                     />
-                    <div className="absolute top-3 left-3 font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-black text-[#FFD177]">
-                      {formattedIdx}{" // "}{category}
-                    </div>
-                  </div>
-
-                {/* Details */}
-                <div className="space-y-2 pt-1">
-                  <h3 className="text-2xl font-bold tracking-tight text-black">
-                    {item.title}
-                  </h3>
-
-                  {item.description && (
-                    <p className="text-sm md:text-base text-black/80 font-normal leading-relaxed line-clamp-3">
-                      {item.description}
-                    </p>
                   )}
-                </div>
-
-                <div>
-                  <Link
-                    href={item.link}
-                    className="inline-flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-widest text-black/80 hover:text-black border-b border-black/30 pb-0.5"
+                  <article
+                    data-mobile-card
+                    className="space-y-4 flex flex-col relative"
                   >
-                    <TextAnimate>EXPLORE PROJECT</TextAnimate>
-                    <span>→</span>
-                  </Link>
-                </div>
-              </article>
-            );
-          }))}
+                    {/* Watermark Index */}
+                    <span
+                      aria-hidden="true"
+                      className="absolute -top-7 right-2 font-mono font-black text-6xl text-black/[0.08] select-none pointer-events-none tracking-tighter leading-none z-0"
+                    >
+                      {formattedIdx}
+                    </span>
+
+                    {/* Image Container */}
+                    <div className="relative z-10 w-full aspect-[16/10] rounded-xl overflow-hidden border border-black/20 bg-black/10 shadow-lg">
+                      <WorkCardImage
+                        src={item.image}
+                        title={item.title}
+                        category={category}
+                        status={item.status}
+                        priority={idx === 0}
+                      />
+                      <div className="absolute top-3 left-3 font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-black text-[#FFD177]">
+                        {formattedIdx}{" // "}{category}
+                      </div>
+                    </div>
+
+                    {/* Details */}
+                    <div className="relative z-10 space-y-2 pt-1">
+                      <h3 className="text-2xl font-bold tracking-tight text-black">
+                        {item.title}
+                      </h3>
+
+                      {item.description && (
+                        <p className="text-sm md:text-base text-black/80 font-normal leading-relaxed line-clamp-3">
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="relative z-10">
+                      <Link
+                        href={item.link}
+                        className="inline-flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-widest text-black/80 hover:text-black border-b border-black/30 pb-0.5"
+                      >
+                        <TextAnimate>EXPLORE PROJECT</TextAnimate>
+                        <span>→</span>
+                      </Link>
+                    </div>
+                  </article>
+                </React.Fragment>
+              );
+            })
+          )}
+
+          {/* Closing Mobile Divider */}
+          {items.length > 0 && (
+            <ProjectDividerMobile
+              label="END // ARCHIVE"
+            />
+          )}
         </div>
       </div>
     </section>
