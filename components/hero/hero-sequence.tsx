@@ -20,9 +20,17 @@ export const HeroSequence = forwardRef<HeroSequenceHandle>(
 
     return (
       <div ref={wrapRef} className="absolute inset-0 overflow-hidden" style={{ background: "var(--background)" }}>
+        {/*
+          The 2D context is created with {alpha:false}, so an un-drawn canvas is
+          not transparent — it is opaque black, and at z-10 it would cover the
+          preloaded LCP poster at z-0. Stay invisible until the first frame is
+          actually on the bitmap, then cross-fade.
+        */}
         <canvas
           ref={canvasRef}
-          className="h-full w-full relative z-10"
+          className={`h-full w-full relative z-10 transition-opacity duration-500 ${
+            status === "ready" ? "opacity-100" : "opacity-0"
+          }`}
           role="img"
           aria-label="Bayu Praditya, cinematic portrait sequence"
         />
