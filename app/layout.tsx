@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Archivo, IBM_Plex_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
+// Ships `.lenis-stopped { overflow: clip }` and `overscroll-behavior: contain`
+// for [data-lenis-prevent]. Without it lenis.stop() does not actually stop
+// native scrolling, and modals scroll-chain into the page behind them.
+import "lenis/dist/lenis.css";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { getProfileSettings } from "@/lib/actions/settings";
 import { TabTitleAnimator } from "@/components/shell/tab-title-animator";
